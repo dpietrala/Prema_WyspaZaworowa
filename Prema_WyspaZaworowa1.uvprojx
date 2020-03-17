@@ -10,6 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -415,6 +416,16 @@
               <FileName>MB_RTU_Slave.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\MB_RTU_Slave.h</FilePath>
+            </File>
+            <File>
+              <FileName>Outputs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Outputs.c</FilePath>
+            </File>
+            <File>
+              <FileName>Outputs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Outputs.h</FilePath>
             </File>
           </Files>
         </Group>

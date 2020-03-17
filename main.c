@@ -1,9 +1,11 @@
 #include "Control.h"
-extern sModbus* pModbus;
+sControl Control;
+sControl* pC = &Control;
 int main(void)
 {
 	SystemStart();
-	Modbus_Conf();
+	Led_Conf();
+	MBM_Conf();
   while(1)
   {
 		LED1_TOG;
