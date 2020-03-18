@@ -398,16 +398,6 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>MB_RTU_Master.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MB_RTU_Master.c</FilePath>
-            </File>
-            <File>
-              <FileName>MB_RTU_Master.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\MB_RTU_Master.h</FilePath>
-            </File>
-            <File>
               <FileName>MB_RTU_Slave.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\MB_RTU_Slave.c</FilePath>
@@ -426,6 +416,16 @@
               <FileName>Outputs.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Outputs.h</FilePath>
+            </File>
+            <File>
+              <FileName>NIC_Module.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\NIC_Module.c</FilePath>
+            </File>
+            <File>
+              <FileName>NIC_Module.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\NIC_Module.h</FilePath>
             </File>
           </Files>
         </Group>

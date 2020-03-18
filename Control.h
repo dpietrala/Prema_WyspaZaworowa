@@ -2,7 +2,7 @@
 #define _CONTROL
 #include <stm32f4xx.h>
 #include <stm32f407xx.h>
-#include "MB_RTU_Master.h"
+#include "NIC_Module.h"
 #include "MB_RTU_Slave.h"
 #include "Outputs.h"
 
@@ -42,9 +42,9 @@ typedef enum
 }eMBError;
 
 #define MBS_BUFMAX 				1000
-#define MBM_BUFMAX 				1000
+#define NIC_BUFMAX 				1000
 #define MBS_REGMAX				100
-#define MBM_REGMAX				100
+#define NIC_REGMAX				100
 #define MBS_COILMAX				16
 
 typedef struct
@@ -70,8 +70,8 @@ typedef struct
 {
 	uint32_t			baud;
 	uint32_t			unittime;
-	uint8_t				bufread[MBM_BUFMAX];
-	uint8_t 			bufwrite[MBM_BUFMAX];
+	uint8_t				bufread[NIC_BUFMAX];
+	uint8_t 			bufwrite[NIC_BUFMAX];
 	
 	uint8_t				address;
 	eMBError			error;
@@ -79,8 +79,8 @@ typedef struct
 	uint32_t			timeout;
 	uint16_t			reg0;
 	uint16_t			numregs;
-	uint16_t			hregs[MBM_REGMAX];
-}sMBM;
+	uint16_t			hregs[NIC_REGMAX];
+}sNIC;
 typedef struct
 {
 	uint16_t			coils;
@@ -93,7 +93,7 @@ typedef struct
 {
 	sMode					Mode;
 	sMBS					Mbs;
-	sMBM					Mbm;
+	sNIC					Nic;
 	sOutputs			Outs;
 	sModuleParam 	Module;
 	
