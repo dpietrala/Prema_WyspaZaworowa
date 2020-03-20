@@ -2,11 +2,11 @@
 #define _CONTROL
 #include <stm32f4xx.h>
 #include <stm32f407xx.h>
-#include <stdbool.h>
 #include "NIC_Module.h"
 #include "MB_RTU_Slave.h"
 #include "Outputs.h"
 
+typedef enum {false = 0, true = 1}eBool;
 typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp = 1, Prot_Pfnet = 2, Prot_Pfbus = 3}eProtocol;
 
 //MF_I 		= 0x00 - modbus function is idle
@@ -139,22 +139,21 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 	uint32_t		conAckTimeout;								//registers: 315d - 316d
 	uint32_t		closeAckTimeout;							//registers: 317d - 318d
 	uint32_t		dataSwap;											//registers: 319d - 320d
-	bool				ipAddressAvailabe;						//register: 321d bit 0
-	bool				netMaskAvailabe;							//register: 321d bit 1
-	bool				gatewayAvailabe;							//register: 321d bit 2
-	bool				bootIp;												//register: 321d bit 3
-	bool				dhcp;													//register: 321d bit 4
-	bool				setEthAddress;								//register: 321d bit 5
+	uint32_t		flagsReg321_322;							//registers: 321d - 322d
+	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
+	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
+	eBool				flagGatewayAvailabe;					//register: 321d bit 2
+	eBool				flagBootIp;										//register: 321d bit 3
+	eBool				flagDhcp;											//register: 321d bit 4
+	eBool				flgSetEthAddress;							//register: 321d bit 5
 	
-	uint8_t			ipAddress[4];									//bytes: 51d, 52d, 49d, 50d
-	uint8_t			subnetMask[4];								//bytes: 55d, 56d, 53d, 54d
-	uint8_t			gateway[4];										//bytes: 59d, 60d, 57d, 58d
-	
-	
-
-
-	uint16_t		nc[100];
-	uint8_t			nc2[200];
+	uint8_t			ipAddress[4];									//registers: 323d - 324d
+	uint8_t			subnetMask[4];								//registers: 325d - 326d
+	uint8_t			gateway[4];										//registers: 327d - 328d
+	uint8_t			ethAddress[6];								//registers: 329d - 331d
+	uint32_t		flagsReg332_333;							//registers: 332d - 333d
+	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
+	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
 }sNIC_NC_MB;
 typedef struct	//system and command status and errors: registers 988d - 998d
 {
@@ -164,19 +163,19 @@ typedef struct	//system and command status and errors: registers 988d - 998d
 typedef struct	//system flags: register 999d
 {
 	uint16_t		systemFlags;									//start registers: 999d, see 12.2.5 System Flags, page 91
-	bool				ready;												//bit0
-	bool				error;												//bit1
-	bool				communicating;								//bit2
-	bool				ncfError;											//bit3
-	bool				rxMbxFull;										//bit4
-	bool				txMbxFull;										//bit5
-	bool				busOn;												//bit6
-	bool				flsCfg;												//bit7
-	bool				lckCfg;												//bit8
-	bool				wdgOn;												//bit9
-	bool				running;											//bit10
-	bool				sxWriteInd;										//bit11
-	bool				remCfg;												//bit12
+	eBool				ready;												//bit0
+	eBool				error;												//bit1
+	eBool				communicating;								//bit2
+	eBool				ncfError;											//bit3
+	eBool				rxMbxFull;										//bit4
+	eBool				txMbxFull;										//bit5
+	eBool				busOn;												//bit6
+	eBool				flsCfg;												//bit7
+	eBool				lckCfg;												//bit8
+	eBool				wdgOn;												//bit9
+	eBool				running;											//bit10
+	eBool				sxWriteInd;										//bit11
+	eBool				remCfg;												//bit12
 }sNIC_SF;
 typedef struct	//cyclic input data: registers 1000d - 1998d
 {
@@ -185,20 +184,20 @@ typedef struct	//cyclic input data: registers 1000d - 1998d
 typedef struct	//command flags: register 1999d
 {
 	uint16_t		commandFlags;									//start registers: 1999d, see 12.2.6 Command Flags, page 93
-	bool				reset;												//bit0
-	bool				bootStart;										//bit1
-	bool				appReady;											//bit2
-	bool				busOn;												//bit3
-	bool				init;													//bit4
-	bool				busOff;												//bit5
-	bool				clrCfg;												//bit6
-	bool				strCfg;												//bit7
-	bool				lckCfg;												//bit8
-	bool				unlockCfg;										//bit9
-	bool				wdgOn;												//bit10
-	bool				wdgOff;												//bit11
-	bool				clrRemCfg;										//bit12
-	bool				fbusSpecCommands[3];					//bit14 - bit16
+	eBool				reset;												//bit0
+	eBool				bootStart;										//bit1
+	eBool				appReady;											//bit2
+	eBool				busOn;												//bit3
+	eBool				init;													//bit4
+	eBool				busOff;												//bit5
+	eBool				clrCfg;												//bit6
+	eBool				strCfg;												//bit7
+	eBool				lckCfg;												//bit8
+	eBool				unlockCfg;										//bit9
+	eBool				wdgOn;												//bit10
+	eBool				wdgOff;												//bit11
+	eBool				clrRemCfg;										//bit12
+	eBool				fbusSpecCommands[3];					//bit14 - bit16
 }sNIC_CF;
 typedef struct	//cyclic output data: registers 2000d - 2993d
 {

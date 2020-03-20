@@ -12,7 +12,8 @@ int main(void)
 		//NIC_ReadCoils();
 		//NIC_ReadSystemInformation();
 		//NIC_ReadSystemConfiguration();
-		//NIC_ReadNetwrkStatusMb();
+		NIC_ReadNetwrkStatusMb();
+		delay_ms(100);
 		NIC_ReadNetwrkConfigurationMb();
 		delay_ms(100);
   }

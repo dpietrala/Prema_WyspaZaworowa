@@ -302,51 +302,51 @@ static void NIC_ReadRequestAfterReadNetworkConfigurationMb(void)
 	}
 	else
 	{
-		pC->Nic.ncMbRead.ipAddress[0] = buf[51];
-		pC->Nic.ncMbRead.ipAddress[1] = buf[52];
-		pC->Nic.ncMbRead.ipAddress[2] = buf[49];
-		pC->Nic.ncMbRead.ipAddress[3] = buf[50];
-		
-		pC->Nic.ncMbRead.subnetMask[0] = buf[55];
-		pC->Nic.ncMbRead.subnetMask[1] = buf[56];
-		pC->Nic.ncMbRead.subnetMask[2] = buf[53];
-		pC->Nic.ncMbRead.subnetMask[3] = buf[54];
-		
-		pC->Nic.ncMbRead.gateway[0] = buf[59];
-		pC->Nic.ncMbRead.gateway[1] = buf[60];
-		pC->Nic.ncMbRead.gateway[2] = buf[57];
-		pC->Nic.ncMbRead.gateway[3] = buf[58];
-		
 		uint32_t idx = 3;
-		uint16_t temp;
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncMbRead.length);
-		
-		NIC_BytesToUint16(buf, &idx, &temp);
-		NIC_BytesToUint16(buf, &idx, &temp);
-		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncMbRead.wdgTimeout);
-		NIC_BytesToUint16(buf, &idx, &temp);
-		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncMbRead.numConnections);
-		NIC_BytesToUint16(buf, &idx, &temp);
-		
-		NIC_BytesToUint16(buf, &idx, &temp);
-		pC->Nic.ncMbRead.responseTimeout = (uint32_t)temp * 100;
-		
-		NIC_BytesToUint16(buf, &idx, &temp);
-		
-		NIC_BytesToUint16(buf, &idx, &temp);
-		pC->Nic.ncMbRead.clientConWdgTimeout = (uint32_t)temp * 100;
-		
-		NIC_BytesToUint16(buf, &idx, &temp);
-		NIC_BytesToUint16(buf, &idx, &temp);
-		NIC_BytesToUint16(buf, &idx, &temp);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.wdgTimeout);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.provSerwerConn);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.responseTimeout);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.clientConWdgTimeout);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.protMode);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.sendAckTimeout);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.conAckTimeout);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.closeAckTimeout);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.dataSwap);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.flagsReg321_322);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncMbRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncMbRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncMbRead.gateway, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncMbRead.ethAddress, 6);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncMbRead.flagsReg332_333);
 		
-		idx = 3;
-		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncMbRead.nc, pC->Nic.ncMbRead.length/2);
-		idx = 3;
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncMbRead.nc2, pC->Nic.ncMbRead.length);
+		pC->Nic.ncMbRead.responseTimeout *= 100;
+		pC->Nic.ncMbRead.clientConWdgTimeout *= 100;
+		
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 0) & 0x01) != RESET)		pC->Nic.ncMbRead.flagIpAddressAvailabe = true;
+		else																														pC->Nic.ncMbRead.flagIpAddressAvailabe = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 1) & 0x01) != RESET)		pC->Nic.ncMbRead.flagNetMaskAvailabe = true;
+		else																														pC->Nic.ncMbRead.flagNetMaskAvailabe = false;
+
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 2) & 0x01) != RESET)		pC->Nic.ncMbRead.flagGatewayAvailabe = true;
+		else																														pC->Nic.ncMbRead.flagGatewayAvailabe = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 4) & 0x01) != RESET)		pC->Nic.ncMbRead.flagBootIp = true;
+		else																														pC->Nic.ncMbRead.flagBootIp = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 5) & 0x01) != RESET)		pC->Nic.ncMbRead.flagDhcp = true;
+		else																														pC->Nic.ncMbRead.flagDhcp = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg321_322 >> 6) & 0x01) != RESET)		pC->Nic.ncMbRead.flgSetEthAddress = true;
+		else																														pC->Nic.ncMbRead.flgSetEthAddress = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg332_333 >> 0) & 0x01) != RESET)		pC->Nic.ncMbRead.flagMapFc1ToFc3 = true;
+		else																														pC->Nic.ncMbRead.flagMapFc1ToFc3 = false;
+		
+		if(((pC->Nic.ncMbRead.flagsReg332_333 >> 1) & 0x01) != RESET)		pC->Nic.ncMbRead.flagSkipConfTcpipStack = true;
+		else																														pC->Nic.ncMbRead.flagSkipConfTcpipStack = false;
 	}
 }
 static void NIC_ReadReaquest(void)
