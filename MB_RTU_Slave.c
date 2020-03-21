@@ -111,7 +111,6 @@ static void MBS_ResponseError_PE(void)
 }
 static void MBS_Response_RnDQ(void)
 {
-	LED2_TOG;
 	uint8_t* bufr = pC->Mbs.bufread;
 	uint8_t* bufw = pC->Mbs.bufwrite;
 	MBS_ClrStr(bufw, MBS_BUFMAX);
