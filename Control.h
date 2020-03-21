@@ -6,9 +6,6 @@
 #include "MB_RTU_Slave.h"
 #include "Outputs.h"
 
-typedef enum {false = 0, true = 1}eBool;
-typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp = 1, Prot_Pfnet = 2, Prot_Pfbus = 3}eProtocol;
-
 //MF_I 		= 0x00 - modbus function is idle
 //MF_RnDQ = 0x01 - modbus function is read 1 digital quits
 //MF_RnDI = 0x02 - modbus function is read n digital inputs
@@ -30,6 +27,9 @@ typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp = 1, Prot_Pfnet = 2, Prot_Pfbus = 3}ePr
 //MFE_SNR = modbus function error - slave not ready
 //MFE_NC 	= modbus function error - negative confirmation
 //MFE_PE 	= modbus function error - parity error
+typedef enum {false = 0, true = 1}eBool;
+typedef enum {workTypeStop = 0, workTypeRun = 1, workTypeConf = 2, workTypeError = 3}eWorkType;
+typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp = 1, Prot_Pfnet = 2, Prot_Pfbus = 3}eProtocol;
 typedef enum 
 {
 	MF_I = 0x00, MF_RnDQ = 0x01, MF_RnDI = 0x02, MF_RnHR = 0x03,
@@ -44,8 +44,38 @@ typedef enum
 typedef enum 
 {
 	NF_I = 0, NF_RC = 1, NF_RSI = 2, NF_RSC = 3, NF_RNS_MB = 4, NF_RNC_MB = 5, 
-	NF_RSSCEF = 6, NF_RCF = 7, NF_WC = 8, NF_WSC = 9, NF_WCF = 10, NF_WNC = 11
+	NF_RSSCEF = 6, NF_RCF = 7, NF_WR = 8
 }eNicFun;
+
+//discovery
+//#define LED_PORT		GPIOD
+//#define LED1_PIN		GPIO_ODR_ODR_12
+//#define LED2_PIN		GPIO_ODR_ODR_13
+//#define LED3_PIN		GPIO_ODR_ODR_14
+//#define LED4_PIN		GPIO_ODR_ODR_15
+
+//plytka od doktoratu
+#define LED_PORT		GPIOE
+#define LED1_PIN		GPIO_ODR_ODR_2
+#define LED2_PIN		GPIO_ODR_ODR_3
+#define LED3_PIN		GPIO_ODR_ODR_4
+#define LED4_PIN		GPIO_ODR_ODR_5
+
+#define LED1_ON			LED_PORT->ODR |= LED1_PIN;
+#define LED1_OFF		LED_PORT->ODR &= ~LED1_PIN;
+#define LED1_TOG		LED_PORT->ODR ^= LED1_PIN;
+#define LED2_ON			LED_PORT->ODR |= LED2_PIN;
+#define LED2_OFF		LED_PORT->ODR &= ~LED2_PIN;
+#define LED2_TOG		LED_PORT->ODR ^= LED2_PIN;
+#define LED3_ON			LED_PORT->ODR |= LED3_PIN;
+#define LED3_OFF		LED_PORT->ODR &= ~LED3_PIN;
+#define LED3_TOG		LED_PORT->ODR ^= LED3_PIN;
+#define LED4_ON			LED_PORT->ODR |= LED4_PIN;
+#define LED4_OFF		LED_PORT->ODR &= ~LED4_PIN;
+#define LED4_TOG		LED_PORT->ODR ^= LED4_PIN;
+#define LEDALL_ON		LED_PORT->ODR |= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
+#define LEDALL_OFF	LED_PORT->ODR &= ~LED1_PIN & ~LED2_PIN & ~LED3_PIN & ~LED4_PIN;
+#define LEDALL_TOG	LED_PORT->ODR ^= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
 
 #define MBS_BUFMAX 				1000
 #define NIC_BUFMAX 				1000
@@ -55,7 +85,9 @@ typedef enum
 
 typedef struct
 {
+	uint32_t			tick;
 	eProtocol			protocol;
+	eWorkType			workType;
 }sMode;
 typedef struct
 {
@@ -210,14 +242,13 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 }sNIC_NC_MB;
 typedef struct
 {
-	uint32_t			baud;
-	uint32_t			unittime;
 	uint8_t				bufread[NIC_BUFMAX];
 	uint8_t 			bufwrite[NIC_BUFMAX];
-	
 	uint8_t				address;
-	eMBError			error;
 	eNicFun 			nicFun;
+	uint32_t			time;
+	uint32_t			timeout;
+	eBool					isSending;
 	
 	sNIC_SI				si;
 	sNIC_SC				scRead;
@@ -241,10 +272,9 @@ typedef struct
 	sMBS					Mbs;
 	sNIC					Nic;
 	sOutputs			Outs;
-	
 }sControl;
 
-void SystemStart(void);
+void Control_SystemStart(void);
 void delay_ms(uint32_t ms);
 
 #endif

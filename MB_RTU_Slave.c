@@ -352,21 +352,21 @@ static void MBS_ReadRequest(void)
 //		char c = USART3->DR;
 //	}
 //}
-void DMA1_Stream3_IRQHandler(void)
-{
-	if((DMA1->LISR & DMA_LISR_TCIF3) != RESET)
-	{
-		MBS_SetRead();
-		DMA1_Stream3->CR &= ~DMA_SxCR_EN;
-		DMA1->LIFCR |= DMA_LIFCR_CTCIF3;
-	}
-}
-void TIM7_IRQHandler(void)
-{
-	if((TIM7->SR & TIM_SR_UIF) != RESET)
-	{
-		TIM7->CR1 &= ~TIM_CR1_CEN;
-		MBS_ReadRequest();
-		TIM7->SR &= ~TIM_SR_UIF;
-	}
-}
+//void DMA1_Stream3_IRQHandler(void)
+//{
+//	if((DMA1->LISR & DMA_LISR_TCIF3) != RESET)
+//	{
+//		MBS_SetRead();
+//		DMA1_Stream3->CR &= ~DMA_SxCR_EN;
+//		DMA1->LIFCR |= DMA_LIFCR_CTCIF3;
+//	}
+//}
+//void TIM7_IRQHandler(void)
+//{
+//	if((TIM7->SR & TIM_SR_UIF) != RESET)
+//	{
+//		TIM7->CR1 &= ~TIM_CR1_CEN;
+//		MBS_ReadRequest();
+//		TIM7->SR &= ~TIM_SR_UIF;
+//	}
+//}

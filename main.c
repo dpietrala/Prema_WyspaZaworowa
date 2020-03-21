@@ -3,13 +3,12 @@ sControl Control;
 sControl* pC = &Control;
 int main(void)
 {
-	SystemStart();
-	Led_Conf();
+	Control_SystemStart();
 	NIC_Conf();
   while(1)
   {
 		LED1_TOG;
-		NIC_ReadCoils();
+		NIC_ReadCoils(); 
 		delay_ms(100);
 //		NIC_ReadSystemInformation();
 //		delay_ms(100);
@@ -23,8 +22,8 @@ int main(void)
 //		delay_ms(100);
 //		NIC_ReadCommandFlags();
 //		delay_ms(50);
-//		NIC_WriteCoils();
-//		delay_ms(25);
+		NIC_WriteCoils();
+		delay_ms(100);
 //		NIC_WriteNetworkConfiguration();
 //		delay_ms(500);
 //		NIC_WriteCommandFlags();

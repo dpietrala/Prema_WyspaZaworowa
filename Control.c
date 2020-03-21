@@ -1,6 +1,6 @@
 #include "Control.h"
-volatile uint32_t tick=0;
-static void RCC_SystemInit(void)
+extern sControl* pC;
+static void Control_RccSystemInit(void)
 {
 	uint32_t PLL_M=8, PLL_N=336, PLL_P=2, PLL_Q=7;
 	RCC->CR |= RCC_CR_HSEON;								//W³¹czenie HSE
@@ -13,7 +13,7 @@ static void RCC_SystemInit(void)
 	RCC->CFGR |= RCC_CFGR_SW_PLL;							//PLL jako Ÿród³o dla SYSCLK
 	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL); //czekanie a¿ PLL bedzie gotowe jako SYSCLK
 }
-static void RCC_Conf(void)
+static void Control_RccConf(void)
 {
 	//Zegary dla portów od A do I oraz DMA2
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN |
@@ -24,18 +24,80 @@ static void RCC_Conf(void)
 	//Zegary dla USART1, SPI1
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART6EN;
 }
-void SystemStart(void)
+static void Control_LedConf(void)
 {
-	RCC_SystemInit();
+//	LED_PORT->MODER 	|= GPIO_MODER_MODER12_0 | GPIO_MODER_MODER13_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER15_0;
+//	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR12_0 | GPIO_PUPDR_PUPDR13_0 | GPIO_PUPDR_PUPDR14_0 | GPIO_PUPDR_PUPDR15_0;
+	
+	LED_PORT->MODER 	|= GPIO_MODER_MODER2_0 | GPIO_MODER_MODER3_0 | GPIO_MODER_MODER4_0 | GPIO_MODER_MODER5_0;
+	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0 | GPIO_PUPDR_PUPDR4_0 | GPIO_PUPDR_PUPDR5_0;
+}
+static void Control_TimsConf(void)
+{
+	TIM7->PSC = 84-1;
+	TIM7->ARR = 10000;
+	TIM7->DIER |= TIM_DIER_UIE;
+	NVIC_EnableIRQ(TIM7_IRQn);
+}
+void Control_SystemStart(void)
+{
+	Control_RccSystemInit();
 	SysTick_Config(168000);
-	RCC_Conf();
+	Control_RccConf();
+	Control_LedConf();
+	Control_TimsConf();
 }
 void delay_ms(uint32_t ms)
 {
-	tick = 0;
-	while(tick < ms);
+	pC->Mode.tick = 0;
+	while(pC->Mode.tick < ms);
 }
 void SysTick_Handler(void)
 {
-	tick++;
+	pC->Mode.tick++;
+	pC->Nic.time++;
+}
+static void Control_Stop(void)
+{
+	
+}
+static void Control_Run(void)
+{
+	
+}
+static void Control_Conf(void)
+{
+	
+}
+static void Control_Error(void)
+{
+	
+}
+static void Control_Act(void)
+{
+	if(pC->Mode.workType == workTypeStop)
+	{
+		Control_Stop();
+	}
+	else if(pC->Mode.workType == workTypeRun)
+	{
+		Control_Run();
+	}
+	else if(pC->Mode.workType == workTypeConf)
+	{
+		Control_Conf();
+	}
+	else if(pC->Mode.workType == workTypeError)
+	{
+		Control_Error();
+	}
+}
+//***** Interrupts ********************************
+void TIM7_IRQHandler(void)
+{
+	if((TIM7->SR & TIM_SR_UIF) != RESET)
+	{
+		Control_Act();
+		TIM7->SR &= ~TIM_SR_UIF;
+	}
 }

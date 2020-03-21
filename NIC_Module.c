@@ -26,6 +26,71 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
   }
   return crc;  
 }
+void NIC_Conf(void)
+{
+	//Srodkowy COM
+	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
+	DMA1_Stream1->M0AR 	= (uint32_t)pC->Nic.bufread;
+	DMA1_Stream1->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
+	DMA1_Stream3->M0AR 	= (uint32_t)pC->Nic.bufwrite;
+	DMA1_Stream3->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
+	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
+	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
+	GPIOB->AFR[1] |= 0x00007700;
+	USART3->BRR = 42000000/115200;
+	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+	NVIC_EnableIRQ(USART3_IRQn);
+	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+	
+	//Pierwszy COM
+	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream2->M0AR 	= (uint32_t)pC->Nic.bufread;
+	DMA2_Stream2->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA2_Stream2->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA2_Stream7->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream7->M0AR 	= (uint32_t)pC->Nic.bufwrite;
+	DMA2_Stream7->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA2_Stream7->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
+	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
+	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9 | GPIO_OSPEEDER_OSPEEDR10;
+	GPIOA->AFR[1] = 0x0770;
+	USART1->BRR = 84000000/115200;
+	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+	NVIC_EnableIRQ(USART1_IRQn);
+	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+
+	//USB
+	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
+	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
+	DMA1_Stream5->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA1_Stream5->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA1_Stream6->PAR 	= (uint32_t)&USART2->DR;
+	DMA1_Stream6->M0AR 	= (uint32_t)pC->Nic.bufwrite;
+	DMA1_Stream6->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA1_Stream6->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
+	GPIOD->MODER |= GPIO_MODER_MODER5_1 | GPIO_MODER_MODER6_1;
+	GPIOD->PUPDR |= GPIO_PUPDR_PUPDR5_0 | GPIO_PUPDR_PUPDR6_0;
+	GPIOD->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5 | GPIO_OSPEEDER_OSPEEDR6;
+	GPIOD->AFR[0] |= 0x07700000;
+	USART2->BRR = 42000000/115200;
+	USART2->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+	NVIC_EnableIRQ(USART2_IRQn);
+	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+	
+	NIC_ClrStr(pC->Nic.bufread, NIC_BUFMAX);
+	NIC_ClrStr(pC->Nic.bufwrite, NIC_BUFMAX);
+	pC->Nic.nicFun = NF_I;
+	pC->Nic.address = 2;
+	pC->Nic.timeout = 500;
+}
 static void NIC_BytesToUint8(uint8_t* buf, uint32_t* idx, uint8_t* val)
 {
 	*val = ((uint16_t)buf[*idx]<<0);
@@ -76,67 +141,6 @@ static void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab)
 	*idx += 1;
 	tab[*idx] = val >> 16;
 	*idx += 1;
-}
-void NIC_Conf(void)
-{
-	//Srodkowy COM
-	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream1->M0AR 	= (uint32_t)pC->Nic.bufread;
-	DMA1_Stream1->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream3->M0AR 	= (uint32_t)pC->Nic.bufwrite;
-	DMA1_Stream3->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
-	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
-	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
-	GPIOB->AFR[1] |= 0x00007700;
-	USART3->BRR = 42000000/115200;
-	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-	NVIC_EnableIRQ(USART3_IRQn);
-	
-	//Pierwszy COM
-	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
-	DMA2_Stream2->M0AR 	= (uint32_t)pC->Nic.bufread;
-	DMA2_Stream2->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA2_Stream2->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-	DMA2_Stream7->PAR 	= (uint32_t)&USART1->DR;
-	DMA2_Stream7->M0AR 	= (uint32_t)pC->Nic.bufwrite;
-	DMA2_Stream7->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA2_Stream7->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
-	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
-	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9 | GPIO_OSPEEDER_OSPEEDR10;
-	GPIOA->AFR[1] = 0x0770;
-	USART1->BRR = 84000000/115200;
-	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-	NVIC_EnableIRQ(USART1_IRQn);
-
-	//USB
-	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
-	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
-	DMA1_Stream5->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream5->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-	DMA1_Stream6->PAR 	= (uint32_t)&USART2->DR;
-	DMA1_Stream6->M0AR 	= (uint32_t)pC->Nic.bufwrite;
-	DMA1_Stream6->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream6->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0;
-	GPIOD->MODER |= GPIO_MODER_MODER5_1 | GPIO_MODER_MODER6_1;
-	GPIOD->PUPDR |= GPIO_PUPDR_PUPDR5_0 | GPIO_PUPDR_PUPDR6_0;
-	GPIOD->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5 | GPIO_OSPEEDER_OSPEEDR6;
-	GPIOD->AFR[0] |= 0x07700000;
-	USART2->BRR = 42000000/115200;
-	USART2->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-	NVIC_EnableIRQ(USART2_IRQn);
-	
-	NIC_ClrStr(pC->Nic.bufread, NIC_BUFMAX);
-	NIC_ClrStr(pC->Nic.bufwrite, NIC_BUFMAX);
-	pC->Nic.nicFun = NF_I;
-	pC->Nic.address = 2;
 }
 static void NIC_ReadRegisters(uint16_t addr0, uint16_t numregs)
 {
@@ -234,14 +238,14 @@ void NIC_ReadNetwrkConfigurationMb(void)
 void NIC_WriteCoils(void)
 {
 	NIC_WriteRegs(2000, 1, &pC->Nic.cod.coils);
-	pC->Nic.nicFun = NF_WC;
+	pC->Nic.nicFun = NF_WR;
 }
 void NIC_WriteSystemConfiguration(void)
 {
 	pC->Nic.scWrite = pC->Nic.scRead;
 	pC->Nic.scWrite.regs[4] = 5;
 	NIC_WriteRegs(100, 100, pC->Nic.scWrite.regs);
-	pC->Nic.nicFun = NF_WSC;
+	pC->Nic.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfiguration(void)
 {
@@ -253,14 +257,14 @@ void NIC_WriteNetworkConfiguration(void)
 	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.sendAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
 	
 	NIC_WriteRegs(300, 100, pC->Nic.ncMbWrite.regs);
-	pC->Nic.nicFun = NF_WNC;
+	pC->Nic.nicFun = NF_WR;
 }
 void NIC_WriteCommandFlags(void)
 {
 	uint16_t val = pC->Nic.cfRead.flagsCommand;
 	val |= (1<<4);
 	NIC_WriteRegs(1999, 1, &val);
-	pC->Nic.nicFun = NF_WCF;
+	pC->Nic.nicFun = NF_WR;
 }
 static void NIC_ReadRequestAfterReadCoils(void)
 {
@@ -511,19 +515,13 @@ static void NIC_ReadRequestAfterReadNetworkConfigurationMb(void)
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncMbRead.regs, 100);
 	}
 }
-static void NIC_ReadRequestAfterWriteCoils(void)
+static void NIC_ReadRequestAfterWriteReisters(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
-	
 	if(buf[0] != pC->Nic.address)
-	{
 		return;
-	}
 	if(buf[1] != MF_WnHR)
-	{
 		return;
-	}
-	
 	uint16_t crc1 = NIC_Crc16(buf, 6);
 	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
 	if(crc1 != crc2)
@@ -532,78 +530,11 @@ static void NIC_ReadRequestAfterWriteCoils(void)
 	}
 	else
 	{
-	}
-}
-static void NIC_ReadRequestAfterWriteSystemConfiguration(void)
-{
-	uint8_t* buf = pC->Nic.bufread;
-	if(buf[0] != pC->Nic.address)
-	{
-		return;
-	}
-	if(buf[1] != MF_WnHR)
-	{
-		return;
-	}
-	
-	uint16_t crc1 = NIC_Crc16(buf, 6);
-	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
-	if(crc1 != crc2)
-	{
-		return;
-	}
-	else
-	{
-	}
-}
-static void NIC_ReadRequestAfterWriteNetworkConfiguration(void)
-{
-	uint8_t* buf = pC->Nic.bufread;
-	if(buf[0] != pC->Nic.address)
-	{
-		return;
-	}
-	if(buf[1] != MF_WnHR)
-	{
-		return;
-	}
-	
-	uint16_t crc1 = NIC_Crc16(buf, 6);
-	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
-	if(crc1 != crc2)
-	{
-		return;
-	}
-	else
-	{
-	}
-}
-static void NIC_ReadRequestAfterWriteCommandFlags(void)
-{
-	uint8_t* buf = pC->Nic.bufread;
-	
-	if(buf[0] != pC->Nic.address)
-	{
-		return;
-	}
-	if(buf[1] != MF_WnHR)
-	{
-		return;
-	}
-	
-	uint16_t crc1 = NIC_Crc16(buf, 6);
-	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
-	if(crc1 != crc2)
-	{
-		return;
-	}
-	else
-	{
+		
 	}
 }
 static void NIC_ReadReaquest(void)
 {
-	LED4_TOG;
 	uint8_t* buf = pC->Nic.bufread;
 	switch(pC->Nic.nicFun)
 	{
@@ -628,20 +559,10 @@ static void NIC_ReadReaquest(void)
 			NIC_ReadRequestAfterReadNetworkStatusMb();
 			break;
 		case NF_RNC_MB:
-			LED2_TOG;
 			NIC_ReadRequestAfterReadNetworkConfigurationMb();
 			break;
-		case NF_WC:
-			NIC_ReadRequestAfterWriteCoils();
-			break;
-		case NF_WSC:
-			NIC_ReadRequestAfterWriteSystemConfiguration();
-			break;
-		case NF_WNC:
-			NIC_ReadRequestAfterWriteNetworkConfiguration();
-			break;
-		case NF_WCF:
-			NIC_ReadRequestAfterWriteCommandFlags();
+		case NF_WR:
+			NIC_ReadRequestAfterWriteReisters();
 			break;
 		default:
 			break;
@@ -659,14 +580,7 @@ static void NIC_ReadReaquest(void)
 	DMA1->HIFCR |= DMA_HIFCR_CTCIF5;
 	DMA1_Stream5->CR |= DMA_SxCR_EN;
 }
-void USART3_IRQHandler(void)
-{
-	if((USART3->SR & USART_SR_IDLE) != RESET)
-	{
-		NIC_ReadReaquest();
-		char c = USART3->DR;
-	}
-}
+//***** Interrupts ********************************
 void USART1_IRQHandler(void)
 {
 	if((USART1->SR & USART_SR_IDLE) != RESET)
@@ -683,69 +597,20 @@ void USART2_IRQHandler(void)
 		char c = USART2->DR;
 	}
 }
-
-
-//static void NIC_ReadRequestAfterWriteRegs(void)
-//{
-//	uint8_t* buf = pC->Nic.bufread;
-//	uint8_t address = buf[0];
-//	uint8_t flag = 0;
-//	
-//	if(address == pC->Nic.address)
-//		flag = 1;
-//	if(flag == 0)
-//		return;
-//	if(buf[1] != pC->Nic.fun)
-//		return;
-//	
-//	uint16_t crc1 = NIC_Crc16(buf, 6);
-//	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
-//	if(crc1 != crc2)
-//	{
-//		return;
-//	}
-//	else
-//	{
-//		pC->Nic.fun = MF_I;
-//		pC->Nic.reg0 = 0;
-//		pC->Nic.numregs = 0;
-//	}
-//	return;
-//}
-//static void NIC_ReadRequestAfterFunctionError(void)
-//{
-//	uint8_t* buf = pC->Nic.bufread;
-//	uint8_t address = buf[0];
-//	uint8_t fun = buf[1];
-//	uint8_t bytes = buf[2];
-//	uint8_t regs = bytes/2;
-//	uint8_t flag = 0;
-//	for(uint8_t i=0;i<SLAVEMAX;i++)
-//		if(address == pC->Nic.slaves[i].address)
-//			flag = 1;
-//	if(flag == 0)
-//		return;
-//	
-//	if(fun != pC->Nic.slaves[address].state)
-//		return;
-
-//	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
-//	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
-//	if(crc1 != crc2)
-//	{
-//		return;
-//	}
-//	else
-//	{
-//		LED3_TOG;
-//		for(uint8_t i=0;i<regs;i++)
-//		{
-//			uint16_t reg = ((uint16_t)buf[3+2*i+0]<<8) + ((uint16_t)buf[3+2*i+1]<<0);
-//			pC->Nic.slaves[address].holdreg[pC->Nic.slaves[address].addr0 + i] = reg;
-//		}
-//		pC->Nic.slaves[address].state = MFI;
-//		pC->Nic.slaves[address].addr0 = 0;
-//		pC->Nic.slaves[address].numregs = 0;
-//	}
-//	return;
-//}
+void USART3_IRQHandler(void)
+{
+	if((USART3->SR & USART_SR_IDLE) != RESET)
+	{
+		NIC_ReadReaquest();
+		char c = USART3->DR;
+	}
+}
+void DMA1_Stream3_IRQHandler(void)
+{
+	if((DMA1->LISR & DMA_LISR_TCIF3) != RESET)
+	{
+		pC->Nic.isSending = false;
+		DMA1_Stream3->CR &= ~DMA_SxCR_EN;
+		DMA1->LIFCR |= DMA_LIFCR_CTCIF3;
+	}
+}
