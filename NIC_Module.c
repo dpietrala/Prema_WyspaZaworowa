@@ -177,6 +177,27 @@ void NIC_WriteCoils(void)
 	NIC_WriteRegs(2000, 1, &pC->Nic.cod.coils);
 	pC->Nic.nicFun = NF_WC;
 }
+void NIC_WriteSystemConfiguration(void)
+{
+	pC->Nic.scWrite = pC->Nic.scRead;
+	pC->Nic.scWrite.regs[4] = 5;
+	NIC_WriteRegs(100, 100, pC->Nic.scWrite.regs);
+	pC->Nic.nicFun = NF_WSC;
+}
+void NIC_WriteNetworkConfiguration(void)
+{
+	pC->Nic.ncMbWrite = pC->Nic.ncMbRead;
+	pC->Nic.ncMbWrite.regs[23] = (0 << 8) + 35;
+	NIC_WriteRegs(300, 100, pC->Nic.ncMbWrite.regs);
+	pC->Nic.nicFun = NF_WNC;
+}
+void NIC_WriteCommandFlags(void)
+{
+	uint16_t val = pC->Nic.cfRead.flagsCommand;
+	val |= (1<<4);
+	NIC_WriteRegs(1999, 1, &val);
+	pC->Nic.nicFun = NF_WCF;
+}
 static void NIC_ReadRequestAfterReadCoils(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
@@ -274,6 +295,9 @@ static void NIC_ReadRequestAfterReadSystemConfiguration(void)
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.offsetAddressOutDataImage);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.numMappData);
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.scRead.mapData, 78);
+		
+		idx = 3;
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.scRead.regs, 100);
 	}
 }
 static void NIC_ReadRequestAfterReadSystemStatusComErrorFlags(void)
@@ -418,9 +442,80 @@ static void NIC_ReadRequestAfterReadNetworkConfigurationMb(void)
 		
 		pC->Nic.ncMbRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncMbRead.flagsReg332_333 >> 0) & 0x01);
 		pC->Nic.ncMbRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncMbRead.flagsReg332_333 >> 1) & 0x01);
+		
+		idx = 3;
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncMbRead.regs, 100);
 	}
 }
 static void NIC_ReadRequestAfterWriteCoils(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	
+	if(buf[0] != pC->Nic.address)
+	{
+		return;
+	}
+	if(buf[1] != MF_WnHR)
+	{
+		return;
+	}
+	
+	uint16_t crc1 = NIC_Crc16(buf, 6);
+	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+	}
+}
+static void NIC_ReadRequestAfterWriteSystemConfiguration(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	if(buf[0] != pC->Nic.address)
+	{
+		return;
+	}
+	if(buf[1] != MF_WnHR)
+	{
+		return;
+	}
+	
+	uint16_t crc1 = NIC_Crc16(buf, 6);
+	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+	}
+}
+static void NIC_ReadRequestAfterWriteNetworkConfiguration(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	if(buf[0] != pC->Nic.address)
+	{
+		return;
+	}
+	if(buf[1] != MF_WnHR)
+	{
+		return;
+	}
+	
+	uint16_t crc1 = NIC_Crc16(buf, 6);
+	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		LED4_TOG;
+	}
+}
+static void NIC_ReadRequestAfterWriteCommandFlags(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
 	
@@ -446,13 +541,13 @@ static void NIC_ReadRequestAfterWriteCoils(void)
 }
 static void NIC_ReadReaquest(void)
 {
+	LED3_OFF;
 	uint8_t* buf = pC->Nic.bufread;
 	switch(pC->Nic.nicFun)
 	{
 		case NF_I:
 			break;
 		case NF_RC:
-			LED4_TOG;
 			NIC_ReadRequestAfterReadCoils();
 			break;
 		case NF_RSI:
@@ -476,8 +571,17 @@ static void NIC_ReadReaquest(void)
 		case NF_WC:
 			NIC_ReadRequestAfterWriteCoils();
 			break;
+		case NF_WSC:
+			NIC_ReadRequestAfterWriteSystemConfiguration();
+			break;
+		case NF_WNC:
+			NIC_ReadRequestAfterWriteNetworkConfiguration();
+			break;
+		case NF_WCF:
+			NIC_ReadRequestAfterWriteCommandFlags();
+			break;
 		default:
-			LED3_TOG;
+			LED3_ON;
 			break;
 	}
 	NIC_ClrStr(buf, NIC_BUFMAX);

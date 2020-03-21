@@ -25,5 +25,11 @@ int main(void)
 		delay_ms(50);
 		NIC_WriteCoils();
 		delay_ms(25);
+//		NIC_WriteNetworkConfiguration();
+//		delay_ms(500);
+//		NIC_WriteSystemConfiguration();
+//		delay_ms(500);
+//		NIC_WriteCommandFlags();
+//		delay_ms(500);
   }
 }

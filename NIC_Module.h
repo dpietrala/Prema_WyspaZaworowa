@@ -11,5 +11,8 @@ void NIC_ReadNetwrkConfigurationMb(void);
 void NIC_ReadSystemStatusComErrorFlags(void);
 void NIC_ReadCommandFlags(void);
 void NIC_WriteCoils(void);
+void NIC_WriteSystemConfiguration(void);
+void NIC_WriteNetworkConfiguration(void);
+void NIC_WriteCommandFlags(void);
 
 #endif

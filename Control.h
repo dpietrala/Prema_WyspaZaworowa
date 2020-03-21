@@ -44,7 +44,7 @@ typedef enum
 typedef enum 
 {
 	NF_I = 0, NF_RC = 1, NF_RSI = 2, NF_RSC = 3, NF_RNS_MB = 4, NF_RNC_MB = 5, 
-	NF_RSSCEF = 6, NF_RCF = 7, NF_WC = 8
+	NF_RSSCEF = 6, NF_RCF = 7, NF_WC = 8, NF_WSC = 9, NF_WCF = 10, NF_WNC = 11
 }eNicFun;
 
 #define MBS_BUFMAX 				1000
@@ -102,6 +102,7 @@ typedef struct	//system information: registers 0d - 99d
 }sNIC_SI;
 typedef struct	//system configuration: registers 100d - 199d
 {
+	uint16_t		regs[100];
 	uint16_t		ssioType;											//start registers: 100d
 	uint16_t		ssioAddress;									//start registers: 101d
 	uint32_t		ssioBaud;											//start registers: 102d
@@ -179,6 +180,7 @@ typedef struct	//network status for ModbusTCP: registers 200d - 299d
 }sNIC_NS_MB;
 typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 {
+	uint16_t		regs[100];
 	uint16_t		length;												//register: 300d
 	uint32_t		busStartup;										//registers: 301d - 302d bit0
 	uint32_t		wdgTimeout;										//registers: 303d - 304d
