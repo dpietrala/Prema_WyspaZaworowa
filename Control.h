@@ -43,8 +43,8 @@ typedef enum
 }eMBError;
 typedef enum 
 {
-	NF_I = 0x00, NF_RC = 0x01, NF_RSI = 0x02, NF_RSC = 0x03,
-	NF_RNS_MB = 0x04, NF_RNC_MB = 0x05
+	NF_I = 0, NF_RC = 1, NF_RSI = 2, NF_RSC = 3, NF_RNS_MB = 4, NF_RNC_MB = 5, 
+	NF_RSSCEF = 6, NF_RCF = 7, NF_WC = 8
 }eNicFun;
 
 #define MBS_BUFMAX 				1000
@@ -110,7 +110,7 @@ typedef struct	//system configuration: registers 100d - 199d
 	uint16_t		shifType;											//start registers: 106d
 	uint16_t		shifBaud;											//start registers: 107d
 	uint16_t		shifAddress;									//start registers: 108d
-	uint16_t		shifConfFlags;								//start registers: 109d
+	uint16_t		flagsShifConf;								//start registers: 109d
 	uint16_t		ssioNumBytesSsioIn;						//start registers: 110d
 	uint16_t		ssioNumBytesSsioOut;					//start registers: 111d
 	uint16_t		ssioOffsetAddressFbIn;				//start registers: 112d
@@ -122,6 +122,57 @@ typedef struct	//system configuration: registers 100d - 199d
 	uint16_t		numMappData;									//start registers: 121d
 	uint16_t		mapData[78];									//start registers: 122d - 199d
 }sNIC_SC;
+typedef struct	//system and command status and errors: registers 988d - 998d
+{
+	uint32_t		systemStatus;									//registers: 988d - 989d, see 12.2.3 System Error, page 90
+	uint32_t		systemError;									//registers: 990d - 991d, see 12.2.4 Comunication State, page 90
+	uint16_t		errorLogInd;									//register: 992d, not suported!!!
+	uint16_t		errorCounter;									//register: 993d
+	uint32_t		comError;											//registers: 994d - 995d
+	uint32_t		comStatus;										//registers: 996d - 997d
+	uint16_t		recPacketSize;								//register: 998d
+	uint16_t		flagsSystem;									//start registers: 999d, see 12.2.5 System Flags, page 91
+	eBool				flagReady;										//bit 0
+	eBool				flagError;										//bit 1
+	eBool				flagCommunicating;						//bit 2
+	eBool				flagNcfError;									//bit 3
+	eBool				flagRxMbxFull;								//bit 4
+	eBool				flagTxMbxFull;								//bit 5
+	eBool				flagBusOn;										//bit 6
+	eBool				flagFlsCfg;										//bit 7
+	eBool				flagLckCfg;										//bit 8
+	eBool				flagWdgOn;										//bit 9
+	eBool				flagRunning;									//bit 10
+	eBool				flagSxWriteInd;								//bit 11
+	eBool				flagRemCfg;										//bit 12
+}sNIC_SSCEF;
+typedef struct	//cyclic input data: registers 1000d - 1998d
+{
+	uint16_t			coils;
+}sNIC_CID;
+typedef struct	//command flags: register 1999d
+{
+	uint16_t		flagsCommand;									//start registers: 1999d, see 12.2.6 Command Flags, page 93
+	eBool				flagReset;										//bit 0
+	eBool				flagBootStart;								//bit 1
+	eBool				flagAppReady;									//bit 2
+	eBool				flagBusOn;										//bit 3
+	eBool				flagInit;											//bit 4
+	eBool				flagBusOff;										//bit 5
+	eBool				flagClrCfg;										//bit 6
+	eBool				flagStrCfg;										//bit 7
+	eBool				flagLckCfg;										//bit 8
+	eBool				flagUnlockCfg;								//bit 9
+	eBool				flagWdgOn;										//bit 10
+	eBool				flagWdgOff;										//bit 11
+	eBool				flagClrRemCfg;								//bit 12
+	//eBool			reserved;											//bit 13
+	eBool				flagFbusSpecCommands[2];			//bit 14 - bit 15
+}sNIC_CF;
+typedef struct	//cyclic output data: registers 2000d - 2993d
+{
+	uint16_t			coils;
+}sNIC_COD;
 typedef struct	//network status for ModbusTCP: registers 200d - 299d
 {
 	uint16_t		ns[100];
@@ -155,54 +206,6 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
 	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
 }sNIC_NC_MB;
-typedef struct	//system and command status and errors: registers 988d - 998d
-{
-	uint32_t		errorStatus;									//start registers: 998d, see 12.2.3 System Error, page 90
-	uint32_t		comStatus;										//start registers: 990d, see 12.2.4 Comunication State, page 90
-}sNIC_SCSE;
-typedef struct	//system flags: register 999d
-{
-	uint16_t		systemFlags;									//start registers: 999d, see 12.2.5 System Flags, page 91
-	eBool				ready;												//bit0
-	eBool				error;												//bit1
-	eBool				communicating;								//bit2
-	eBool				ncfError;											//bit3
-	eBool				rxMbxFull;										//bit4
-	eBool				txMbxFull;										//bit5
-	eBool				busOn;												//bit6
-	eBool				flsCfg;												//bit7
-	eBool				lckCfg;												//bit8
-	eBool				wdgOn;												//bit9
-	eBool				running;											//bit10
-	eBool				sxWriteInd;										//bit11
-	eBool				remCfg;												//bit12
-}sNIC_SF;
-typedef struct	//cyclic input data: registers 1000d - 1998d
-{
-	uint16_t			coils;
-}sNIC_CID;
-typedef struct	//command flags: register 1999d
-{
-	uint16_t		commandFlags;									//start registers: 1999d, see 12.2.6 Command Flags, page 93
-	eBool				reset;												//bit0
-	eBool				bootStart;										//bit1
-	eBool				appReady;											//bit2
-	eBool				busOn;												//bit3
-	eBool				init;													//bit4
-	eBool				busOff;												//bit5
-	eBool				clrCfg;												//bit6
-	eBool				strCfg;												//bit7
-	eBool				lckCfg;												//bit8
-	eBool				unlockCfg;										//bit9
-	eBool				wdgOn;												//bit10
-	eBool				wdgOff;												//bit11
-	eBool				clrRemCfg;										//bit12
-	eBool				fbusSpecCommands[3];					//bit14 - bit16
-}sNIC_CF;
-typedef struct	//cyclic output data: registers 2000d - 2993d
-{
-	uint16_t			coils;
-}sNIC_COD;
 typedef struct
 {
 	uint32_t			baud;
@@ -215,11 +218,12 @@ typedef struct
 	eNicFun 			nicFun;
 	
 	sNIC_SI				si;
-	sNIC_SC				sc;
-	sNIC_SCSE			scse;
-	sNIC_SF				sf;
+	sNIC_SC				scRead;
+	sNIC_SC				scWrite;
+	sNIC_SSCEF		sscef;
 	sNIC_CID			cid;
-	sNIC_CF				cf;
+	sNIC_CF				cfRead;
+	sNIC_CF				cfWrite;
 	sNIC_COD			cod;
 	sNIC_NS_MB		nsMb;
 	sNIC_NC_MB		ncMbRead;
