@@ -15,13 +15,13 @@ static void Control_RccSystemInit(void)
 }
 static void Control_RccConf(void)
 {
-	//Zegary dla portów od A do I oraz DMA2
+
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN |
 									RCC_AHB1ENR_GPIODEN | RCC_AHB1ENR_GPIOEEN | RCC_AHB1ENR_GPIOFEN |
 									RCC_AHB1ENR_GPIOGEN | RCC_AHB1ENR_GPIOHEN | RCC_AHB1ENR_GPIOIEN | RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
-	//Zegary dla SPI2, SPI3
-	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN | RCC_APB1ENR_SPI3EN | RCC_APB1ENR_USART2EN | RCC_APB1ENR_USART3EN;
-	//Zegary dla USART1, SPI1
+
+	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN | RCC_APB1ENR_SPI3EN | RCC_APB1ENR_USART2EN | RCC_APB1ENR_USART3EN | RCC_APB1ENR_TIM7EN;
+
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART6EN;
 }
 static void Control_LedConf(void)
@@ -37,7 +37,54 @@ static void Control_TimsConf(void)
 	TIM7->PSC = 84-1;
 	TIM7->ARR = 10000;
 	TIM7->DIER |= TIM_DIER_UIE;
+	TIM7->CR1 |= TIM_CR1_CEN;
 	NVIC_EnableIRQ(TIM7_IRQn);
+}
+static void Control_StructConf(void)
+{
+	pC->Mode.protocol = Prot_Mbtcp;
+	pC->Mode.workType = workTypeRun;
+	
+	pC->Nic.mode.nicFun = NF_I;
+	pC->Nic.mode.comStatus = NCS_isIdle;
+	pC->Nic.mode.address = 2;
+	pC->Nic.mode.timeout = 100;
+	pC->Nic.mode.time = 0;
+	pC->Nic.mode.tabFunToSendMb[0] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendMb[1] = NIC_ReadSystemInformation;
+	pC->Nic.mode.tabFunToSendMb[2] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendMb[3] = NIC_ReadSystemConfiguration;
+	pC->Nic.mode.tabFunToSendMb[4] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendMb[5] = NIC_ReadSystemStatusComErrorFlags;
+	pC->Nic.mode.tabFunToSendMb[6] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendMb[7] = NIC_ReadNetworkStatusMb;
+	pC->Nic.mode.tabFunToSendMb[8] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendMb[9] = NIC_ReadNetworkConfigurationMb;
+	pC->Nic.mode.tabFunToSendMb[10] = NIC_ReadCoils;
+	
+	pC->Nic.mode.tabFunToSendPfbus[0] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfbus[1] = NIC_ReadSystemInformation;
+	pC->Nic.mode.tabFunToSendPfbus[2] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfbus[3] = NIC_ReadSystemConfiguration;
+	pC->Nic.mode.tabFunToSendPfbus[4] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfbus[5] = NIC_ReadSystemStatusComErrorFlags;
+	pC->Nic.mode.tabFunToSendPfbus[6] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfbus[7] = NIC_ReadNetworkStatusPfbus;
+	pC->Nic.mode.tabFunToSendPfbus[8] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfbus[9] = NIC_ReadNetworkConfigurationPfbus;
+	pC->Nic.mode.tabFunToSendPfbus[10] = NIC_ReadCoils;
+	
+	pC->Nic.mode.tabFunToSendPfnet[0] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfnet[1] = NIC_ReadSystemInformation;
+	pC->Nic.mode.tabFunToSendPfnet[2] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfnet[3] = NIC_ReadSystemConfiguration;
+	pC->Nic.mode.tabFunToSendPfnet[4] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfnet[5] = NIC_ReadSystemStatusComErrorFlags;
+	pC->Nic.mode.tabFunToSendPfnet[6] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfnet[7] = NIC_ReadNetworkStatusPfnet;
+	pC->Nic.mode.tabFunToSendPfnet[8] = NIC_ReadCoils;
+	pC->Nic.mode.tabFunToSendPfnet[9] = NIC_ReadNetworkConfigurationPfnet;
+	pC->Nic.mode.tabFunToSendPfnet[10] = NIC_ReadCoils;
 }
 void Control_SystemStart(void)
 {
@@ -45,6 +92,7 @@ void Control_SystemStart(void)
 	SysTick_Config(168000);
 	Control_RccConf();
 	Control_LedConf();
+	Control_StructConf();
 	Control_TimsConf();
 }
 void delay_ms(uint32_t ms)
@@ -55,41 +103,43 @@ void delay_ms(uint32_t ms)
 void SysTick_Handler(void)
 {
 	pC->Mode.tick++;
-	pC->Nic.time++;
+	if(pC->Nic.mode.comStatus != NCS_isIdle)
+		pC->Nic.mode.time++;
 }
-static void Control_Stop(void)
+static void Control_WorkTypeStop(void)
 {
-	
+	Outputs_WorkTypeStop();
 }
-static void Control_Run(void)
+static void Control_WorkTypeRun(void)
 {
-	
+	NIC_WorkTypeRunComunication();
+	Outputs_WorkTypeRun();
 }
-static void Control_Conf(void)
+static void Control_WorkTypeConfiguration(void)
 {
-	
+	Outputs_WorkTypeConfiguration();
 }
-static void Control_Error(void)
+static void Control_WorkTypeError(void)
 {
-	
+	Outputs_WorkTypeError();
 }
 static void Control_Act(void)
 {
 	if(pC->Mode.workType == workTypeStop)
 	{
-		Control_Stop();
+		Control_WorkTypeStop();
 	}
 	else if(pC->Mode.workType == workTypeRun)
 	{
-		Control_Run();
+		Control_WorkTypeRun();
 	}
 	else if(pC->Mode.workType == workTypeConf)
 	{
-		Control_Conf();
+		Control_WorkTypeConfiguration();
 	}
 	else if(pC->Mode.workType == workTypeError)
 	{
-		Control_Error();
+		Control_WorkTypeError();
 	}
 }
 //***** Interrupts ********************************

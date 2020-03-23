@@ -28,25 +28,17 @@
 //MFE_NC 	= modbus function error - negative confirmation
 //MFE_PE 	= modbus function error - parity error
 typedef enum {false = 0, true = 1}eBool;
-typedef enum {workTypeStop = 0, workTypeRun = 1, workTypeConf = 2, workTypeError = 3}eWorkType;
-typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp = 1, Prot_Pfnet = 2, Prot_Pfbus = 3}eProtocol;
+typedef enum {workTypeStop = 0, workTypeRun, workTypeConf, workTypeError}eWorkType;
+typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp, Prot_Pfnet, Prot_Pfbus}eProtocol;
 typedef enum 
 {
 	MF_I = 0x00, MF_RnDQ = 0x01, MF_RnDI = 0x02, MF_RnHR = 0x03,
 	MF_RnIR = 0x04, MF_W1DQ = 0x05, MF_W1HR = 0x06, MF_RS = 0x07,
 	MF_DT = 0x08, MF_WnDQ = 0x0f, MF_WnHR = 0x10, MF_ID = 0x11,
 }eMBFun;
-typedef enum 
-{
-	MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,
-	MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08
-}eMBError;
-typedef enum 
-{
-	NF_I = 0, NF_RC = 1, NF_RSI = 2, NF_RSC = 3, NF_RNS_MB = 4, NF_RNC_MB = 5, 
-	NF_RSSCEF = 6, NF_RCF = 7, NF_WR = 8
-}eNicFun;
-
+typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
+typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
+typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicComStatus;
 //discovery
 //#define LED_PORT		GPIOD
 //#define LED1_PIN		GPIO_ODR_ODR_12
@@ -81,14 +73,9 @@ typedef enum
 #define NIC_BUFMAX 				1000
 #define MBS_REGMAX				100
 #define NIC_REGMAX				100
+#define NIC_FRAMEMAX			11
 #define MBS_COILMAX				16
 
-typedef struct
-{
-	uint32_t			tick;
-	eProtocol			protocol;
-	eWorkType			workType;
-}sMode;
 typedef struct
 {
 	uint32_t			baud;
@@ -240,16 +227,93 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
 	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
 }sNIC_NC_MB;
+typedef struct	//network status for ProfiBus: registers 200d - 299d
+{
+	uint16_t		ns[100];
+}sNIC_NS_PFB;
+typedef struct	//network confguration for ProfiBus: registers 300d - 987d
+{
+	uint16_t		regs[100];
+	uint16_t		length;												//register: 300d
+	uint32_t		busStartup;										//registers: 301d - 302d bit0
+	uint32_t		wdgTimeout;										//registers: 303d - 304d
+	uint32_t		provSerwerConn;								//registers: 305d - 306d
+	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
+	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
+	uint32_t		protMode;											//registers: 311d - 312d
+	uint32_t		sendAckTimeout;								//registers: 313d - 314d
+	uint32_t		conAckTimeout;								//registers: 315d - 316d
+	uint32_t		closeAckTimeout;							//registers: 317d - 318d
+	uint32_t		dataSwap;											//registers: 319d - 320d
+	uint32_t		flagsReg321_322;							//registers: 321d - 322d
+	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
+	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
+	eBool				flagGatewayAvailabe;					//register: 321d bit 2
+	eBool				flagBootIp;										//register: 321d bit 3
+	eBool				flagDhcp;											//register: 321d bit 4
+	eBool				flgSetEthAddress;							//register: 321d bit 5
+	
+	uint8_t			ipAddress[4];									//registers: 323d - 324d
+	uint8_t			subnetMask[4];								//registers: 325d - 326d
+	uint8_t			gateway[4];										//registers: 327d - 328d
+	uint8_t			ethAddress[6];								//registers: 329d - 331d
+	uint32_t		flagsReg332_333;							//registers: 332d - 333d
+	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
+	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+}sNIC_NC_PFB;
+typedef struct	//network status for ProfiNet: registers 200d - 299d
+{
+	uint16_t		ns[100];
+}sNIC_NS_PFN;
+typedef struct	//network confguration for ProfiNet: registers 300d - 987d
+{
+	uint16_t		regs[100];
+	uint16_t		length;												//register: 300d
+	uint32_t		busStartup;										//registers: 301d - 302d bit0
+	uint32_t		wdgTimeout;										//registers: 303d - 304d
+	uint32_t		provSerwerConn;								//registers: 305d - 306d
+	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
+	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
+	uint32_t		protMode;											//registers: 311d - 312d
+	uint32_t		sendAckTimeout;								//registers: 313d - 314d
+	uint32_t		conAckTimeout;								//registers: 315d - 316d
+	uint32_t		closeAckTimeout;							//registers: 317d - 318d
+	uint32_t		dataSwap;											//registers: 319d - 320d
+	uint32_t		flagsReg321_322;							//registers: 321d - 322d
+	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
+	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
+	eBool				flagGatewayAvailabe;					//register: 321d bit 2
+	eBool				flagBootIp;										//register: 321d bit 3
+	eBool				flagDhcp;											//register: 321d bit 4
+	eBool				flgSetEthAddress;							//register: 321d bit 5
+	
+	uint8_t			ipAddress[4];									//registers: 323d - 324d
+	uint8_t			subnetMask[4];								//registers: 325d - 326d
+	uint8_t			gateway[4];										//registers: 327d - 328d
+	uint8_t			ethAddress[6];								//registers: 329d - 331d
+	uint32_t		flagsReg332_333;							//registers: 332d - 333d
+	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
+	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+}sNIC_NC_PFN;
 typedef struct
 {
-	uint8_t				bufread[NIC_BUFMAX];
-	uint8_t 			bufwrite[NIC_BUFMAX];
 	uint8_t				address;
 	eNicFun 			nicFun;
 	uint32_t			time;
 	uint32_t			timeout;
-	eBool					isSending;
-	
+	eBool					errorTimeout;
+	eNicComStatus	comStatus;
+	uint8_t				numFunToSend;
+	void					(*tabFunToSendMb[NIC_FRAMEMAX])(void);
+	void					(*tabFunToSendPfbus[NIC_FRAMEMAX])(void);
+	void					(*tabFunToSendPfnet[NIC_FRAMEMAX])(void);
+}sNIC_Mode;
+typedef struct
+{
+	uint8_t				bufread[NIC_BUFMAX];
+	uint8_t 			bufwrite[NIC_BUFMAX];
+
+	sNIC_Mode			mode;
 	sNIC_SI				si;
 	sNIC_SC				scRead;
 	sNIC_SC				scWrite;
@@ -261,11 +325,23 @@ typedef struct
 	sNIC_NS_MB		nsMb;
 	sNIC_NC_MB		ncMbRead;
 	sNIC_NC_MB		ncMbWrite;
+	sNIC_NS_MB		nsPfbus;
+	sNIC_NC_MB		ncPfbusRead;
+	sNIC_NC_MB		ncPfbusWrite;
+	sNIC_NS_MB		nsPfnet;
+	sNIC_NC_MB		ncPfnetRead;
+	sNIC_NC_MB		ncPfnetWrite;
 }sNIC;
 typedef struct
 {
 	uint16_t			coils;
 }sOutputs;
+typedef struct
+{
+	uint32_t			tick;
+	eProtocol			protocol;
+	eWorkType			workType;
+}sMode;
 typedef struct
 {
 	sMode					Mode;
