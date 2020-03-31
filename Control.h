@@ -39,19 +39,20 @@ typedef enum
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
 typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicComStatus;
-//discovery
-//#define LED_PORT		GPIOD
-//#define LED1_PIN		GPIO_ODR_ODR_12
-//#define LED2_PIN		GPIO_ODR_ODR_13
-//#define LED3_PIN		GPIO_ODR_ODR_14
-//#define LED4_PIN		GPIO_ODR_ODR_15
 
-//plytka od doktoratu
-#define LED_PORT		GPIOE
-#define LED1_PIN		GPIO_ODR_ODR_2
-#define LED2_PIN		GPIO_ODR_ODR_3
-#define LED3_PIN		GPIO_ODR_ODR_4
-#define LED4_PIN		GPIO_ODR_ODR_5
+//discovery ledy
+#define LED_PORT		GPIOD
+#define LED1_PIN		GPIO_ODR_ODR_12
+#define LED2_PIN		GPIO_ODR_ODR_13
+#define LED3_PIN		GPIO_ODR_ODR_14
+#define LED4_PIN		GPIO_ODR_ODR_15
+
+////plytka od doktoratu ledy
+//#define LED_PORT		GPIOE
+//#define LED1_PIN		GPIO_ODR_ODR_2
+//#define LED2_PIN		GPIO_ODR_ODR_3
+//#define LED3_PIN		GPIO_ODR_ODR_4
+//#define LED4_PIN		GPIO_ODR_ODR_5
 
 #define LED1_ON			LED_PORT->ODR |= LED1_PIN;
 #define LED1_OFF		LED_PORT->ODR &= ~LED1_PIN;
@@ -73,7 +74,7 @@ typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicCo
 #define NIC_BUFMAX 				1000
 #define MBS_REGMAX				100
 #define NIC_REGMAX				100
-#define NIC_FRAMEMAX			11
+#define NIC_FRAMEMAX			10
 #define MBS_COILMAX				16
 
 typedef struct
@@ -195,7 +196,7 @@ typedef struct	//cyclic output data: registers 2000d - 2993d
 }sNIC_COD;
 typedef struct	//network status for ModbusTCP: registers 200d - 299d
 {
-	uint16_t		ns[100];
+	uint16_t		regs[100];
 }sNIC_NS_MB;
 typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 {
@@ -229,7 +230,7 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 }sNIC_NC_MB;
 typedef struct	//network status for ProfiBus: registers 200d - 299d
 {
-	uint16_t		ns[100];
+	uint16_t		regs[100];
 }sNIC_NS_PFB;
 typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 {
@@ -263,7 +264,7 @@ typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 }sNIC_NC_PFB;
 typedef struct	//network status for ProfiNet: registers 200d - 299d
 {
-	uint16_t		ns[100];
+	uint16_t		regs[100];
 }sNIC_NS_PFN;
 typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 {
@@ -325,12 +326,12 @@ typedef struct
 	sNIC_NS_MB		nsMb;
 	sNIC_NC_MB		ncMbRead;
 	sNIC_NC_MB		ncMbWrite;
-	sNIC_NS_MB		nsPfbus;
-	sNIC_NC_MB		ncPfbusRead;
-	sNIC_NC_MB		ncPfbusWrite;
-	sNIC_NS_MB		nsPfnet;
-	sNIC_NC_MB		ncPfnetRead;
-	sNIC_NC_MB		ncPfnetWrite;
+	sNIC_NS_PFB		nsPfbus;
+	sNIC_NC_PFB		ncPfbusRead;
+	sNIC_NC_PFB		ncPfbusWrite;
+	sNIC_NS_PFN		nsPfnet;
+	sNIC_NC_PFN		ncPfnetRead;
+	sNIC_NC_PFN		ncPfnetWrite;
 }sNIC;
 typedef struct
 {

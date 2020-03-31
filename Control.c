@@ -26,11 +26,11 @@ static void Control_RccConf(void)
 }
 static void Control_LedConf(void)
 {
-//	LED_PORT->MODER 	|= GPIO_MODER_MODER12_0 | GPIO_MODER_MODER13_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER15_0;
-//	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR12_0 | GPIO_PUPDR_PUPDR13_0 | GPIO_PUPDR_PUPDR14_0 | GPIO_PUPDR_PUPDR15_0;
+	LED_PORT->MODER 	|= GPIO_MODER_MODER12_0 | GPIO_MODER_MODER13_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER15_0;
+	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR12_0 | GPIO_PUPDR_PUPDR13_0 | GPIO_PUPDR_PUPDR14_0 | GPIO_PUPDR_PUPDR15_0;
 	
-	LED_PORT->MODER 	|= GPIO_MODER_MODER2_0 | GPIO_MODER_MODER3_0 | GPIO_MODER_MODER4_0 | GPIO_MODER_MODER5_0;
-	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0 | GPIO_PUPDR_PUPDR4_0 | GPIO_PUPDR_PUPDR5_0;
+//	LED_PORT->MODER 	|= GPIO_MODER_MODER2_0 | GPIO_MODER_MODER3_0 | GPIO_MODER_MODER4_0 | GPIO_MODER_MODER5_0;
+//	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0 | GPIO_PUPDR_PUPDR4_0 | GPIO_PUPDR_PUPDR5_0;
 }
 static void Control_TimsConf(void)
 {
@@ -48,7 +48,7 @@ static void Control_StructConf(void)
 	pC->Nic.mode.nicFun = NF_I;
 	pC->Nic.mode.comStatus = NCS_isIdle;
 	pC->Nic.mode.address = 2;
-	pC->Nic.mode.timeout = 100;
+	pC->Nic.mode.timeout = 50;
 	pC->Nic.mode.time = 0;
 	pC->Nic.mode.tabFunToSendMb[0] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendMb[1] = NIC_ReadSystemInformation;
@@ -60,7 +60,6 @@ static void Control_StructConf(void)
 	pC->Nic.mode.tabFunToSendMb[7] = NIC_ReadNetworkStatusMb;
 	pC->Nic.mode.tabFunToSendMb[8] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendMb[9] = NIC_ReadNetworkConfigurationMb;
-	pC->Nic.mode.tabFunToSendMb[10] = NIC_ReadCoils;
 	
 	pC->Nic.mode.tabFunToSendPfbus[0] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendPfbus[1] = NIC_ReadSystemInformation;
@@ -72,7 +71,6 @@ static void Control_StructConf(void)
 	pC->Nic.mode.tabFunToSendPfbus[7] = NIC_ReadNetworkStatusPfbus;
 	pC->Nic.mode.tabFunToSendPfbus[8] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendPfbus[9] = NIC_ReadNetworkConfigurationPfbus;
-	pC->Nic.mode.tabFunToSendPfbus[10] = NIC_ReadCoils;
 	
 	pC->Nic.mode.tabFunToSendPfnet[0] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendPfnet[1] = NIC_ReadSystemInformation;
@@ -84,7 +82,6 @@ static void Control_StructConf(void)
 	pC->Nic.mode.tabFunToSendPfnet[7] = NIC_ReadNetworkStatusPfnet;
 	pC->Nic.mode.tabFunToSendPfnet[8] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendPfnet[9] = NIC_ReadNetworkConfigurationPfnet;
-	pC->Nic.mode.tabFunToSendPfnet[10] = NIC_ReadCoils;
 }
 void Control_SystemStart(void)
 {
