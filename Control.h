@@ -77,7 +77,7 @@ typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicCo
 #define NIC_FRAMEMAX			10
 #define MBS_COILMAX				16
 
-typedef struct
+typedef struct	//modbus rtu slave
 {
 	uint32_t			baud;
 	uint32_t			unittime;
@@ -333,7 +333,7 @@ typedef struct
 	sNIC_NC_PFN		ncPfnetRead;
 	sNIC_NC_PFN		ncPfnetWrite;
 }sNIC;
-typedef struct
+typedef struct	//outputs
 {
 	uint16_t			coils;
 }sOutputs;
