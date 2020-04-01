@@ -247,7 +247,7 @@ void NIC_ReadNetworkStatusPfbus(void)
 }
 void NIC_ReadNetworkConfigurationPfbus(void)
 {
-	NIC_ReadRegisters(300, 100);
+	NIC_ReadRegisters(300, 10);
 	pC->Nic.mode.nicFun = NF_RNC_PFB;
 }
 void NIC_ReadNetworkStatusPfnet(void)
@@ -286,27 +286,27 @@ void NIC_WriteNetworkConfigurationMb(void)
 }
 void NIC_WriteNetworkConfigurationPfbus(void)
 {
-	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusRead;
-	
-	pC->Nic.ncPfbusWrite.sendAckTimeout = 25000;
-	
-	uint32_t idx = 12;
-	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusWrite.sendAckTimeout, &idx, pC->Nic.ncPfbusWrite.regs);
-	
-	NIC_WriteRegs(300, 100, pC->Nic.ncPfbusWrite.regs);
-	pC->Nic.mode.nicFun = NF_WR;
+//	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusRead;
+//	
+//	pC->Nic.ncPfbusWrite.sendAckTimeout = 25000;
+//	
+//	uint32_t idx = 12;
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusWrite.sendAckTimeout, &idx, pC->Nic.ncPfbusWrite.regs);
+//	
+//	NIC_WriteRegs(300, 100, pC->Nic.ncPfbusWrite.regs);
+//	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationPfnet(void)
 {
-	pC->Nic.ncPfnetWrite = pC->Nic.ncPfnetRead;
-	
-	pC->Nic.ncPfnetWrite.sendAckTimeout = 25000;
-	
-	uint32_t idx = 12;
-	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.sendAckTimeout, &idx, pC->Nic.ncPfnetWrite.regs);
-	
-	NIC_WriteRegs(300, 100, pC->Nic.ncPfnetWrite.regs);
-	pC->Nic.mode.nicFun = NF_WR;
+//	pC->Nic.ncPfnetWrite = pC->Nic.ncPfnetRead;
+//	
+//	pC->Nic.ncPfnetWrite.sendAckTimeout = 25000;
+//	
+//	uint32_t idx = 12;
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.sendAckTimeout, &idx, pC->Nic.ncPfnetWrite.regs);
+//	
+//	NIC_WriteRegs(300, 100, pC->Nic.ncPfnetWrite.regs);
+//	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteCommandFlags(void)
 {
@@ -603,38 +603,26 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfbus(void)
 	{
 		uint32_t idx = 3;
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfbusRead.length);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.flagsReg301_302);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.wdgTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.provSerwerConn);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.responseTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.clientConWdgTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.protMode);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.sendAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.conAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.closeAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.dataSwap);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.flagsReg321_322);
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfbusRead.ipAddress, 4);
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfbusRead.subnetMask, 4);
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfbusRead.gateway, 4);
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfbusRead.ethAddress, 6);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfbusRead.flagsReg332_333);
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfbusRead.identNumber);
+		NIC_BytesToUint8(buf, &idx, &pC->Nic.ncPfbusRead.baudrate);
+		NIC_BytesToUint8(buf, &idx, &pC->Nic.ncPfbusRead.stationAddress);
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfbusRead.flagsReg307);
+		NIC_BytesToUint8(buf, &idx, &pC->Nic.ncPfbusRead.lengthConfData);
 		
-		pC->Nic.ncPfbusRead.responseTimeout *= 100;
-		pC->Nic.ncPfbusRead.clientConWdgTimeout *= 100;
+		pC->Nic.ncPfbusRead.flagBusStartup 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg301_302 >> 0) & 0x01);
+		pC->Nic.ncPfbusRead.flagAddressSwitchEnable 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg301_302 >> 4) & 0x01);
+		pC->Nic.ncPfbusRead.flagBaudrateSwitchEnable 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg301_302 >> 5) & 0x01);
 		
-		pC->Nic.ncPfbusRead.flagIpAddressAvailabe 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 0) & 0x01);
-		pC->Nic.ncPfbusRead.flagNetMaskAvailabe 		= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 1) & 0x01);
-		pC->Nic.ncPfbusRead.flagGatewayAvailabe 		= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 2) & 0x01);
-		pC->Nic.ncPfbusRead.flagBootIp 						= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 3) & 0x01);
-		pC->Nic.ncPfbusRead.flagDhcp 							= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 4) & 0x01);
-		pC->Nic.ncPfbusRead.flgSetEthAddress 			= (eBool)((pC->Nic.ncPfbusRead.flagsReg321_322 >> 5) & 0x01);
-		
-		pC->Nic.ncPfbusRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncPfbusRead.flagsReg332_333 >> 0) & 0x01);
-		pC->Nic.ncPfbusRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncPfbusRead.flagsReg332_333 >> 1) & 0x01);
-		
-		idx = 3;
-		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncPfbusRead.regs, 100);
+		pC->Nic.ncPfbusRead.flagDpv1Enable 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 0) & 0x01);
+		pC->Nic.ncPfbusRead.flagSyncSupperted 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 1) & 0x01);
+		pC->Nic.ncPfbusRead.flagFreezeSuported 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 2) & 0x01);
+		pC->Nic.ncPfbusRead.flagFailSafeSuported 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 3) & 0x01);
+		pC->Nic.ncPfbusRead.flagAlarmSap50Deactivate 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 4) & 0x01);
+		pC->Nic.ncPfbusRead.flagIoDataSwap 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 5) & 0x01);
+		pC->Nic.ncPfbusRead.flagAutoConfiguration 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 6) & 0x01);
+		pC->Nic.ncPfbusRead.flagAddressChangeNotAllowed 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 7) & 0x01);
 	}
 }
 static void NIC_ReadResponseAfterReadNetworkStatusPfnet(void)
@@ -803,7 +791,7 @@ void NIC_WorkTypeRunComunication(void)
 	if(pC->Nic.mode.comStatus == NCS_isIdle)
 	{
 		LED2_TOG;
-		pC->Nic.mode.tabFunToSendMb[pC->Nic.mode.numFunToSend]();
+		pC->Nic.mode.tabFunToSendPfbus[pC->Nic.mode.numFunToSend]();
 		pC->Nic.mode.numFunToSend++;
 		if(pC->Nic.mode.numFunToSend >= NIC_FRAMEMAX)
 			pC->Nic.mode.numFunToSend = 0;

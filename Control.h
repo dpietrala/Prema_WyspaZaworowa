@@ -234,33 +234,30 @@ typedef struct	//network status for ProfiBus: registers 200d - 299d
 }sNIC_NS_PFB;
 typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 {
-	uint16_t		regs[100];
 	uint16_t		length;												//register: 300d
-	uint32_t		busStartup;										//registers: 301d - 302d bit0
-	uint32_t		wdgTimeout;										//registers: 303d - 304d
-	uint32_t		provSerwerConn;								//registers: 305d - 306d
-	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
-	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
-	uint32_t		protMode;											//registers: 311d - 312d
-	uint32_t		sendAckTimeout;								//registers: 313d - 314d
-	uint32_t		conAckTimeout;								//registers: 315d - 316d
-	uint32_t		closeAckTimeout;							//registers: 317d - 318d
-	uint32_t		dataSwap;											//registers: 319d - 320d
-	uint32_t		flagsReg321_322;							//registers: 321d - 322d
-	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
-	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
-	eBool				flagGatewayAvailabe;					//register: 321d bit 2
-	eBool				flagBootIp;										//register: 321d bit 3
-	eBool				flagDhcp;											//register: 321d bit 4
-	eBool				flgSetEthAddress;							//register: 321d bit 5
+
+	uint32_t		flagsReg301_302;							//registers: 301d - 302d
+	eBool				flagBusStartup;								//registers: 301d - 302d bit0
+	eBool				flagAddressSwitchEnable;			//registers: 301d - 302d bit4
+	eBool				flagBaudrateSwitchEnable;			//registers: 301d - 302d bit5
 	
-	uint8_t			ipAddress[4];									//registers: 323d - 324d
-	uint8_t			subnetMask[4];								//registers: 325d - 326d
-	uint8_t			gateway[4];										//registers: 327d - 328d
-	uint8_t			ethAddress[6];								//registers: 329d - 331d
-	uint32_t		flagsReg332_333;							//registers: 332d - 333d
-	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
-	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+	uint32_t		wdgTimeout;										//registers: 303d - 304d
+	uint16_t		identNumber;									//register: 305d
+	uint8_t			stationAddress;								//register: 306d lowbyte
+	uint8_t			baudrate;											//register: 306d highbyte
+	
+	uint16_t		flagsReg307;									//registers: 307d
+	eBool				flagDpv1Enable;								//register: 307d bit0
+	eBool				flagSyncSupperted;						//register: 307d bit1
+	eBool				flagFreezeSuported;						//register: 307d bit2
+	eBool				flagFailSafeSuported;					//register: 307d bit3
+	eBool				flagAlarmSap50Deactivate;			//register: 307d bit4
+	eBool				flagIoDataSwap;								//register: 307d bit5
+	eBool				flagAutoConfiguration;				//register: 307d bit6
+	eBool				flagAddressChangeNotAllowed;	//register: 307d bit7
+	
+	uint8_t			lengthConfData;								//register: 308d highbyte
+	uint16_t		confData[122];								//registers: 309d - 430d
 }sNIC_NC_PFB;
 typedef struct	//network status for ProfiNet: registers 200d - 299d
 {
