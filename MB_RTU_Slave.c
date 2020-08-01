@@ -12,29 +12,29 @@ void MBS_Conf(void)
 	for(uint16_t j=0;j<MBS_REGMAX;j++)
 		pC->Mbs.hregs[j] = 0;
 	
-	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream1->M0AR 	= (uint32_t)pC->Mbs.bufread;
-	DMA1_Stream1->NDTR 	= (uint16_t)MBS_BUFMAX;
-	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream3->M0AR 	= (uint32_t)pC->Mbs.bufwrite;
-	DMA1_Stream3->NDTR 	= (uint16_t)MBS_BUFMAX;
-	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
-	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+//	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
+//	DMA1_Stream1->M0AR 	= (uint32_t)pC->Mbs.bufread;
+//	DMA1_Stream1->NDTR 	= (uint16_t)MBS_BUFMAX;
+//	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+//	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
+//	DMA1_Stream3->M0AR 	= (uint32_t)pC->Mbs.bufwrite;
+//	DMA1_Stream3->NDTR 	= (uint16_t)MBS_BUFMAX;
+//	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
+//	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+//	
+//	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
+//	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
+//	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
+//	GPIOB->AFR[1] |= 0x00007700;
+//	USART3->BRR = 42000000/pC->Mbs.baud;
+//	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+//	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+//	NVIC_EnableIRQ(USART3_IRQn);
 	
-	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
-	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
-	GPIOB->AFR[1] |= 0x00007700;
-	USART3->BRR = 42000000/pC->Mbs.baud;
-	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-	NVIC_EnableIRQ(USART3_IRQn);
-	
-	TIM7->PSC = 84-1;
-	TIM7->ARR = 10 * pC->Mbs.unittime;
-	TIM7->DIER |= TIM_DIER_UIE;
-	NVIC_EnableIRQ(TIM7_IRQn);
+//	TIM7->PSC = 84-1;
+//	TIM7->ARR = 10 * pC->Mbs.unittime;
+//	TIM7->DIER |= TIM_DIER_UIE;
+//	NVIC_EnableIRQ(TIM7_IRQn);
 }
 void MBS_ClrStr(uint8_t* str, uint32_t n)
 {
@@ -65,11 +65,9 @@ uint16_t MBS_Crc16(uint8_t* buf, uint32_t len)
 
 static void MBS_SetRead(void)
 {
-	LED4_OFF;
 }
 static void MBS_SetSend(void)
 {
-	LED4_ON;
 }
 static void MBS_ResponseError_IF(void)
 {
@@ -322,7 +320,7 @@ static void MBS_CheckAddress(void)
 	if(buf[0] == pC->Mbs.address)
 	{
 		MBS_SetSend();
-		TIM7->CR1 |= TIM_CR1_CEN;
+//		TIM7->CR1 |= TIM_CR1_CEN;
 	}
 }
 static void MBS_ReadRequest(void)

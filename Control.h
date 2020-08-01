@@ -1,7 +1,7 @@
 #ifndef	_CONTROL
 #define _CONTROL
 #include <stm32f4xx.h>
-#include <stm32f407xx.h>
+#include <STM32F410Rx.h>
 #include "NIC_Module.h"
 #include "MB_RTU_Slave.h"
 #include "Outputs.h"
@@ -40,12 +40,12 @@ typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
 typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicComStatus;
 
-//discovery ledy
-#define LED_PORT		GPIOD
-#define LED1_PIN		GPIO_ODR_ODR_12
-#define LED2_PIN		GPIO_ODR_ODR_13
-#define LED3_PIN		GPIO_ODR_ODR_14
-#define LED4_PIN		GPIO_ODR_ODR_15
+////discovery ledy
+//#define LED_PORT		GPIOD
+//#define LED1_PIN		GPIO_ODR_ODR_12
+//#define LED2_PIN		GPIO_ODR_ODR_13
+//#define LED3_PIN		GPIO_ODR_ODR_14
+//#define LED4_PIN		GPIO_ODR_ODR_15
 
 ////plytka od doktoratu ledy
 //#define LED_PORT		GPIOE
@@ -54,21 +54,25 @@ typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicCo
 //#define LED3_PIN		GPIO_ODR_ODR_4
 //#define LED4_PIN		GPIO_ODR_ODR_5
 
+//plytka docelowa dla wyspy
+#define LED_PORT		GPIOA
+#define LED1_PIN		GPIO_ODR_ODR_8
+
 #define LED1_ON			LED_PORT->ODR |= LED1_PIN;
 #define LED1_OFF		LED_PORT->ODR &= ~LED1_PIN;
 #define LED1_TOG		LED_PORT->ODR ^= LED1_PIN;
-#define LED2_ON			LED_PORT->ODR |= LED2_PIN;
-#define LED2_OFF		LED_PORT->ODR &= ~LED2_PIN;
-#define LED2_TOG		LED_PORT->ODR ^= LED2_PIN;
-#define LED3_ON			LED_PORT->ODR |= LED3_PIN;
-#define LED3_OFF		LED_PORT->ODR &= ~LED3_PIN;
-#define LED3_TOG		LED_PORT->ODR ^= LED3_PIN;
-#define LED4_ON			LED_PORT->ODR |= LED4_PIN;
-#define LED4_OFF		LED_PORT->ODR &= ~LED4_PIN;
-#define LED4_TOG		LED_PORT->ODR ^= LED4_PIN;
-#define LEDALL_ON		LED_PORT->ODR |= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
-#define LEDALL_OFF	LED_PORT->ODR &= ~LED1_PIN & ~LED2_PIN & ~LED3_PIN & ~LED4_PIN;
-#define LEDALL_TOG	LED_PORT->ODR ^= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
+//#define LED2_ON			LED_PORT->ODR |= LED2_PIN;
+//#define LED2_OFF		LED_PORT->ODR &= ~LED2_PIN;
+//#define LED2_TOG		LED_PORT->ODR ^= LED2_PIN;
+//#define LED3_ON			LED_PORT->ODR |= LED3_PIN;
+//#define LED3_OFF		LED_PORT->ODR &= ~LED3_PIN;
+//#define LED3_TOG		LED_PORT->ODR ^= LED3_PIN;
+//#define LED4_ON			LED_PORT->ODR |= LED4_PIN;
+//#define LED4_OFF		LED_PORT->ODR &= ~LED4_PIN;
+//#define LED4_TOG		LED_PORT->ODR ^= LED4_PIN;
+//#define LEDALL_ON		LED_PORT->ODR |= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
+//#define LEDALL_OFF	LED_PORT->ODR &= ~LED1_PIN & ~LED2_PIN & ~LED3_PIN & ~LED4_PIN;
+//#define LEDALL_TOG	LED_PORT->ODR ^= LED1_PIN | LED2_PIN | LED3_PIN | LED4_PIN;
 
 #define MBS_BUFMAX 				1000
 #define NIC_BUFMAX 				1000

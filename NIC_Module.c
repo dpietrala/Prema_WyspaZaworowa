@@ -28,44 +28,24 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
 }
 void NIC_Conf(void)
 {
-	//Srodkowy COM
-	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream1->M0AR 	= (uint32_t)pC->Nic.bufread;
-	DMA1_Stream1->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
-	DMA1_Stream3->M0AR 	= (uint32_t)pC->Nic.bufwrite;
-	DMA1_Stream3->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
-	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
-	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
-	GPIOB->AFR[1] |= 0x00007700;
-	USART3->BRR = 42000000/115200;
-	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-	NVIC_EnableIRQ(USART3_IRQn);
-	
-//	//Lewy COM
-//	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
-//	DMA2_Stream2->M0AR 	= (uint32_t)pC->Nic.bufread;
-//	DMA2_Stream2->NDTR 	= (uint16_t)NIC_BUFMAX;
-//	DMA2_Stream2->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-//	DMA2_Stream7->PAR 	= (uint32_t)&USART1->DR;
-//	DMA2_Stream7->M0AR 	= (uint32_t)pC->Nic.bufwrite;
-//	DMA2_Stream7->NDTR 	= (uint16_t)NIC_BUFMAX;
-//	DMA2_Stream7->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
-//	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
-//	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
-//	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
-//	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9 | GPIO_OSPEEDER_OSPEEDR10;
-//	GPIOA->AFR[1] = 0x0770;
-//	USART1->BRR = 84000000/115200;
-//	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-//	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-//	NVIC_EnableIRQ(USART1_IRQn);
-//
+	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream2->M0AR 	= (uint32_t)pC->Nic.bufread;
+	DMA2_Stream2->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA2_Stream2->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA2_Stream7->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream7->M0AR 	= (uint32_t)pC->Nic.bufwrite;
+	DMA2_Stream7->NDTR 	= (uint16_t)NIC_BUFMAX;
+	DMA2_Stream7->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
+	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
+	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9 | GPIO_OSPEEDER_OSPEEDR10;
+	GPIOA->AFR[1] = 0x00000770;
+	USART1->BRR = 50000000/115200;
+	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+	NVIC_EnableIRQ(USART1_IRQn);
+
 //	//USB
 //	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
 //	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
@@ -780,7 +760,6 @@ void NIC_WorkTypeRunComunication(void)
 {
 	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
 	{
-		LED3_ON;
 		pC->Nic.mode.time = pC->Nic.mode.timeout;
 		pC->Nic.mode.errorTimeout = true;
 		pC->Nic.mode.comStatus = NCS_isIdle;
@@ -790,7 +769,6 @@ void NIC_WorkTypeRunComunication(void)
 	
 	if(pC->Nic.mode.comStatus == NCS_isIdle)
 	{
-		LED2_TOG;
 		pC->Nic.mode.tabFunToSendPfbus[pC->Nic.mode.numFunToSend]();
 		pC->Nic.mode.numFunToSend++;
 		if(pC->Nic.mode.numFunToSend >= NIC_FRAMEMAX)
@@ -802,7 +780,6 @@ void NIC_WorkTypeRunComunication(void)
 	}
 }
 //***** Interrupts ********************************
-//Lewy COM
 void USART1_IRQHandler(void)
 {
 	if((USART1->SR & USART_SR_IDLE) != RESET)
@@ -811,22 +788,12 @@ void USART1_IRQHandler(void)
 		char c = USART1->DR;
 	}
 }
-//USB
 void USART2_IRQHandler(void)
 {
 	if((USART2->SR & USART_SR_IDLE) != RESET)
 	{
 		NIC_ChangeComStatus(NCS_isReading);
 		char c = USART2->DR;
-	}
-}
-//Srodkowy COM
-void USART3_IRQHandler(void)
-{
-	if((USART3->SR & USART_SR_IDLE) != RESET)
-	{
-		NIC_ChangeComStatus(NCS_isReading);
-		char c = USART3->DR;
 	}
 }
 //Srodkowy COM
