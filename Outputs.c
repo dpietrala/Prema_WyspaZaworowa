@@ -158,6 +158,11 @@ void Outputs_WorkTypeStop(void)
 	pC->Outs.coils = 0x00;
 	Outputs_ChangeState();
 }
+void Outputs_WorkTypeConfiguration(void)
+{
+	pC->Outs.coils = 0x00;
+	Outputs_ChangeState();
+}
 void Outputs_WorkTypeRun(void)
 {
 	if(pC->Mode.protocol == Prot_Mbrtu)
@@ -169,11 +174,6 @@ void Outputs_WorkTypeRun(void)
 	else if(pC->Mode.protocol == Prot_Pfnet)
 		pC->Outs.coils = pC->Nic.cid.coils;
 	
-	Outputs_ChangeState();
-}
-void Outputs_WorkTypeConfiguration(void)
-{
-	pC->Outs.coils = 0x00;
 	Outputs_ChangeState();
 }
 void Outputs_WorkTypeError(void)

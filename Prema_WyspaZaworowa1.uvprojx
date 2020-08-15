@@ -134,7 +134,7 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>-1</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
@@ -326,10 +326,10 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
-            <uGnu>1</uGnu>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
-            <v6LangP>1</v6LangP>
+            <v6Lang>3</v6Lang>
+            <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -352,7 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <ClangAsOpt>4</ClangAsOpt>
+            <ClangAsOpt>1</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -409,16 +409,6 @@
               <FilePath>.\MB_RTU_Slave.h</FilePath>
             </File>
             <File>
-              <FileName>Outputs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Outputs.c</FilePath>
-            </File>
-            <File>
-              <FileName>Outputs.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Outputs.h</FilePath>
-            </File>
-            <File>
               <FileName>NIC_Module.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\NIC_Module.c</FilePath>
@@ -427,6 +417,16 @@
               <FileName>NIC_Module.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\NIC_Module.h</FilePath>
+            </File>
+            <File>
+              <FileName>Outputs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Outputs.c</FilePath>
+            </File>
+            <File>
+              <FileName>Outputs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Outputs.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -457,18 +457,6 @@
       </component>
     </components>
     <files>
-      <file attr="config" category="source" condition="STM32F407xx_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s" version="2.6.2">
-        <instance index="0" removed="1">RTE\Device\STM32F407VGTx\startup_stm32f407xx.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
-        <targetInfos/>
-      </file>
-      <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.6.2">
-        <instance index="0" removed="1">RTE\Device\STM32F407VGTx\system_stm32f4xx.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS"/>
-        <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
-        <targetInfos/>
-      </file>
       <file attr="config" category="source" condition="STM32F410Rx_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f410rx.s" version="2.6.2">
         <instance index="0">RTE\Device\STM32F410RBTx\startup_stm32f410rx.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS"/>

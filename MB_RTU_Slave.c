@@ -12,24 +12,22 @@ void MBS_Conf(void)
 	for(uint16_t j=0;j<MBS_REGMAX;j++)
 		pC->Mbs.hregs[j] = 0;
 	
-//	DMA1_Stream1->PAR 	= (uint32_t)&USART3->DR;
-//	DMA1_Stream1->M0AR 	= (uint32_t)pC->Mbs.bufread;
-//	DMA1_Stream1->NDTR 	= (uint16_t)MBS_BUFMAX;
-//	DMA1_Stream1->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
-//	DMA1_Stream3->PAR 	= (uint32_t)&USART3->DR;
-//	DMA1_Stream3->M0AR 	= (uint32_t)pC->Mbs.bufwrite;
-//	DMA1_Stream3->NDTR 	= (uint16_t)MBS_BUFMAX;
-//	DMA1_Stream3->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
-//	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-//	
-//	GPIOB->MODER |= GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1;
-//	GPIOB->PUPDR |= GPIO_PUPDR_PUPDR10_0 | GPIO_PUPDR_PUPDR11_0;
-//	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10 | GPIO_OSPEEDER_OSPEEDR11;
-//	GPIOB->AFR[1] |= 0x00007700;
-//	USART3->BRR = 42000000/pC->Mbs.baud;
-//	USART3->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
-//	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
-//	NVIC_EnableIRQ(USART3_IRQn);
+	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream2->M0AR 	= (uint32_t)pC->Mbs.bufread;
+	DMA2_Stream2->NDTR 	= (uint16_t)MBS_BUFMAX;
+	DMA2_Stream2->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA2_Stream7->PAR 	= (uint32_t)&USART1->DR;
+	DMA2_Stream7->M0AR 	= (uint32_t)pC->Mbs.bufwrite;
+	DMA2_Stream7->NDTR 	= (uint16_t)MBS_BUFMAX;
+	DMA2_Stream7->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
+	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
+	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
+	GPIOA->AFR[1] = 0x00000770;
+	USART1->BRR = 50000000/pC->Mbs.baud;
+	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
+	NVIC_EnableIRQ(USART1_IRQn);
 	
 //	TIM7->PSC = 84-1;
 //	TIM7->ARR = 10 * pC->Mbs.unittime;
@@ -342,23 +340,23 @@ static void MBS_ReadRequest(void)
 	DMA1->LIFCR |= DMA_LIFCR_CTCIF1;
 	DMA1_Stream1->CR |= DMA_SxCR_EN;
 }
-//void USART3_IRQHandler(void)
-//{
-//	if((USART3->SR & USART_SR_IDLE) != RESET)
-//	{
-//		MBS_CheckAddress();
-//		char c = USART3->DR;
-//	}
-//}
-//void DMA1_Stream3_IRQHandler(void)
-//{
-//	if((DMA1->LISR & DMA_LISR_TCIF3) != RESET)
-//	{
-//		MBS_SetRead();
-//		DMA1_Stream3->CR &= ~DMA_SxCR_EN;
-//		DMA1->LIFCR |= DMA_LIFCR_CTCIF3;
-//	}
-//}
+void USART1_IRQHandler(void)
+{
+	if((USART1->SR & USART_SR_IDLE) != RESET)
+	{
+		MBS_CheckAddress();
+		char c = USART1->DR;
+	}
+}
+void DMA2_Stream2_IRQHandler(void)
+{
+	if((DMA2->LISR & DMA_LISR_TCIF2) != RESET)
+	{
+		MBS_SetRead();
+		DMA2_Stream2->CR &= ~DMA_SxCR_EN;
+		DMA2->LIFCR |= DMA_LIFCR_CTCIF2;
+	}
+}
 //void TIM7_IRQHandler(void)
 //{
 //	if((TIM7->SR & TIM_SR_UIF) != RESET)

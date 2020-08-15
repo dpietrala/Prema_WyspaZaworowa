@@ -15,36 +15,30 @@ static void Control_RccSystemInit(void)
 }
 static void Control_RccConf(void)
 {
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN |
-									RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
-
-	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-
-	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_USART6EN;
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+	RCC->APB1ENR |= RCC_APB1ENR_USART2EN | RCC_APB1ENR_TIM6EN;
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_ADC1EN;
 }
 static void Control_LedConf(void)
 {
 	LED_PORT->MODER 	|= GPIO_MODER_MODER8_0;
 	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR8_0;
-}
-static void Control_TimsConf(void)
-{
-	TIM6->PSC = 84-1;
-	TIM6->ARR = 10000;
-	TIM6->DIER |= TIM_DIER_UIE;
-	TIM6->CR1 |= TIM_CR1_CEN;
-	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	LED1_OFF;
 }
 static void Control_StructConf(void)
 {
-	pC->Mode.protocol = Prot_Mbtcp;
-	pC->Mode.workType = workTypeRun;
+	pC->Mode.protocol = Prot_Mbrtu;
+	pC->Mode.workType = workTypeStop;
+	
+	pC->Mode.ledTime = 0;
+	pC->Mode.ledPeriod = 100;
 	
 	pC->Nic.mode.nicFun = NF_I;
 	pC->Nic.mode.comStatus = NCS_isIdle;
 	pC->Nic.mode.address = 2;
 	pC->Nic.mode.timeout = 50;
 	pC->Nic.mode.time = 0;
+	
 	pC->Nic.mode.tabFunToSendMb[0] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendMb[1] = NIC_ReadSystemInformation;
 	pC->Nic.mode.tabFunToSendMb[2] = NIC_ReadCoils;
@@ -78,14 +72,60 @@ static void Control_StructConf(void)
 	pC->Nic.mode.tabFunToSendPfnet[8] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendPfnet[9] = NIC_ReadNetworkConfigurationPfnet;
 }
-void Control_SystemStart(void)
+static void Control_AdcConf(void)
+{
+	DMA2_Stream0->PAR = (uint32_t)&ADC1->DR;
+	DMA2_Stream0->M0AR = (uint32_t)pC->Mode.adcValue;
+	DMA2_Stream0->NDTR = (uint16_t)(200);
+	DMA2_Stream0->CR |= DMA_SxCR_PSIZE_0 | DMA_SxCR_MSIZE_0 | DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_EN;
+	
+	ADC->CCR 	|= ADC_CCR_ADCPRE | ADC_CCR_TSVREFE;
+	ADC1->CR2 |= ADC_CR2_ADON | ADC_CR2_CONT | ADC_CR2_DDS | ADC_CR2_DMA;
+	ADC1->CR1 |= ADC_CR1_SCAN;
+	
+	ADC1->SMPR1 |= ADC_SMPR1_SMP18;
+	ADC1->SQR3 |= (18<<0);
+	ADC1->CR2 |= ADC_CR2_SWSTART;
+}
+static void Control_TimsConf(void)
+{
+	TIM6->PSC = 50-1;
+	TIM6->ARR = 10000;
+	TIM6->DIER |= TIM_DIER_UIE;
+	TIM6->CR1 |= TIM_CR1_CEN;
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+}
+void Control_SystemInit(void)
 {
 	Control_RccSystemInit();
 	SysTick_Config(100000);
 	Control_RccConf();
 	Control_LedConf();
-//	Control_StructConf();
-//	Control_TimsConf();
+	Control_StructConf();
+	Control_AdcConf();
+	Control_TimsConf();
+}
+void Control_SystemStart(void)
+{
+	pC->Mode.workType = workTypeConf;
+}
+static void Control_LedAct(void)
+{
+	if(pC->Mode.workType == workTypeStop)
+	{
+		LED1_OFF;
+		pC->Mode.ledTime = 0;
+	}
+	else if(pC->Mode.workType == workTypeConf)
+	{
+		LED1_ON;
+		pC->Mode.ledTime = 0;
+	}
+	else if(pC->Mode.ledTime >= pC->Mode.ledPeriod)
+	{
+		LED1_TOG;
+		pC->Mode.ledTime = 0;
+	}
 }
 void delay_ms(uint32_t ms)
 {
@@ -95,39 +135,90 @@ void delay_ms(uint32_t ms)
 void SysTick_Handler(void)
 {
 	pC->Mode.tick++;
+	pC->Mode.ledTime++;
 	if(pC->Nic.mode.comStatus != NCS_isIdle)
 		pC->Nic.mode.time++;
 }
+static void Control_ReadMcuTemp(void)
+{
+	uint32_t suma = 0;
+	for(uint16_t i=0;i<200;i++)
+		suma += pC->Mode.adcValue[i];
+	
+	double VSENSE = (double)suma / 200.0 / 4096.0 * 3.3;
+	double V25 = 0.76;//V
+	double Avg_Slope = 0.0025; //V/C
+	pC->Mode.mcuTemp = ((VSENSE - V25) / Avg_Slope) + 25.0;
+}
+//******************************************************
+static void Control_ReadConfigFromFlash(void)
+{
+	
+}
+static void Control_StartModbusRTU(void)
+{
+}
+static void Control_StartModbusTCP(void)
+{
+}
+static void Control_StartProfiBUS(void)
+{
+}
+static void Control_StartProfiNET(void)
+{
+}
+//******************************************************
 static void Control_WorkTypeStop(void)
 {
 	Outputs_WorkTypeStop();
 }
-static void Control_WorkTypeRun(void)
-{
-	NIC_WorkTypeRunComunication();
-	Outputs_WorkTypeRun();
-}
 static void Control_WorkTypeConfiguration(void)
 {
 	Outputs_WorkTypeConfiguration();
+	Control_ReadConfigFromFlash();
+	if(pC->Mode.protocol == Prot_Mbrtu)
+	{
+		Control_StartModbusRTU();
+	}
+	else if(pC->Mode.protocol == Prot_Mbtcp)
+	{
+		Control_StartModbusTCP();
+	}
+	else if(pC->Mode.protocol == Prot_Pfbus)
+	{
+		Control_StartProfiBUS();
+	}
+	else if(pC->Mode.protocol == Prot_Pfnet)
+	{
+		Control_StartProfiNET();
+	}
+}
+static void Control_WorkTypeRun(void)
+{
+	pC->Mode.ledPeriod = 500;
+	NIC_WorkTypeRunComunication();
+	Outputs_WorkTypeRun();
 }
 static void Control_WorkTypeError(void)
 {
+	pC->Mode.ledPeriod = 100;
 	Outputs_WorkTypeError();
 }
 static void Control_Act(void)
 {
+	Control_LedAct();
+	Control_ReadMcuTemp();
 	if(pC->Mode.workType == workTypeStop)
 	{
 		Control_WorkTypeStop();
 	}
-	else if(pC->Mode.workType == workTypeRun)
-	{
-		Control_WorkTypeRun();
-	}
 	else if(pC->Mode.workType == workTypeConf)
 	{
 		Control_WorkTypeConfiguration();
+	}
+	else if(pC->Mode.workType == workTypeRun)
+	{
+		Control_WorkTypeRun();
 	}
 	else if(pC->Mode.workType == workTypeError)
 	{
