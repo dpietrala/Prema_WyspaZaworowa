@@ -5,6 +5,8 @@
 #include "NIC_Module.h"
 #include "MB_RTU_Slave.h"
 #include "Outputs.h"
+#include "Flash.h"
+#include "Eeprom.h"
 
 //MF_I 		= 0x00 - modbus function is idle
 //MF_RnDQ = 0x01 - modbus function is read 1 digital quits
@@ -55,6 +57,7 @@ typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicCo
 #define NIC_REGMAX				100
 #define NIC_FRAMEMAX			10
 #define MBS_COILMAX				16
+#define EE_VARMAX					10
 
 typedef struct	//modbus rtu slave
 {
@@ -325,10 +328,16 @@ typedef struct
 }sMode;
 typedef struct
 {
+	uint16_t 			VirtAddVarTab[EE_VARMAX];
+	uint16_t			VarDataTab[EE_VARMAX];
+}sEe;
+typedef struct
+{
 	sMode					Mode;
 	sMBS					Mbs;
 	sNIC					Nic;
 	sOutputs			Outs;
+	sEe						Ee;
 }sControl;
 
 void Control_SystemInit(void);

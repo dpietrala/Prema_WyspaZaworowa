@@ -135,7 +135,7 @@
 void Outputs_Conf(void);
 void Outputs_WorkTypeStop(void);
 void Outputs_WorkTypeRun(void);
-void Outputs_WorkTypeConfiguration(void);
+void Outputs_WorkTypeConf(void);
 void Outputs_WorkTypeError(void);
 
 

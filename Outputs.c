@@ -158,7 +158,7 @@ void Outputs_WorkTypeStop(void)
 	pC->Outs.coils = 0x00;
 	Outputs_ChangeState();
 }
-void Outputs_WorkTypeConfiguration(void)
+void Outputs_WorkTypeConf(void)
 {
 	pC->Outs.coils = 0x00;
 	Outputs_ChangeState();

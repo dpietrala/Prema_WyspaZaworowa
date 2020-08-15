@@ -1,5 +1,6 @@
 #include "Control.h"
 extern sControl* pC;
+
 static void Control_RccSystemInit(void)
 {
 	uint32_t PLL_M=8, PLL_N=200, PLL_P=2, PLL_Q=7;
@@ -29,6 +30,10 @@ static void Control_StructConf(void)
 {
 	pC->Mode.protocol = Prot_Mbrtu;
 	pC->Mode.workType = workTypeStop;
+	
+	for(uint32_t i=0;i<EE_VARMAX;i++)
+		pC->Ee.VirtAddVarTab[i] = i;
+	
 	
 	pC->Mode.ledTime = 0;
 	pC->Mode.ledPeriod = 100;
@@ -87,6 +92,14 @@ static void Control_AdcConf(void)
 	ADC1->SQR3 |= (18<<0);
 	ADC1->CR2 |= ADC_CR2_SWSTART;
 }
+static void Control_ReadConfigFromFlash(void)
+{
+	FLASH_Unlock();
+	EE_Init();
+	for(uint16_t i=0;i<EE_VARMAX;i++)
+		EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.VarDataTab[i]);
+	FLASH_Lock();
+}
 static void Control_TimsConf(void)
 {
 	TIM6->PSC = 50-1;
@@ -103,6 +116,7 @@ void Control_SystemInit(void)
 	Control_LedConf();
 	Control_StructConf();
 	Control_AdcConf();
+	Control_ReadConfigFromFlash();
 	Control_TimsConf();
 }
 void Control_SystemStart(void)
@@ -151,12 +165,9 @@ static void Control_ReadMcuTemp(void)
 	pC->Mode.mcuTemp = ((VSENSE - V25) / Avg_Slope) + 25.0;
 }
 //******************************************************
-static void Control_ReadConfigFromFlash(void)
-{
-	
-}
 static void Control_StartModbusRTU(void)
 {
+	pC->Mode.workType = workTypeRun;
 }
 static void Control_StartModbusTCP(void)
 {
@@ -167,15 +178,13 @@ static void Control_StartProfiBUS(void)
 static void Control_StartProfiNET(void)
 {
 }
-//******************************************************
 static void Control_WorkTypeStop(void)
 {
 	Outputs_WorkTypeStop();
 }
-static void Control_WorkTypeConfiguration(void)
+static void Control_WorkTypeConf(void)
 {
-	Outputs_WorkTypeConfiguration();
-	Control_ReadConfigFromFlash();
+	Outputs_WorkTypeConf();
 	if(pC->Mode.protocol == Prot_Mbrtu)
 	{
 		Control_StartModbusRTU();
@@ -214,7 +223,7 @@ static void Control_Act(void)
 	}
 	else if(pC->Mode.workType == workTypeConf)
 	{
-		Control_WorkTypeConfiguration();
+		Control_WorkTypeConf();
 	}
 	else if(pC->Mode.workType == workTypeRun)
 	{
