@@ -41,7 +41,8 @@ typedef enum
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
 
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
-typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicComStatus;
+typedef enum {NCS_comIsIdle = 0, NCS_comIsSending, NCS_comIsWaiting, NCS_comIsReading, NCS_comIsDone}eNicComStatus;
+typedef enum {NCS_confIsntDone = 0, NCS_confIsReading, NCS_confIsChecking, NCS_confIsWriting, NCS_confIsDone}eNicConfStatus;
 
 typedef enum
 {
@@ -107,7 +108,6 @@ typedef enum
 #define MBS_REGMAX				100
 #define NIC_REGMAX				100
 #define NIC_FRAMEMAX			10
-#define NIC_FUNCONFMAX		5
 #define MBS_COILMAX				16
 #define EE_VARMAX					47
 
@@ -330,20 +330,20 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 }sNIC_NC_PFN;
 typedef struct
 {
-	uint8_t				address;
-	eNicFun 			nicFun;
-	uint32_t			time;
-	uint32_t			timeout;
-	eBool					errorTimeout;
-	eNicComStatus	comStatus;
-	uint8_t				numFunToSend;
-	void					(*tabFunConfToSendMb[NIC_FRAMEMAX])(void);
-//	void					(*tabFunInitToSendPfbus[NIC_FRAMEMAX])(void);
-//	void					(*tabFunInitToSendPfnet[NIC_FRAMEMAX])(void);
+	uint8_t					address;
+	eNicFun 				nicFun;
+	uint32_t				time;
+	uint32_t				timeout;
+	eBool						errorTimeout;
+	eNicComStatus		comStatus; 
+	eNicConfStatus	confStatus;
+	uint8_t					numFunToSend;
+	uint8_t					maxFunToSend;
 
-	void					(*tabFunToSendMb[NIC_FRAMEMAX])(void);
-	void					(*tabFunToSendPfbus[NIC_FRAMEMAX])(void);
-	void					(*tabFunToSendPfnet[NIC_FRAMEMAX])(void);
+	void						(*tabFunToSend[NIC_FRAMEMAX])(void);
+//	void						(*tabFunToSendMb[NIC_FRAMEMAX])(void);
+//	void						(*tabFunToSendPfbus[NIC_FRAMEMAX])(void);
+//	void						(*tabFunToSendPfnet[NIC_FRAMEMAX])(void);
 }sNIC_Mode;
 typedef struct
 {
@@ -396,6 +396,7 @@ typedef struct
 	sNIC					Nic;
 	sOutputs			Outs;
 	sEe						Ee;
+	uint32_t			flaga1;
 }sControl;
 
 void Control_SystemInit(void);

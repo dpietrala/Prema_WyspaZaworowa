@@ -112,7 +112,7 @@ static void NIC_SendData(uint8_t* buf, uint32_t num)
 	DMA1_Stream6->NDTR 	= num;
 	DMA1_Stream6->CR |= DMA_SxCR_EN;
 	
-	NIC_ChangeComStatus(NCS_isSending);
+	NIC_ChangeComStatus(NCS_comIsSending);
 }
 static void NIC_ReadRegisters(uint16_t addr0, uint16_t numregs)
 {
@@ -665,8 +665,30 @@ static void NIC_ReadResponseAfterWriteReisters(void)
 		
 	}
 }
+static void NIC_SendNextFunction(void)
+{
+	pC->Nic.mode.tabFunToSend[pC->Nic.mode.numFunToSend]();
+}
+uint32_t licz = 0;
+void NIC_StartComunication(void)
+{
+//	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
+//	{
+//		pC->Nic.mode.time = pC->Nic.mode.timeout;
+//		pC->Nic.mode.errorTimeout = true;
+//		pC->Nic.mode.comStatus = NCS_comIsIdle;
+//	}
+//	else
+//	{
+//		pC->Nic.mode.errorTimeout = false;
+//	}
+		licz++;
+		pC->Nic.mode.numFunToSend = 0;
+		NIC_SendNextFunction();
+}
 static void NIC_ReadResponse(void)
 {
+	NIC_ChangeComStatus(NCS_comIsReading);
 	uint8_t* buf = pC->Nic.bufread;
 	switch(pC->Nic.mode.nicFun)
 	{
@@ -716,89 +738,14 @@ static void NIC_ReadResponse(void)
 	DMA1->HIFCR |= DMA_HIFCR_CTCIF5;
 	DMA1_Stream5->CR |= DMA_SxCR_EN;
 	
-	NIC_ChangeComStatus(NCS_isIdle);
-}
-//******************************************************************************
-static void NIC_ConfNextFunction(void)
-{
-	if(pC->Mode.protocol == Prot_Mbtcp)
-	{
-		pC->Nic.mode.tabFunConfToSendMb[pC->Nic.mode.numFunToSend]();
-	}
-//	else if(pC->Mode.protocol == Prot_Pfbus)
-//	{
-//		pC->Nic.mode.tabFunToSendPfbus[pC->Nic.mode.numFunToSend]();
-//	}
-//	else if(pC->Mode.protocol == Prot_Pfnet)
-//	{
-//		pC->Nic.mode.tabFunToSendPfnet[pC->Nic.mode.numFunToSend]();
-//	}
-	
 	pC->Nic.mode.numFunToSend++;
-	if(pC->Nic.mode.numFunToSend >= NIC_FUNCONFMAX)
-		pC->Nic.mode.numFunToSend = 0;
-}
-void NIC_WorkTypeConfComunication(void)
-{
-	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
+	if(pC->Nic.mode.numFunToSend >= pC->Nic.mode.maxFunToSend)
 	{
-		pC->Nic.mode.time = pC->Nic.mode.timeout;
-		pC->Nic.mode.errorTimeout = true;
-		pC->Nic.mode.comStatus = NCS_isIdle;
+		NIC_ChangeComStatus(NCS_comIsDone);
 	}
 	else
 	{
-		pC->Nic.mode.errorTimeout = false;
-	}
-	
-	if(pC->Nic.mode.comStatus == NCS_isIdle)
-	{
-		NIC_ConfNextFunction();
-	}
-	else if(pC->Nic.mode.comStatus == NCS_isReading)
-	{
-		NIC_ReadResponse();
-	}
-}
-static void NIC_WorkTypeRunNextFunction(void)
-{
-	if(pC->Mode.protocol == Prot_Mbtcp)
-	{
-		pC->Nic.mode.tabFunToSendMb[pC->Nic.mode.numFunToSend]();
-	}
-	else if(pC->Mode.protocol == Prot_Pfbus)
-	{
-		pC->Nic.mode.tabFunToSendPfbus[pC->Nic.mode.numFunToSend]();
-	}
-	else if(pC->Mode.protocol == Prot_Pfnet)
-	{
-		pC->Nic.mode.tabFunToSendPfnet[pC->Nic.mode.numFunToSend]();
-	}
-	
-	pC->Nic.mode.numFunToSend++;
-	if(pC->Nic.mode.numFunToSend >= NIC_FRAMEMAX)
-		pC->Nic.mode.numFunToSend = 0;
-}
-void NIC_WorkTypeRunComunication(void)
-{
-	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
-	{
-		pC->Nic.mode.time = pC->Nic.mode.timeout;
-		pC->Nic.mode.errorTimeout = true;
-		pC->Nic.mode.comStatus = NCS_isIdle;
-	}
-	else
-	{
-		pC->Nic.mode.errorTimeout = false;
-	}
-	
-	if(pC->Nic.mode.comStatus == NCS_isIdle)
-	{
-		NIC_WorkTypeRunNextFunction();
-	}
-	else if(pC->Nic.mode.comStatus == NCS_isReading)
-	{
-		NIC_ReadResponse();
+		NIC_SendNextFunction();
 	}
 }
 //***** Interrupts ********************************
@@ -806,7 +753,7 @@ void USART2_IRQHandler(void)
 {
 	if((USART2->SR & USART_SR_IDLE) != RESET)
 	{
-		NIC_ChangeComStatus(NCS_isReading);
+		NIC_ReadResponse();
 		char c = USART2->DR;
 	}
 }
@@ -814,7 +761,7 @@ void DMA1_Stream6_IRQHandler(void)
 {
 	if((DMA1->HISR & DMA_HISR_TCIF6) != RESET)
 	{
-		NIC_ChangeComStatus(NCS_isWaiting);
+		NIC_ChangeComStatus(NCS_comIsWaiting);
 		DMA1_Stream6->CR &= ~DMA_SxCR_EN;
 		DMA1->HIFCR |= DMA_HIFCR_CTCIF6;
 	}
