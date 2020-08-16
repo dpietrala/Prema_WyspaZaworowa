@@ -1,12 +1,14 @@
 #include "Control.h"
-extern sModbus* pModbus;
+sControl Control;
+sControl* pC = &Control;
 int main(void)
 {
-	SystemStart();
-	Modbus_Conf();
+	Control_SystemInit();
+	Outputs_Conf();
+	NIC_Conf();
+	Control_SystemStart();
   while(1)
   {
-		LED1_TOG;
-		delay_ms(100);
-  }
+		
+	}
 }
