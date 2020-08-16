@@ -719,7 +719,48 @@ static void NIC_ReadResponse(void)
 	NIC_ChangeComStatus(NCS_isIdle);
 }
 //******************************************************************************
-static void NIC_RunNextFunction(void)
+static void NIC_ConfNextFunction(void)
+{
+	if(pC->Mode.protocol == Prot_Mbtcp)
+	{
+		pC->Nic.mode.tabFunConfToSendMb[pC->Nic.mode.numFunToSend]();
+	}
+//	else if(pC->Mode.protocol == Prot_Pfbus)
+//	{
+//		pC->Nic.mode.tabFunToSendPfbus[pC->Nic.mode.numFunToSend]();
+//	}
+//	else if(pC->Mode.protocol == Prot_Pfnet)
+//	{
+//		pC->Nic.mode.tabFunToSendPfnet[pC->Nic.mode.numFunToSend]();
+//	}
+	
+	pC->Nic.mode.numFunToSend++;
+	if(pC->Nic.mode.numFunToSend >= NIC_FUNCONFMAX)
+		pC->Nic.mode.numFunToSend = 0;
+}
+void NIC_WorkTypeConfComunication(void)
+{
+	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
+	{
+		pC->Nic.mode.time = pC->Nic.mode.timeout;
+		pC->Nic.mode.errorTimeout = true;
+		pC->Nic.mode.comStatus = NCS_isIdle;
+	}
+	else
+	{
+		pC->Nic.mode.errorTimeout = false;
+	}
+	
+	if(pC->Nic.mode.comStatus == NCS_isIdle)
+	{
+		NIC_ConfNextFunction();
+	}
+	else if(pC->Nic.mode.comStatus == NCS_isReading)
+	{
+		NIC_ReadResponse();
+	}
+}
+static void NIC_WorkTypeRunNextFunction(void)
 {
 	if(pC->Mode.protocol == Prot_Mbtcp)
 	{
@@ -753,7 +794,7 @@ void NIC_WorkTypeRunComunication(void)
 	
 	if(pC->Nic.mode.comStatus == NCS_isIdle)
 	{
-		NIC_RunNextFunction();
+		NIC_WorkTypeRunNextFunction();
 	}
 	else if(pC->Nic.mode.comStatus == NCS_isReading)
 	{

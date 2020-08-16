@@ -21,5 +21,6 @@ void NIC_WriteNetworkConfigurationPfbus(void);
 void NIC_WriteNetworkConfigurationPfnet(void);
 void NIC_WriteCommandFlags(void);
 void NIC_WorkTypeRunComunication(void);
+void NIC_WorkTypeConfComunication(void);
 
 #endif

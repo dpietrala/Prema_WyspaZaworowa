@@ -1,6 +1,5 @@
 #include "Control.h"
 extern sControl* pC;
-
 static void Control_RccSystemInit(void)
 {
 	uint32_t PLL_M=8, PLL_N=200, PLL_P=2, PLL_Q=7;
@@ -43,6 +42,12 @@ static void Control_StructConf(void)
 	pC->Nic.mode.address = 2;
 	pC->Nic.mode.timeout = 50;
 	pC->Nic.mode.time = 0;
+	
+	pC->Nic.mode.tabFunConfToSendMb[0] = NIC_ReadSystemInformation;
+	pC->Nic.mode.tabFunConfToSendMb[1] = NIC_ReadSystemConfiguration;
+	pC->Nic.mode.tabFunConfToSendMb[2] = NIC_ReadSystemStatusComErrorFlags;
+	pC->Nic.mode.tabFunConfToSendMb[3] = NIC_ReadNetworkStatusMb;
+	pC->Nic.mode.tabFunConfToSendMb[4] = NIC_ReadNetworkConfigurationMb;
 	
 	pC->Nic.mode.tabFunToSendMb[0] = NIC_ReadCoils;
 	pC->Nic.mode.tabFunToSendMb[1] = NIC_ReadSystemInformation;
@@ -97,7 +102,69 @@ static void Control_ReadConfigFromFlash(void)
 	FLASH_Unlock();
 	EE_Init();
 	for(uint16_t i=0;i<EE_VARMAX;i++)
-		EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.VarDataTab[i]);
+		EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.rData[i]);
+	FLASH_Lock();
+	pC->Mode.protocol = (eProtocol)pC->Ee.rData[EeAdd_stmProt];
+}
+static void Control_WriteConfigToFlash(void)
+{
+	pC->Ee.wData[EeAdd_stmProt] 					= (uint16_t)Prot_Mbrtu;
+	
+	pC->Ee.wData[EeAdd_mbrtuAddress] 			= 2;
+	pC->Ee.wData[EeAdd_mbrtuTimeout] 			= 1000;
+	pC->Ee.wData[EeAdd_mbrtuBaudrate] 		= 7;
+	
+	pC->Ee.wData[EeAdd_mbtcpTimeout] 			= 1000;
+	pC->Ee.wData[EeAdd_mbtcpDataSwap] 		= 1;
+	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 19;
+	pC->Ee.wData[EeAdd_mbtcpIP1] 					= 0;
+	pC->Ee.wData[EeAdd_mbtcpIP2] 					= 168;
+	pC->Ee.wData[EeAdd_mbtcpIP3] 					= 192;
+	pC->Ee.wData[EeAdd_mbtcpMask0] 				= 0;
+	pC->Ee.wData[EeAdd_mbtcpMask1] 				= 255;
+	pC->Ee.wData[EeAdd_mbtcpMask2] 				= 255;
+	pC->Ee.wData[EeAdd_mbtcpMask3] 				= 255;
+	pC->Ee.wData[EeAdd_mbtcpGateway0] 		= 1;
+	pC->Ee.wData[EeAdd_mbtcpGateway1] 		= 0;
+	pC->Ee.wData[EeAdd_mbtcpGateway2] 		= 168;
+	pC->Ee.wData[EeAdd_mbtcpGateway3] 		= 192;
+	pC->Ee.wData[EeAdd_mbtcpSerwerCons] 	= 4;
+	pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutLow] 			= 0;
+	pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutHigh] 		= 0;	//0 - default value 31000ms
+	pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutLow] 	= 0;
+	pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutHigh] 	= 0;	//0 - default value 31000ms
+	pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutLow] 		= 0;
+	pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutHigh] 		= 0;	//0 - default value 13000ms
+	
+	pC->Ee.wData[EeAdd_pfbusTimeout] 								= 1000;
+	pC->Ee.wData[EeAdd_pfbusAdress] 								= 2;
+	pC->Ee.wData[EeAdd_pfbusBaudrate] 							= 15;
+	pC->Ee.wData[EeAdd_pfbusDPV1Enable] 						= 1;
+	pC->Ee.wData[EeAdd_pfbusSyncSupported] 					= 1;
+	pC->Ee.wData[EeAdd_pfbusFreezeSupported] 				= 1;
+	pC->Ee.wData[EeAdd_pfbusFailSafeSupported] 			= 1;
+	
+	pC->Ee.wData[EeAdd_pfnetTimeout] 		= 1000;
+	pC->Ee.wData[EeAdd_pfnetVendorId] 	= 1;
+	pC->Ee.wData[EeAdd_pfnetDeviceId] 	= 1;
+	pC->Ee.wData[EeAdd_pfnetIP0] 				= 19;
+	pC->Ee.wData[EeAdd_pfnetIP1] 				= 0;
+	pC->Ee.wData[EeAdd_pfnetIP2] 				= 168;
+	pC->Ee.wData[EeAdd_pfnetIP3] 				= 192;
+	pC->Ee.wData[EeAdd_pfnetMask0] 			= 0;
+	pC->Ee.wData[EeAdd_pfnetMask1] 			= 255;
+	pC->Ee.wData[EeAdd_pfnetMask2] 			= 255;
+	pC->Ee.wData[EeAdd_pfnetMask3] 			= 255;
+	pC->Ee.wData[EeAdd_pfnetGateway0] 	= 1;
+	pC->Ee.wData[EeAdd_pfnetGateway1] 	= 0;
+	pC->Ee.wData[EeAdd_pfnetGateway2] 	= 168;
+	pC->Ee.wData[EeAdd_pfnetGateway3] 	= 192;
+	
+	
+	FLASH_Unlock();
+	EE_Init();
+	for(uint16_t i=0;i<EE_VARMAX;i++)
+		EE_WriteVariable(pC->Ee.VirtAddVarTab[i], pC->Ee.wData[i]);
 	FLASH_Lock();
 }
 static void Control_TimsConf(void)
@@ -167,10 +234,25 @@ static void Control_ReadMcuTemp(void)
 //******************************************************
 static void Control_StartModbusRTU(void)
 {
+	pC->Mbs.address = (uint8_t)pC->Ee.rData[EeAdd_mbrtuAddress];
+	pC->Mbs.timeout	= pC->Ee.rData[EeAdd_mbrtuTimeout];
+	switch(pC->Ee.rData[EeAdd_mbrtuBaudrate])
+	{
+		case 0:		pC->Mbs.baud = 1200;		break;
+		case 1:		pC->Mbs.baud = 2400;		break;
+		case 2:		pC->Mbs.baud = 4800;		break;
+		case 3:		pC->Mbs.baud = 9600;		break;
+		case 4:		pC->Mbs.baud = 19200;		break;
+		case 5:		pC->Mbs.baud = 38400;		break;
+		case 6:		pC->Mbs.baud = 57600;		break;
+		case 7:		pC->Mbs.baud = 115200;	break;
+		default: 	pC->Mbs.baud = 9600;		break;
+	}
 	pC->Mode.workType = workTypeRun;
 }
 static void Control_StartModbusTCP(void)
 {
+	
 }
 static void Control_StartProfiBUS(void)
 {

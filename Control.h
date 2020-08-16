@@ -43,6 +43,57 @@ typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
 typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicComStatus;
 
+typedef enum
+{
+	EeAdd_stmProt,
+	EeAdd_mbrtuTimeout,
+	EeAdd_mbrtuAddress,
+	EeAdd_mbrtuBaudrate,
+	EeAdd_mbtcpTimeout,
+	EeAdd_mbtcpDataSwap,
+	EeAdd_mbtcpIP0,
+	EeAdd_mbtcpIP1,
+	EeAdd_mbtcpIP2,
+	EeAdd_mbtcpIP3,
+	EeAdd_mbtcpMask0,
+	EeAdd_mbtcpMask1,
+	EeAdd_mbtcpMask2,
+	EeAdd_mbtcpMask3,
+	EeAdd_mbtcpGateway0,
+	EeAdd_mbtcpGateway1,
+	EeAdd_mbtcpGateway2,
+	EeAdd_mbtcpGateway3,
+	EeAdd_mbtcpSerwerCons,
+	EeAdd_mbtcpSendAckTimeoutLow,
+	EeAdd_mbtcpSendAckTimeoutHigh,
+	EeAdd_mbtcpConnectAckTimeoutLow,
+	EeAdd_mbtcpConnectAckTimeoutHigh,
+	EeAdd_mbtcpCloseAckTimeoutLow,
+	EeAdd_mbtcpCloseAckTimeoutHigh,
+	EeAdd_pfbusTimeout,
+	EeAdd_pfbusAdress,
+	EeAdd_pfbusBaudrate,
+	EeAdd_pfbusDPV1Enable,
+	EeAdd_pfbusSyncSupported,
+	EeAdd_pfbusFreezeSupported,
+	EeAdd_pfbusFailSafeSupported,
+	EeAdd_pfnetTimeout,
+	EeAdd_pfnetVendorId,
+	EeAdd_pfnetDeviceId,
+	EeAdd_pfnetIP0,
+	EeAdd_pfnetIP1,
+	EeAdd_pfnetIP2,
+	EeAdd_pfnetIP3,
+	EeAdd_pfnetMask0,
+	EeAdd_pfnetMask1,
+	EeAdd_pfnetMask2,
+	EeAdd_pfnetMask3,
+	EeAdd_pfnetGateway0,
+	EeAdd_pfnetGateway1,
+	EeAdd_pfnetGateway2,
+	EeAdd_pfnetGateway3,
+}eEeAdd;
+
 #define LED_PORT		GPIOA
 #define LED1_PIN		GPIO_ODR_ODR_8
 
@@ -56,13 +107,15 @@ typedef enum {NCS_isIdle = 0, NCS_isSending, NCS_isWaiting, NCS_isReading}eNicCo
 #define MBS_REGMAX				100
 #define NIC_REGMAX				100
 #define NIC_FRAMEMAX			10
+#define NIC_FUNCONFMAX		5
 #define MBS_COILMAX				16
-#define EE_VARMAX					10
+#define EE_VARMAX					47
 
 typedef struct	//modbus rtu slave
 {
 	uint32_t			baud;
 	uint32_t			unittime;
+	uint16_t			timeout;
 	uint8_t				bufread[MBS_BUFMAX];
 	uint8_t 			bufwrite[MBS_BUFMAX];
 	
@@ -284,6 +337,10 @@ typedef struct
 	eBool					errorTimeout;
 	eNicComStatus	comStatus;
 	uint8_t				numFunToSend;
+	void					(*tabFunConfToSendMb[NIC_FRAMEMAX])(void);
+//	void					(*tabFunInitToSendPfbus[NIC_FRAMEMAX])(void);
+//	void					(*tabFunInitToSendPfnet[NIC_FRAMEMAX])(void);
+
 	void					(*tabFunToSendMb[NIC_FRAMEMAX])(void);
 	void					(*tabFunToSendPfbus[NIC_FRAMEMAX])(void);
 	void					(*tabFunToSendPfnet[NIC_FRAMEMAX])(void);
@@ -329,7 +386,8 @@ typedef struct
 typedef struct
 {
 	uint16_t 			VirtAddVarTab[EE_VARMAX];
-	uint16_t			VarDataTab[EE_VARMAX];
+	uint16_t			rData[EE_VARMAX];
+	uint16_t			wData[EE_VARMAX];
 }sEe;
 typedef struct
 {
