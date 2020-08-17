@@ -19,6 +19,9 @@ void NIC_WriteSystemConfiguration(void);
 void NIC_WriteNetworkConfigurationMb(void);
 void NIC_WriteNetworkConfigurationPfbus(void);
 void NIC_WriteNetworkConfigurationPfnet(void);
+void NIC_WriteClrcfgFlagInCommandFlags(void);
+void NIC_WriteStrcfgFlagInCommandFlags(void);
+void NIC_WriteInitFlagInCommandFlags(void);
 void NIC_WriteCommandFlags(void);
 void NIC_StartComunication(void);
 

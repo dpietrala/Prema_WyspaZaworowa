@@ -1,5 +1,6 @@
 #include "Control.h"
 extern sControl* pC;
+eBool correct = true;
 static void Control_RccSystemInit(void)
 {
 	uint32_t PLL_M=8, PLL_N=200, PLL_P=2, PLL_Q=7;
@@ -123,7 +124,7 @@ static void Control_WriteConfigToFlash(void)
 	
 	pC->Ee.wData[EeAdd_mbtcpTimeout] 			= 1234;
 	pC->Ee.wData[EeAdd_mbtcpDataSwap] 		= 1;
-	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 19;
+	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 13;
 	pC->Ee.wData[EeAdd_mbtcpIP1] 					= 0;
 	pC->Ee.wData[EeAdd_mbtcpIP2] 					= 168;
 	pC->Ee.wData[EeAdd_mbtcpIP3] 					= 192;
@@ -192,11 +193,10 @@ void Control_SystemInit(void)
 	Control_AdcConf();
 	Control_WriteConfigToFlash();
 	Control_ReadConfigFromFlash();
-	Control_TimsConf();
 }
 void Control_SystemStart(void)
 {
-	pC->Mode.workType = workTypeConf;
+	Control_TimsConf();
 }
 static void Control_LedAct(void)
 {
@@ -286,41 +286,135 @@ static void Control_ConfModbusRTU(void)
 	}
 	pC->Mode.workType = workTypeRun;
 }
-eBool correct = true;
 static void Control_ConfModbusTCP(void)
 {
-	if(pC->Nic.mode.confStatus == NCS_confIsntDone && pC->Nic.mode.comStatus == NCS_comIsIdle)
-	{
-		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
-		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
-		pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
-		pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkStatusMb;
-		pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationMb;
-		pC->Nic.mode.maxFunToSend = 5;
-		NIC_StartComunication();
-		pC->Nic.mode.confStatus = NCS_confIsReading;
-	}
-	if(pC->Nic.mode.confStatus == NCS_confIsReading && pC->Nic.mode.comStatus == NCS_comIsDone)
-	{
-		pC->flaga1++;
-		correct = Control_ConfCheckModbusTCP();
-		if(correct == false)
-		{
-//		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
-//		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
+	pC->flaga1 = 1; //*******************
+	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
+	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
+	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
+	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationMb;
+	pC->Nic.mode.maxFunToSend = 4;
+	NIC_StartComunication();
+	while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+	pC->Mode.workType = workTypeRun;
+//	correct = Control_ConfCheckModbusTCP();
+//	if(correct == true)
+//	{
+//		pC->Nic.mode.confStatus = NCS_confIsDone;
+//		pC->Mode.workType = workTypeRun;
+//		return;
+//	}
+//	else
+//	{
+//		pC->flaga1 = 2; //*******************
+//		pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb;
+//		pC->Nic.mode.tabFunToSend[1] = NIC_WriteClrcfgFlagInCommandFlags;
 //		pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
-//		pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkStatusMb;
-//		pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationMb;
-//		pC->Nic.mode.maxFunToSend = 5;
+//		pC->Nic.mode.maxFunToSend = 3;
 //		NIC_StartComunication();
-		}
-		else
-		{
-			pC->Nic.mode.confStatus = NCS_confIsDone;
-			pC->Mode.workType = workTypeRun;
-		}
-	}
+//		while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//		delay_ms(20000);
+//		pC->flaga1 = 3; //*******************
+//		while(pC->Nic.sscef.flagFlsCfg == true)
+//		{
+//			pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
+//			pC->Nic.mode.maxFunToSend = 1;
+//			NIC_StartComunication();
+//			while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//		}
+//		
+//		pC->flaga1 = 4; //*******************
+//		pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
+//		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+//		pC->Nic.mode.maxFunToSend = 2;
+//		NIC_StartComunication();
+//		while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//		delay_ms(20000);
+//		pC->flaga1 = 5; //*******************
+//		while(pC->Nic.sscef.flagFlsCfg == true)
+//		{
+//			pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
+//			pC->Nic.mode.maxFunToSend = 1;
+//			NIC_StartComunication();
+//			while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//		}
+//		
+//		pC->flaga1 = 6; //*******************
+//		pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
+//		pC->Nic.mode.maxFunToSend = 1;
+//		NIC_StartComunication();
+//		while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//	}
+//	
+//	pC->flaga1 = 7; //*******************
+//	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
+//	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
+//	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
+//	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationMb;
+//	pC->Nic.mode.maxFunToSend = 4;
+//	NIC_StartComunication();
+//	while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//	
+//	correct = Control_ConfCheckModbusTCP();
+//	if(correct == true)
+//	{
+//		pC->flaga1 = 8; //*******************
+//		pC->Nic.mode.confStatus = NCS_confIsDone;
+//		pC->Mode.workType = workTypeRun;
+//		return;
+//	}
 }
+
+//static void Control_ConfModbusTCP(void)
+//{
+//	pC->Nic.mode.confStatus = NCS_confIsReading;
+//	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
+//	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
+//	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
+//	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkStatusMb;
+//	pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationMb;
+//	pC->Nic.mode.maxFunToSend = 5;
+//	NIC_StartComunication();
+//	while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//	
+//	pC->Nic.mode.confStatus = NCS_confIsChecking;
+//	correct = Control_ConfCheckModbusTCP();
+//	if(correct == true)
+//	{
+//		pC->Nic.mode.confStatus = NCS_confIsDone;
+//		pC->Mode.workType = workTypeRun;
+//	}
+//	else
+//	{
+//		pC->Nic.mode.confStatus = NCS_confIsWriting;
+//		pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb;
+//		pC->Nic.mode.tabFunToSend[1] = NIC_WriteInitFlagInCommandFlags;
+//		pC->Nic.mode.maxFunToSend = 2;
+//		NIC_StartComunication();
+//	}
+//	while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//	
+//	pC->Nic.mode.confStatus = NCS_confIsReading;
+//	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
+//	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemConfiguration;
+//	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
+//	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkStatusMb;
+//	pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationMb;
+//	pC->Nic.mode.maxFunToSend = 5;
+//	NIC_StartComunication();
+//	while(pC->Nic.mode.comStatus != NCS_comIsDone){;}
+//	pC->Nic.mode.confStatus = NCS_confIsChecking;
+//	correct = Control_ConfCheckModbusTCP();
+//	if(correct == true)
+//	{
+//		pC->Nic.mode.confStatus = NCS_confIsDone;
+//		pC->Mode.workType = workTypeRun;
+//	}
+//	else
+//	{
+//		//Error
+//	}
+//}
 static void Control_ConfProfiBUS(void)
 {
 }
@@ -355,8 +449,9 @@ static void Control_WorkTypeStop(void)
 {
 	Outputs_WorkTypeStop();
 }
-static void Control_WorkTypeConf(void)
+void Control_WorkTypeConf(void)
 {
+	pC->Mode.workType = workTypeConf;
 	Outputs_WorkTypeConf();
 	if(pC->Mode.protocol == Prot_Mbrtu)
 	{
@@ -405,15 +500,7 @@ static void Control_Act(void)
 {
 	Control_LedAct();
 	Control_ReadMcuTemp();
-	if(pC->Mode.workType == workTypeStop)
-	{
-		Control_WorkTypeStop();
-	}
-	else if(pC->Mode.workType == workTypeConf)
-	{
-		Control_WorkTypeConf();
-	}
-	else if(pC->Mode.workType == workTypeRun)
+	if(pC->Mode.workType == workTypeRun)
 	{
 		Control_WorkTypeRun();
 	}

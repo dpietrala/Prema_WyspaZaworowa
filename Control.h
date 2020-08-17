@@ -30,7 +30,7 @@
 //MFE_NC 	= modbus function error - negative confirmation
 //MFE_PE 	= modbus function error - parity error
 typedef enum {false = 0, true = 1}eBool;
-typedef enum {workTypeStop = 0, workTypeConf, workTypeRun, workTypeError}eWorkType;
+typedef enum {workTypeStop = 0, workTypeConf = 1, workTypeRun = 2, workTypeError = 3}eWorkType;
 typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp, Prot_Pfbus, Prot_Pfnet}eProtocol;
 typedef enum 
 {
@@ -41,8 +41,8 @@ typedef enum
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
 
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
-typedef enum {NCS_comIsIdle = 0, NCS_comIsSending, NCS_comIsWaiting, NCS_comIsReading, NCS_comIsDone}eNicComStatus;
-typedef enum {NCS_confIsntDone = 0, NCS_confIsReading, NCS_confIsChecking, NCS_confIsWriting, NCS_confIsDone}eNicConfStatus;
+typedef enum {NCS_comIsIdle = 0, NCS_comIsSending = 1, NCS_comIsWaiting = 2, NCS_comIsReading = 3, NCS_comIsDone = 4}eNicComStatus;
+typedef enum {NCS_confIsntDone = 0, NCS_confIsReading = 1, NCS_confIsChecking = 2, NCS_confIsWriting = 3, NCS_confIsDone = 4}eNicConfStatus;
 
 typedef enum
 {
@@ -402,5 +402,6 @@ typedef struct
 void Control_SystemInit(void);
 void Control_SystemStart(void);
 void delay_ms(uint32_t ms);
+void Control_WorkTypeConf(void);
 
 #endif

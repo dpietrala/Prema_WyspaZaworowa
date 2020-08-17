@@ -84,6 +84,14 @@ static void NIC_BytesToTableUint16(uint8_t* buf, uint32_t* idx, uint16_t* tab, u
 		*idx += 2;
 	}
 }
+static void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_t* destidx, uint32_t num)
+{
+	for(int i=0;i<num/2;i++)
+	{
+		dest[*destidx] = ((uint16_t)source[2*i+1] << 8) + ((uint16_t)source[2*i+0] << 0);
+		*destidx += 1;
+	}
+}
 static void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab)
 {
 	tab[*idx] = val;
@@ -225,11 +233,13 @@ void NIC_WriteSystemConfiguration(void)
 void NIC_WriteNetworkConfigurationMb(void)
 {
 	pC->Nic.ncMbWrite = pC->Nic.ncMbRead;
+	pC->Nic.ncMbWrite.ipAddress[0] = pC->Ee.rData[EeAdd_mbtcpIP0];
+	pC->Nic.ncMbWrite.ipAddress[1] = pC->Ee.rData[EeAdd_mbtcpIP1];
+	pC->Nic.ncMbWrite.ipAddress[2] = pC->Ee.rData[EeAdd_mbtcpIP2];
+	pC->Nic.ncMbWrite.ipAddress[3] = pC->Ee.rData[EeAdd_mbtcpIP3];
 	
-	pC->Nic.ncMbWrite.sendAckTimeout = 25000;
-	
-	uint32_t idx = 12;
-	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.sendAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
+	uint32_t idx = 23;
+	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ipAddress, pC->Nic.ncMbWrite.regs, &idx,  4);
 	
 	NIC_WriteRegs(300, 100, pC->Nic.ncMbWrite.regs);
 	pC->Nic.mode.nicFun = NF_WR;
@@ -257,6 +267,27 @@ void NIC_WriteNetworkConfigurationPfnet(void)
 //	
 //	NIC_WriteRegs(300, 100, pC->Nic.ncPfnetWrite.regs);
 //	pC->Nic.mode.nicFun = NF_WR;
+}
+void NIC_WriteClrcfgFlagInCommandFlags(void)
+{
+	uint16_t val = pC->Nic.cfRead.flagsCommand;
+	val |= (1<<6);
+	NIC_WriteRegs(1999, 1, &val);
+	pC->Nic.mode.nicFun = NF_WR;
+}
+void NIC_WriteStrcfgFlagInCommandFlags(void)
+{
+	uint16_t val = pC->Nic.cfRead.flagsCommand;
+	val |= (1<<7);
+	NIC_WriteRegs(1999, 1, &val);
+	pC->Nic.mode.nicFun = NF_WR;
+}
+void NIC_WriteInitFlagInCommandFlags(void)
+{
+	uint16_t val = pC->Nic.cfRead.flagsCommand;
+	val |= (1<<4);
+	NIC_WriteRegs(1999, 1, &val);
+	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteCommandFlags(void)
 {
