@@ -26,7 +26,7 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
   }
   return crc;  
 }
-void NIC_Conf(void)
+static void NIC_ComConf(void)
 {
 	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
@@ -45,19 +45,23 @@ void NIC_Conf(void)
 	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
 	NVIC_EnableIRQ(USART2_IRQn);
 }
-static void NIC_BytesToUint8(uint8_t* buf, uint32_t* idx, uint8_t* val)
+void NIC_Conf(void)
+{
+	NIC_ComConf();
+}
+void NIC_BytesToUint8(uint8_t* buf, uint32_t* idx, uint8_t* val)
 {
 	*val = ((uint16_t)buf[*idx]<<0);
 	*idx += 1;
 }
-static void NIC_BytesToUint16(uint8_t* buf, uint32_t *idx, uint16_t* val)
+void NIC_BytesToUint16(uint8_t* buf, uint32_t *idx, uint16_t* val)
 {
 	*val = 0;
 	*val += ((uint16_t)buf[*idx+0]<<8);
 	*val += ((uint16_t)buf[*idx+1]<<0);
 	*idx += 2;
 }
-static void NIC_BytesToUint32(uint8_t* buf, uint32_t* idx, uint32_t* val)
+void NIC_BytesToUint32(uint8_t* buf, uint32_t* idx, uint32_t* val)
 {
 	*val = 0;
 	*val += ((uint32_t)buf[*idx+0]<<8);
@@ -66,7 +70,7 @@ static void NIC_BytesToUint32(uint8_t* buf, uint32_t* idx, uint32_t* val)
 	*val += ((uint32_t)buf[*idx+3]<<16);
 	*idx += 4;
 }
-static void NIC_BytesToTableUint8(uint8_t* buf, uint32_t* idx, uint8_t* tab, uint32_t num)
+void NIC_BytesToTableUint8(uint8_t* buf, uint32_t* idx, uint8_t* tab, uint32_t num)
 {
 	for(int i=0;i<num/2;i++)
 	{
@@ -76,7 +80,7 @@ static void NIC_BytesToTableUint8(uint8_t* buf, uint32_t* idx, uint8_t* tab, uin
 		*idx += 1;
 	}
 }
-static void NIC_BytesToTableUint16(uint8_t* buf, uint32_t* idx, uint16_t* tab, uint32_t num)
+void NIC_BytesToTableUint16(uint8_t* buf, uint32_t* idx, uint16_t* tab, uint32_t num)
 {
 	for(int i=0;i<num;i++)
 	{
@@ -84,7 +88,7 @@ static void NIC_BytesToTableUint16(uint8_t* buf, uint32_t* idx, uint16_t* tab, u
 		*idx += 2;
 	}
 }
-static void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_t* destidx, uint32_t num)
+void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_t* destidx, uint32_t num)
 {
 	for(int i=0;i<num/2;i++)
 	{
@@ -92,12 +96,12 @@ static void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_
 		*destidx += 1;
 	}
 }
-static void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab)
+void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab)
 {
 	tab[*idx] = val;
 	*idx += 1;
 }
-static void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab)
+void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab)
 {
 	tab[*idx] = val >> 0;
 	*idx += 1;
@@ -161,6 +165,67 @@ static void NIC_WriteRegs(uint16_t addr0, uint16_t numregs, uint16_t* regs)
 	buf[index++] = crc >> 8;
 	
 	NIC_SendData(buf, index);
+}
+void NIC_SetDefaultConfigurationMb(void)
+{
+	pC->Nic.ncMbDef.length = 66;	//66 Bayts
+	pC->Nic.ncMbDef.busStartup = 0;	//Automatic
+	pC->Nic.ncMbDef.wdgTimeout = 1000;
+	pC->Nic.ncMbDef.provSerwerConn = 4;
+	pC->Nic.ncMbDef.responseTimeout = 2000;	//2000ms
+	pC->Nic.ncMbDef.clientConWdgTimeout = 1000; //1000ms
+	pC->Nic.ncMbDef.protMode = 1; //Server mode
+	pC->Nic.ncMbDef.sendAckTimeout = 31000; //31000ms
+	pC->Nic.ncMbDef.conAckTimeout = 31000; //31000ms
+	pC->Nic.ncMbDef.closeAckTimeout = 13000; //13000ms
+	pC->Nic.ncMbDef.dataSwap = 1; //Data will be swapped
+	pC->Nic.ncMbDef.flagsReg321_322 = 0x00000007; //IP address available, Netmask available, Gateway available
+	pC->Nic.ncMbDef.flagIpAddressAvailabe = true; //IP address available,
+	pC->Nic.ncMbDef.flagNetMaskAvailabe = true; //Netmask available,
+	pC->Nic.ncMbDef.flagGatewayAvailabe = true;	//Gateway available
+	pC->Nic.ncMbDef.flagBootIp = false;
+	pC->Nic.ncMbDef.flagDhcp = false;
+	pC->Nic.ncMbDef.flagSetEthAddress = false;
+	pC->Nic.ncMbDef.ipAddress[0] = 19;
+	pC->Nic.ncMbDef.ipAddress[1] = 0;
+	pC->Nic.ncMbDef.ipAddress[2] = 168;
+	pC->Nic.ncMbDef.ipAddress[3] = 192;
+	pC->Nic.ncMbDef.subnetMask[0] = 0;
+	pC->Nic.ncMbDef.subnetMask[1] = 255;
+	pC->Nic.ncMbDef.subnetMask[2] = 255;
+	pC->Nic.ncMbDef.subnetMask[3] = 255;
+	pC->Nic.ncMbDef.gateway[0] = 1;
+	pC->Nic.ncMbDef.gateway[1] = 0;
+	pC->Nic.ncMbDef.gateway[2] = 168;
+	pC->Nic.ncMbDef.gateway[3] = 192;
+	pC->Nic.ncMbDef.ethAddress[0] = 0;
+	pC->Nic.ncMbDef.ethAddress[1] = 0;
+	pC->Nic.ncMbDef.ethAddress[2] = 0;
+	pC->Nic.ncMbDef.ethAddress[3] = 0;
+	pC->Nic.ncMbDef.ethAddress[4] = 0;
+	pC->Nic.ncMbDef.ethAddress[5] = 0;
+	pC->Nic.ncMbDef.flagsReg332_333 = 0x00000000;
+	pC->Nic.ncMbDef.flagMapFc1ToFc3 = false;
+	pC->Nic.ncMbDef.flagSkipConfTcpipStack = false;
+	
+	uint32_t idx = 0;
+	NIC_Uint16ToTableUint16(pC->Nic.ncMbDef.length, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.busStartup, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.wdgTimeout, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.provSerwerConn, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.responseTimeout/100, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.clientConWdgTimeout/100, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.protMode, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.sendAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.conAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.closeAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.dataSwap, &idx, pC->Nic.ncMbDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg321_322, &idx, pC->Nic.ncMbDef.regs);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ipAddress, pC->Nic.ncMbDef.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.subnetMask, pC->Nic.ncMbDef.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.gateway, pC->Nic.ncMbDef.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ethAddress, pC->Nic.ncMbDef.regs, &idx, 6);
+	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg332_333, &idx, pC->Nic.ncMbDef.regs);
 }
 //**** Funkcje wysylajace do modulu *************************************
 void NIC_ReadCoils(void)
@@ -232,39 +297,16 @@ void NIC_WriteSystemConfiguration(void)
 }
 void NIC_WriteNetworkConfigurationMb(void)
 {
-	pC->Nic.ncMbWrite = pC->Nic.ncMbRead;
-	pC->Nic.ncMbWrite.ipAddress[0] = pC->Ee.rData[EeAdd_mbtcpIP0];
-	pC->Nic.ncMbWrite.ipAddress[1] = pC->Ee.rData[EeAdd_mbtcpIP1];
-	pC->Nic.ncMbWrite.ipAddress[2] = pC->Ee.rData[EeAdd_mbtcpIP2];
-	pC->Nic.ncMbWrite.ipAddress[3] = pC->Ee.rData[EeAdd_mbtcpIP3];
-	
-	uint32_t idx = 23;
-	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ipAddress, pC->Nic.ncMbWrite.regs, &idx,  4);
-	
 	NIC_WriteRegs(300, 100, pC->Nic.ncMbWrite.regs);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationPfbus(void)
 {
-//	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusRead;
-//	
-//	pC->Nic.ncPfbusWrite.sendAckTimeout = 25000;
-//	
-//	uint32_t idx = 12;
-//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusWrite.sendAckTimeout, &idx, pC->Nic.ncPfbusWrite.regs);
-//	
 //	NIC_WriteRegs(300, 100, pC->Nic.ncPfbusWrite.regs);
 //	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationPfnet(void)
 {
-//	pC->Nic.ncPfnetWrite = pC->Nic.ncPfnetRead;
-//	
-//	pC->Nic.ncPfnetWrite.sendAckTimeout = 25000;
-//	
-//	uint32_t idx = 12;
-//	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.sendAckTimeout, &idx, pC->Nic.ncPfnetWrite.regs);
-//	
 //	NIC_WriteRegs(300, 100, pC->Nic.ncPfnetWrite.regs);
 //	pC->Nic.mode.nicFun = NF_WR;
 }
@@ -537,7 +579,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationMb(void)
 		pC->Nic.ncMbRead.flagGatewayAvailabe 		= (eBool)((pC->Nic.ncMbRead.flagsReg321_322 >> 2) & 0x01);
 		pC->Nic.ncMbRead.flagBootIp 						= (eBool)((pC->Nic.ncMbRead.flagsReg321_322 >> 3) & 0x01);
 		pC->Nic.ncMbRead.flagDhcp 							= (eBool)((pC->Nic.ncMbRead.flagsReg321_322 >> 4) & 0x01);
-		pC->Nic.ncMbRead.flgSetEthAddress 			= (eBool)((pC->Nic.ncMbRead.flagsReg321_322 >> 5) & 0x01);
+		pC->Nic.ncMbRead.flagSetEthAddress 			= (eBool)((pC->Nic.ncMbRead.flagsReg321_322 >> 5) & 0x01);
 		
 		pC->Nic.ncMbRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncMbRead.flagsReg332_333 >> 0) & 0x01);
 		pC->Nic.ncMbRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncMbRead.flagsReg332_333 >> 1) & 0x01);
@@ -669,7 +711,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet(void)
 		pC->Nic.ncPfnetRead.flagGatewayAvailabe 		= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 2) & 0x01);
 		pC->Nic.ncPfnetRead.flagBootIp 						= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 3) & 0x01);
 		pC->Nic.ncPfnetRead.flagDhcp 							= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 4) & 0x01);
-		pC->Nic.ncPfnetRead.flgSetEthAddress 			= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 5) & 0x01);
+		pC->Nic.ncPfnetRead.flagSetEthAddress 			= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 5) & 0x01);
 		
 		pC->Nic.ncPfnetRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 0) & 0x01);
 		pC->Nic.ncPfnetRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 1) & 0x01);

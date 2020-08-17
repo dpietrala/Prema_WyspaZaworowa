@@ -107,7 +107,7 @@ typedef enum
 #define NIC_BUFMAX 				1000
 #define MBS_REGMAX				100
 #define NIC_REGMAX				100
-#define NIC_FRAMEMAX			10
+#define NIC_FRAMEMAX			20
 #define MBS_COILMAX				16
 #define EE_VARMAX					47
 
@@ -253,7 +253,7 @@ typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 	eBool				flagGatewayAvailabe;					//register: 321d bit 2
 	eBool				flagBootIp;										//register: 321d bit 3
 	eBool				flagDhcp;											//register: 321d bit 4
-	eBool				flgSetEthAddress;							//register: 321d bit 5
+	eBool				flagSetEthAddress;						//register: 321d bit 5
 	
 	uint8_t			ipAddress[4];									//registers: 323d - 324d
 	uint8_t			subnetMask[4];								//registers: 325d - 326d
@@ -318,7 +318,7 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 	eBool				flagGatewayAvailabe;					//register: 321d bit 2
 	eBool				flagBootIp;										//register: 321d bit 3
 	eBool				flagDhcp;											//register: 321d bit 4
-	eBool				flgSetEthAddress;							//register: 321d bit 5
+	eBool				flagSetEthAddress;							//register: 321d bit 5
 	
 	uint8_t			ipAddress[4];									//registers: 323d - 324d
 	uint8_t			subnetMask[4];								//registers: 325d - 326d
@@ -341,9 +341,6 @@ typedef struct
 	uint8_t					maxFunToSend;
 
 	void						(*tabFunToSend[NIC_FRAMEMAX])(void);
-//	void						(*tabFunToSendMb[NIC_FRAMEMAX])(void);
-//	void						(*tabFunToSendPfbus[NIC_FRAMEMAX])(void);
-//	void						(*tabFunToSendPfnet[NIC_FRAMEMAX])(void);
 }sNIC_Mode;
 typedef struct
 {
@@ -360,6 +357,7 @@ typedef struct
 	sNIC_CF				cfWrite;
 	sNIC_COD			cod;
 	sNIC_NS_MB		nsMb;
+	sNIC_NC_MB		ncMbDef;
 	sNIC_NC_MB		ncMbRead;
 	sNIC_NC_MB		ncMbWrite;
 	sNIC_NS_PFB		nsPfbus;

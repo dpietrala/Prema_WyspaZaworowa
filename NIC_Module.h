@@ -2,6 +2,16 @@
 #define _NIC_MODULE
 #include "Control.h"
 
+void NIC_BytesToUint8(uint8_t* buf, uint32_t* idx, uint8_t* val);
+void NIC_BytesToUint16(uint8_t* buf, uint32_t *idx, uint16_t* val);
+void NIC_BytesToUint32(uint8_t* buf, uint32_t* idx, uint32_t* val);
+void NIC_BytesToTableUint8(uint8_t* buf, uint32_t* idx, uint8_t* tab, uint32_t num);
+void NIC_BytesToTableUint16(uint8_t* buf, uint32_t* idx, uint16_t* tab, uint32_t num);
+void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_t* destidx, uint32_t num);
+void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab);
+void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab);
+
+
 void NIC_Conf(void);
 void NIC_ReadCoils(void);
 void NIC_ReadSystemInformation(void);
@@ -24,5 +34,7 @@ void NIC_WriteStrcfgFlagInCommandFlags(void);
 void NIC_WriteInitFlagInCommandFlags(void);
 void NIC_WriteCommandFlags(void);
 void NIC_StartComunication(void);
+void NIC_ConverseConfiguratonToRegsMb(void);
+void NIC_SetDefaultConfigurationMb(void);
 
 #endif
