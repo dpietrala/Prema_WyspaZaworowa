@@ -35,6 +35,8 @@ void NIC_WriteInitFlagInCommandFlags(void);
 void NIC_WriteCommandFlags(void);
 void NIC_StartComunication(void);
 void NIC_ConverseConfiguratonToRegsMb(void);
+void NIC_SetDefaultSystemInformationMb(void);
 void NIC_SetDefaultConfigurationMb(void);
+
 
 #endif

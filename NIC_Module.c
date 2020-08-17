@@ -166,6 +166,141 @@ static void NIC_WriteRegs(uint16_t addr0, uint16_t numregs, uint16_t* regs)
 	
 	NIC_SendData(buf, index);
 }
+void NIC_SetDefaultSystemInformationMb(void)
+{
+	uint32_t tabidx = 0;
+	
+	pC->Nic.siDefMb.devNumber = 1541100;
+	pC->Nic.siDefMb.serNumber = 73180;			//doesnt matter
+	pC->Nic.siDefMb.devClass = 19;
+	pC->Nic.siDefMb.hardRev = 1;						//doesnt matter
+	pC->Nic.siDefMb.hardCompIndex = 0;			//doesnt matter
+	pC->Nic.siDefMb.hardOpChann0 = 128;			//doesnt matter
+	pC->Nic.siDefMb.hardOpChann1 = 128;			//doesnt matter
+	pC->Nic.siDefMb.hardOpChann2 = 65534;		//doesnt matter
+	pC->Nic.siDefMb.hardOpChann3 = 65534;		//doesnt matter
+	pC->Nic.siDefMb.virtualDPMSize = 65536;	//doesnt matter
+	pC->Nic.siDefMb.manufCode = 1;					//doesnt matter
+	pC->Nic.siDefMb.prodCode = 4896;				//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x02; //doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0xa2; //doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x57; //doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x2d; //doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x46; //doesnt matter
+	pC->Nic.siDefMb.firm = 0;
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.firmVer[tabidx++] = 1; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 2; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 16; //doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefMb.firmVer[tabidx++] = 0; 	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.firmDate[tabidx++] = 255;	//doesnt matter
+	pC->Nic.siDefMb.firmDate[tabidx++] = 7;		//doesnt matter
+	pC->Nic.siDefMb.firmDate[tabidx++] = 6;		//doesnt matter
+	pC->Nic.siDefMb.firmDate[tabidx++] = 31;	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = '\t';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'M';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'o';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'd';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'b';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'u';
+	pC->Nic.siDefMb.firmName[tabidx++] = 's';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'T';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'C';
+	pC->Nic.siDefMb.firmName[tabidx++] = 'P';
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.firmName[tabidx++] = 0;
+	pC->Nic.siDefMb.comClass = 6;						//doesnt matter
+	pC->Nic.siDefMb.protClass = 18;
+	pC->Nic.siDefMb.protConfClass = 0;			//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefMb.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+}
 void NIC_SetDefaultConfigurationMb(void)
 {
 	pC->Nic.ncMbDef.length = 66;	//66 Bayts
@@ -398,6 +533,9 @@ static void NIC_ReadResponseAfterReadSystemInformations(void)
 		idx += 18; //reserved bytes
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.si.inputConfShiftRegs, 10);
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.si.outputStatusShiftRegs, 10);
+		
+		idx = 3;
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.si.regs, 100);
 	}
 }
 static void NIC_ReadResponseAfterReadSystemConfiguration(void)

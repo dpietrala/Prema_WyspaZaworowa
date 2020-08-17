@@ -129,6 +129,7 @@ typedef struct	//modbus rtu slave
 }sMBS;
 typedef struct	//system information: registers 0d - 99d
 {
+	uint16_t		regs[100];
 	uint32_t		devNumber;										//start registers: 0d
 	uint32_t		serNumber;										//start registers: 2d
 	uint16_t		devClass;											//start registers: 4d
@@ -349,6 +350,7 @@ typedef struct
 
 	sNIC_Mode			mode;
 	sNIC_SI				si;
+	sNIC_SI				siDefMb;
 	sNIC_SC				scRead;
 	sNIC_SC				scWrite;
 	sNIC_SSCEF		sscef;
@@ -389,11 +391,21 @@ typedef struct
 }sEe;
 typedef struct
 {
+	eBool		nicIncompDevNumber;
+	eBool		nicIncompDevClass;
+	eBool		nicIncompProtClass;
+	eBool		nicIncompFirmName;
+	eBool		nicInvalidConfigWriting;
+	
+}sStatus;
+typedef struct
+{
 	sMode					Mode;
 	sMBS					Mbs;
 	sNIC					Nic;
 	sOutputs			Outs;
 	sEe						Ee;
+	sStatus				Status;
 	uint32_t			flaga1;
 }sControl;
 
