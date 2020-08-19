@@ -111,7 +111,6 @@ void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab)
 static void NIC_ChangeComStatus(eNicComStatus newstatus)
 {
 	pC->Nic.mode.comStatus = newstatus;
-	pC->Nic.mode.time = 0;
 }
 static void NIC_SendData(uint8_t* buf, uint32_t num)
 {
@@ -209,7 +208,7 @@ void NIC_SetDefaultSystemInformationMb(void)
 	pC->Nic.siDefMb.firmDate[tabidx++] = 31;	//doesnt matter
 	
 	tabidx = 0;
-	pC->Nic.siDefMb.firmName[tabidx++] = '\t';
+	pC->Nic.siDefMb.firmName[tabidx++] = 9;
 	pC->Nic.siDefMb.firmName[tabidx++] = 'M';
 	pC->Nic.siDefMb.firmName[tabidx++] = 'o';
 	pC->Nic.siDefMb.firmName[tabidx++] = 'd';
@@ -361,6 +360,236 @@ void NIC_SetDefaultConfigurationMb(void)
 	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.gateway, pC->Nic.ncMbDef.regs, &idx, 4);
 	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ethAddress, pC->Nic.ncMbDef.regs, &idx, 6);
 	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg332_333, &idx, pC->Nic.ncMbDef.regs);
+}
+void NIC_SetDefaultSystemInformationPfnet(void)
+{
+	uint32_t tabidx = 0;
+	
+	pC->Nic.siDefPfnet.devNumber = 1541100;
+	pC->Nic.siDefPfnet.serNumber = 73180;			//doesnt matter
+	pC->Nic.siDefPfnet.devClass = 19;
+	pC->Nic.siDefPfnet.hardRev = 1;						//doesnt matter
+	pC->Nic.siDefPfnet.hardCompIndex = 4;			//doesnt matter
+	pC->Nic.siDefPfnet.hardOpChann0 = 128;			//doesnt matter
+	pC->Nic.siDefPfnet.hardOpChann1 = 128;			//doesnt matter
+	pC->Nic.siDefPfnet.hardOpChann2 = 65534;		//doesnt matter
+	pC->Nic.siDefPfnet.hardOpChann3 = 65534;		//doesnt matter
+	pC->Nic.siDefPfnet.virtualDPMSize = 65536;	//doesnt matter
+	pC->Nic.siDefPfnet.manufCode = 1;					//doesnt matter
+	pC->Nic.siDefPfnet.prodCode = 4896;				//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x02; //doesnt matter
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0xa2; //doesnt matter
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x57; //doesnt matter
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x2d; //doesnt matter
+	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x46; //doesnt matter
+	
+	pC->Nic.siDefPfnet.firm = 0;										//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 1; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 5; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 17; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfnet.firmVer[tabidx++] = 0; 	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.firmDate[tabidx++] = 255;	//doesnt matter
+	pC->Nic.siDefPfnet.firmDate[tabidx++] = 7;		//doesnt matter
+	pC->Nic.siDefPfnet.firmDate[tabidx++] = 11;		//doesnt matter
+	pC->Nic.siDefPfnet.firmDate[tabidx++] = 2;	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 14;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'P';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'R';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'O';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'F';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'I';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'N';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'E';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'T';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = ' ';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'S';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'l';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'a';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'v';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 'e';
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfnet.comClass = 10;					//doesnt matter
+	pC->Nic.siDefPfnet.protClass = 21;
+	pC->Nic.siDefPfnet.protConfClass = 67;			//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfnet.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+}
+void NIC_SetDefaultConfigurationPfnet(void)
+{
+	pC->Nic.ncMbDef.length = 66;	//66 Bayts
+	pC->Nic.ncMbDef.busStartup = 0;	//Automatic
+	pC->Nic.ncMbDef.wdgTimeout = 1000;
+	pC->Nic.ncMbDef.provSerwerConn = 4;
+	pC->Nic.ncMbDef.responseTimeout = 2000;	//2000ms
+	pC->Nic.ncMbDef.clientConWdgTimeout = 1000; //1000ms
+	pC->Nic.ncMbDef.protMode = 1; //Server mode
+	pC->Nic.ncMbDef.sendAckTimeout = 31000; //31000ms
+	pC->Nic.ncMbDef.conAckTimeout = 31000; //31000ms
+	pC->Nic.ncMbDef.closeAckTimeout = 13000; //13000ms
+	pC->Nic.ncMbDef.dataSwap = 1; //Data will be swapped
+	pC->Nic.ncMbDef.flagsReg321_322 = 0x00000007; //IP address available, Netmask available, Gateway available
+	pC->Nic.ncMbDef.flagIpAddressAvailabe = true; //IP address available,
+	pC->Nic.ncMbDef.flagNetMaskAvailabe = true; //Netmask available,
+	pC->Nic.ncMbDef.flagGatewayAvailabe = true;	//Gateway available
+	pC->Nic.ncMbDef.flagBootIp = false;
+	pC->Nic.ncMbDef.flagDhcp = false;
+	pC->Nic.ncMbDef.flagSetEthAddress = false;
+	pC->Nic.ncMbDef.ipAddress[0] = 19;
+	pC->Nic.ncMbDef.ipAddress[1] = 0;
+	pC->Nic.ncMbDef.ipAddress[2] = 168;
+	pC->Nic.ncMbDef.ipAddress[3] = 192;
+	pC->Nic.ncMbDef.subnetMask[0] = 0;
+	pC->Nic.ncMbDef.subnetMask[1] = 255;
+	pC->Nic.ncMbDef.subnetMask[2] = 255;
+	pC->Nic.ncMbDef.subnetMask[3] = 255;
+	pC->Nic.ncMbDef.gateway[0] = 1;
+	pC->Nic.ncMbDef.gateway[1] = 0;
+	pC->Nic.ncMbDef.gateway[2] = 168;
+	pC->Nic.ncMbDef.gateway[3] = 192;
+	pC->Nic.ncMbDef.ethAddress[0] = 0;
+	pC->Nic.ncMbDef.ethAddress[1] = 0;
+	pC->Nic.ncMbDef.ethAddress[2] = 0;
+	pC->Nic.ncMbDef.ethAddress[3] = 0;
+	pC->Nic.ncMbDef.ethAddress[4] = 0;
+	pC->Nic.ncMbDef.ethAddress[5] = 0;
+	pC->Nic.ncMbDef.flagsReg332_333 = 0x00000000;
+	pC->Nic.ncMbDef.flagMapFc1ToFc3 = false;
+	pC->Nic.ncMbDef.flagSkipConfTcpipStack = false;
+	
+	
+	
+	
+	
+	
+//	uint16_t		length;												//register: 300d
+//	uint32_t		busStartup;										//registers: 301d - 302d bit0
+//	uint32_t		wdgTimeout;										//registers: 303d - 304d
+//	uint32_t		provSerwerConn;								//registers: 305d - 306d
+//	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
+//	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
+//	uint32_t		protMode;											//registers: 311d - 312d
+//	uint32_t		sendAckTimeout;								//registers: 313d - 314d
+//	uint32_t		conAckTimeout;								//registers: 315d - 316d
+//	uint32_t		closeAckTimeout;							//registers: 317d - 318d
+//	uint32_t		dataSwap;											//registers: 319d - 320d
+//	uint32_t		flagsReg321_322;							//registers: 321d - 322d
+//	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
+//	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
+//	eBool				flagGatewayAvailabe;					//register: 321d bit 2
+//	eBool				flagBootIp;										//register: 321d bit 3
+//	eBool				flagDhcp;											//register: 321d bit 4
+//	eBool				flagSetEthAddress;							//register: 321d bit 5
+//	
+//	uint8_t			ipAddress[4];									//registers: 323d - 324d
+//	uint8_t			subnetMask[4];								//registers: 325d - 326d
+//	uint8_t			gateway[4];										//registers: 327d - 328d
+//	uint8_t			ethAddress[6];								//registers: 329d - 331d
+//	uint32_t		flagsReg332_333;							//registers: 332d - 333d
+//	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
+//	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+	
+//	
+//	uint32_t idx = 0;
+//	NIC_Uint16ToTableUint16(pC->Nic.ncMbDef.length, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.busStartup, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.wdgTimeout, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.provSerwerConn, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.responseTimeout/100, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.clientConWdgTimeout/100, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.protMode, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.sendAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.conAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.closeAckTimeout, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.dataSwap, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg321_322, &idx, pC->Nic.ncMbDef.regs);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ipAddress, pC->Nic.ncMbDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.subnetMask, pC->Nic.ncMbDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.gateway, pC->Nic.ncMbDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ethAddress, pC->Nic.ncMbDef.regs, &idx, 6);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg332_333, &idx, pC->Nic.ncMbDef.regs);
 }
 //**** Funkcje wysylajace do modulu *************************************
 void NIC_ReadCoils(void)
@@ -847,12 +1076,12 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet(void)
 		pC->Nic.ncPfnetRead.flagIpAddressAvailabe 	= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 0) & 0x01);
 		pC->Nic.ncPfnetRead.flagNetMaskAvailabe 		= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 1) & 0x01);
 		pC->Nic.ncPfnetRead.flagGatewayAvailabe 		= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 2) & 0x01);
-		pC->Nic.ncPfnetRead.flagBootIp 						= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 3) & 0x01);
-		pC->Nic.ncPfnetRead.flagDhcp 							= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 4) & 0x01);
+		pC->Nic.ncPfnetRead.flagBootIp 							= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 3) & 0x01);
+		pC->Nic.ncPfnetRead.flagDhcp 								= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 4) & 0x01);
 		pC->Nic.ncPfnetRead.flagSetEthAddress 			= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 5) & 0x01);
 		
 		pC->Nic.ncPfnetRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 0) & 0x01);
-		pC->Nic.ncPfnetRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 1) & 0x01);
+		pC->Nic.ncPfnetRead.flagSkipConfTcpipStack 	= (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 1) & 0x01);
 		
 		idx = 3;
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncPfnetRead.regs, 100);
@@ -880,22 +1109,13 @@ static void NIC_SendNextFunction(void)
 {
 	pC->Nic.mode.tabFunToSend[pC->Nic.mode.numFunToSend]();
 }
-uint32_t licz = 0;
-void NIC_StartComunication(void)
+void NIC_StartComunication(uint8_t num, uint32_t timeout)
 {
-//	if(pC->Nic.mode.time >= pC->Nic.mode.timeout)
-//	{
-//		pC->Nic.mode.time = pC->Nic.mode.timeout;
-//		pC->Nic.mode.errorTimeout = true;
-//		pC->Nic.mode.comStatus = NCS_comIsIdle;
-//	}
-//	else
-//	{
-//		pC->Nic.mode.errorTimeout = false;
-//	}
-		licz++;
-		pC->Nic.mode.numFunToSend = 0;
-		NIC_SendNextFunction();
+	pC->Nic.mode.comTimeout = timeout;
+	pC->Nic.mode.comTime = 0;
+	pC->Nic.mode.maxFunToSend = num;
+	pC->Nic.mode.numFunToSend = 0;
+	NIC_SendNextFunction();
 }
 static void NIC_ReadResponse(void)
 {

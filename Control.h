@@ -43,10 +43,18 @@ typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC
 typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
 typedef enum {NCS_comIsIdle = 0, NCS_comIsSending = 1, NCS_comIsWaiting = 2, NCS_comIsReading = 3, NCS_comIsDone = 4}eNicComStatus;
 typedef enum {NCS_confIsntDone = 0, NCS_confIsReading = 1, NCS_confIsChecking = 2, NCS_confIsWriting = 3, NCS_confIsDone = 4}eNicConfStatus;
-
+typedef enum 
+{
+	RES_OK = 0,
+	RES_NicComTimeout,
+	RES_NicFlagTimeout,
+	RES_NicSiIncompatible,
+	RES_NicNcMbIncompatible,
+	
+}eResult;
 typedef enum
 {
-	EeAdd_stmProt,
+	EeAdd_stmProt = 0,
 	EeAdd_mbrtuTimeout,
 	EeAdd_mbrtuAddress,
 	EeAdd_mbrtuBaudrate,
@@ -319,7 +327,7 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 	eBool				flagGatewayAvailabe;					//register: 321d bit 2
 	eBool				flagBootIp;										//register: 321d bit 3
 	eBool				flagDhcp;											//register: 321d bit 4
-	eBool				flagSetEthAddress;							//register: 321d bit 5
+	eBool				flagSetEthAddress;						//register: 321d bit 5
 	
 	uint8_t			ipAddress[4];									//registers: 323d - 324d
 	uint8_t			subnetMask[4];								//registers: 325d - 326d
@@ -333,14 +341,15 @@ typedef struct
 {
 	uint8_t					address;
 	eNicFun 				nicFun;
-	uint32_t				time;
-	uint32_t				timeout;
-	eBool						errorTimeout;
+	uint32_t				comTime;
+	uint32_t				comTimeout;
+	uint32_t				flagTime;
+	uint32_t				flagTimeout;
+	eBool						flagWaitingForFlag;
 	eNicComStatus		comStatus; 
 	eNicConfStatus	confStatus;
 	uint8_t					numFunToSend;
 	uint8_t					maxFunToSend;
-
 	void						(*tabFunToSend[NIC_FRAMEMAX])(void);
 }sNIC_Mode;
 typedef struct
@@ -351,6 +360,7 @@ typedef struct
 	sNIC_Mode			mode;
 	sNIC_SI				si;
 	sNIC_SI				siDefMb;
+	sNIC_SI				siDefPfnet;
 	sNIC_SC				scRead;
 	sNIC_SC				scWrite;
 	sNIC_SSCEF		sscef;
@@ -366,6 +376,7 @@ typedef struct
 	sNIC_NC_PFB		ncPfbusRead;
 	sNIC_NC_PFB		ncPfbusWrite;
 	sNIC_NS_PFN		nsPfnet;
+	sNIC_NC_PFN		ncPfnetDef;
 	sNIC_NC_PFN		ncPfnetRead;
 	sNIC_NC_PFN		ncPfnetWrite;
 }sNIC;
@@ -373,7 +384,7 @@ typedef struct	//outputs
 {
 	uint16_t			coils;
 }sOutputs;
-typedef struct
+typedef struct	//Mode
 {
 	uint32_t			tick;
 	eProtocol			protocol;
@@ -383,7 +394,7 @@ typedef struct
 	uint32_t			ledPeriod;
 	uint32_t			ledTime;
 }sMode;
-typedef struct
+typedef struct	//Eeprom emulation
 {
 	uint16_t 			VirtAddVarTab[EE_VARMAX];
 	uint16_t			rData[EE_VARMAX];
@@ -391,12 +402,13 @@ typedef struct
 }sEe;
 typedef struct
 {
+	eBool		nicComTimeoutError;
+	eBool		nicFlagTimeoutError;
 	eBool		nicIncompDevNumber;
 	eBool		nicIncompDevClass;
 	eBool		nicIncompProtClass;
 	eBool		nicIncompFirmName;
 	eBool		nicInvalidConfigWriting;
-	
 }sStatus;
 typedef struct
 {
@@ -407,6 +419,13 @@ typedef struct
 	sEe						Ee;
 	sStatus				Status;
 	uint32_t			flaga1;
+	uint32_t			flaga2;
+	uint32_t			time0;
+	uint32_t			time1;
+	uint32_t			time2;
+	uint32_t			time3;
+	uint32_t			time4;
+	uint32_t			time5;
 }sControl;
 
 void Control_SystemInit(void);
