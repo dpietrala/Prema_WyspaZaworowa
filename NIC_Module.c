@@ -183,13 +183,13 @@ void NIC_SetDefaultSystemInformationMb(void)
 	pC->Nic.siDefMb.prodCode = 4896;				//doesnt matter
 	
 	tabidx = 0;
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x00; //doesnt matter
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x02; //doesnt matter
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0xa2; //doesnt matter
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x57; //doesnt matter
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x2d; //doesnt matter
-	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x46; //doesnt matter
-	pC->Nic.siDefMb.firm = 0;
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x00; 	//doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x02; 	//doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0xa2; 	//doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x57; 	//doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x2d; 	//doesnt matter
+	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x46; 	//doesnt matter
+	pC->Nic.siDefMb.firm = 0;											//doesnt matter
 	
 	tabidx = 0;
 	pC->Nic.siDefMb.firmVer[tabidx++] = 1; 	//doesnt matter
@@ -360,6 +360,186 @@ void NIC_SetDefaultConfigurationMb(void)
 	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.gateway, pC->Nic.ncMbDef.regs, &idx, 4);
 	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ethAddress, pC->Nic.ncMbDef.regs, &idx, 6);
 	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg332_333, &idx, pC->Nic.ncMbDef.regs);
+}
+void NIC_SetDefaultSystemInformationPfbus(void)
+{
+	uint32_t tabidx = 0;
+	
+	pC->Nic.siDefPfbus.devNumber = 1541420;
+	pC->Nic.siDefPfbus.serNumber = 30581;				//doesnt matter
+	pC->Nic.siDefPfbus.devClass = 19;
+	pC->Nic.siDefPfbus.hardRev = 0;							//doesnt matter
+	pC->Nic.siDefPfbus.hardCompIndex = 2;				//doesnt matter
+	pC->Nic.siDefPfbus.hardOpChann0 = 80;				//doesnt matter
+	pC->Nic.siDefPfbus.hardOpChann1 = 65534;		//doesnt matter
+	pC->Nic.siDefPfbus.hardOpChann2 = 65534;		//doesnt matter
+	pC->Nic.siDefPfbus.hardOpChann3 = 65534;		//doesnt matter
+	pC->Nic.siDefPfbus.virtualDPMSize = 65536;	//doesnt matter
+	pC->Nic.siDefPfbus.manufCode = 1;						//doesnt matter
+	pC->Nic.siDefPfbus.prodCode = 4907;					//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
+	pC->Nic.siDefPfbus.firm = 0;										//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 1; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 5; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 16; //doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 0; 	//doesnt matter
+	pC->Nic.siDefPfbus.firmVer[tabidx++] = 0; 	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.firmDate[tabidx++] = 255;	//doesnt matter
+	pC->Nic.siDefPfbus.firmDate[tabidx++] = 7;		//doesnt matter
+	pC->Nic.siDefPfbus.firmDate[tabidx++] = 6;		//doesnt matter
+	pC->Nic.siDefPfbus.firmDate[tabidx++] = 31;	//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 14;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'P';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'R';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'O';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'F';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'I';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'B';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'U';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'S';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = ' ';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'S';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'l';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'a';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'v';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 'e';
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.firmName[tabidx++] = 0;
+	pC->Nic.siDefPfbus.comClass = 3;						//doesnt matter
+	pC->Nic.siDefPfbus.protClass = 19;
+	pC->Nic.siDefPfbus.protConfClass = 0;			//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.inputConfShiftRegs[tabidx++] = 0;//doesnt matter
+	
+	tabidx = 0;
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+	pC->Nic.siDefPfbus.outputStatusShiftRegs[tabidx++] = 0;//doesnt matter
+}
+void NIC_SetDefaultConfigurationPfbus(void)
+{
+	pC->Nic.ncPfbusDef.length = 18;	//18 Bayts
+	pC->Nic.ncPfbusDef.flagsReg301_302 = 0x00000000;
+	pC->Nic.ncPfbusDef.flagBusStartup = false;
+	pC->Nic.ncPfbusDef.flagAddressSwitchEnable = false;
+	pC->Nic.ncPfbusDef.flagBaudrateSwitchEnable = false;
+	pC->Nic.ncPfbusDef.wdgTimeout = 1000;
+	pC->Nic.ncPfbusDef.identNumber = 0x000000C10;
+	pC->Nic.ncPfbusDef.stationAddress = 2;
+	pC->Nic.ncPfbusDef.baudrate = 15;
+	pC->Nic.ncPfbusDef.flagsReg307 = 0x00FF;
+	pC->Nic.ncPfbusDef.flagDpv1Enable = true; //register: 307d bit0
+	pC->Nic.ncPfbusDef.flagSyncSupperted = true;
+	pC->Nic.ncPfbusDef.flagFreezeSuported = true;
+	pC->Nic.ncPfbusDef.flagFailSafeSuported = true;
+	pC->Nic.ncPfbusDef.flagAlarmSap50Deactivate = true;
+	pC->Nic.ncPfbusDef.flagIoDataSwap = true;
+	pC->Nic.ncPfbusDef.flagAutoConfiguration = true;
+	pC->Nic.ncPfbusDef.flagAddressChangeNotAllowed = true;
+	pC->Nic.ncPfbusDef.lengthConfData = 2;
+	pC->Nic.ncPfbusDef.confData[0] = 0xD0E0;
+	
+	uint32_t idx = 0;
+	
+	
+	
+//	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusDef.length, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.busStartup, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.wdgTimeout, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.provSerwerConn, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.responseTimeout/100, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.clientConWdgTimeout/100, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.protMode, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.sendAckTimeout, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.conAckTimeout, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.closeAckTimeout, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.dataSwap, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.flagsReg321_322, &idx, pC->Nic.ncPfbusDef.regs);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncPfbusDef.ipAddress, pC->Nic.ncPfbusDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncPfbusDef.subnetMask, pC->Nic.ncPfbusDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncPfbusDef.gateway, pC->Nic.ncPfbusDef.regs, &idx, 4);
+//	NIC_TableUint8ToTableUint16(pC->Nic.ncPfbusDef.ethAddress, pC->Nic.ncPfbusDef.regs, &idx, 6);
+//	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.flagsReg332_333, &idx, pC->Nic.ncPfbusDef.regs);
 }
 void NIC_SetDefaultSystemInformationPfnet(void)
 {
@@ -634,7 +814,7 @@ void NIC_ReadNetworkStatusPfbus(void)
 }
 void NIC_ReadNetworkConfigurationPfbus(void)
 {
-	NIC_ReadRegisters(300, 10);
+	NIC_ReadRegisters(300, 100);
 	pC->Nic.mode.nicFun = NF_RNC_PFB;
 }
 void NIC_ReadNetworkStatusPfnet(void)
@@ -1000,6 +1180,8 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfbus(void)
 		NIC_BytesToUint8(buf, &idx, &pC->Nic.ncPfbusRead.stationAddress);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfbusRead.flagsReg307);
 		NIC_BytesToUint8(buf, &idx, &pC->Nic.ncPfbusRead.lengthConfData);
+		idx++;
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncPfbusRead.confData, 182);
 		
 		pC->Nic.ncPfbusRead.flagBusStartup 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg301_302 >> 0) & 0x01);
 		pC->Nic.ncPfbusRead.flagAddressSwitchEnable 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg301_302 >> 4) & 0x01);
@@ -1013,6 +1195,9 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfbus(void)
 		pC->Nic.ncPfbusRead.flagIoDataSwap 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 5) & 0x01);
 		pC->Nic.ncPfbusRead.flagAutoConfiguration 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 6) & 0x01);
 		pC->Nic.ncPfbusRead.flagAddressChangeNotAllowed 	= (eBool)((pC->Nic.ncPfbusRead.flagsReg307 >> 7) & 0x01);
+		
+		idx = 3;
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncPfbusRead.regs, 100);
 	}
 }
 static void NIC_ReadResponseAfterReadNetworkStatusPfnet(void)

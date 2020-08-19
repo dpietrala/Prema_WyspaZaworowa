@@ -37,6 +37,8 @@ void NIC_StartComunication(uint8_t num, uint32_t timeout);
 void NIC_ConverseConfiguratonToRegsMb(void);
 void NIC_SetDefaultSystemInformationMb(void);
 void NIC_SetDefaultConfigurationMb(void);
+void NIC_SetDefaultSystemInformationPfbus(void);
+void NIC_SetDefaultConfigurationPfbus(void);
 void NIC_SetDefaultSystemInformationPfnet(void);
 void NIC_SetDefaultConfigurationPfnet(void);
 

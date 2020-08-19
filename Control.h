@@ -278,6 +278,7 @@ typedef struct	//network status for ProfiBus: registers 200d - 299d
 }sNIC_NS_PFB;
 typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 {
+	uint16_t		regs[100];
 	uint16_t		length;												//register: 300d
 
 	uint32_t		flagsReg301_302;							//registers: 301d - 302d
@@ -360,6 +361,7 @@ typedef struct
 	sNIC_Mode			mode;
 	sNIC_SI				si;
 	sNIC_SI				siDefMb;
+	sNIC_SI				siDefPfbus;
 	sNIC_SI				siDefPfnet;
 	sNIC_SC				scRead;
 	sNIC_SC				scWrite;
@@ -373,6 +375,7 @@ typedef struct
 	sNIC_NC_MB		ncMbRead;
 	sNIC_NC_MB		ncMbWrite;
 	sNIC_NS_PFB		nsPfbus;
+	sNIC_NC_PFB		ncPfbusDef;
 	sNIC_NC_PFB		ncPfbusRead;
 	sNIC_NC_PFB		ncPfbusWrite;
 	sNIC_NS_PFN		nsPfnet;
