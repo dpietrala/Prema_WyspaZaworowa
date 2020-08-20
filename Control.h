@@ -40,7 +40,7 @@ typedef enum
 }eMBFun;
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
 
-typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
+typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB_300_399, NF_RNC_PFB_400_430, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
 typedef enum {NCS_comIsIdle = 0, NCS_comIsSending = 1, NCS_comIsWaiting = 2, NCS_comIsReading = 3, NCS_comIsDone = 4}eNicComStatus;
 typedef enum {NCS_confIsntDone = 0, NCS_confIsReading = 1, NCS_confIsChecking = 2, NCS_confIsWriting = 3, NCS_confIsDone = 4}eNicConfStatus;
 typedef enum 
@@ -50,6 +50,8 @@ typedef enum
 	RES_NicFlagTimeout,
 	RES_NicSiIncompatible,
 	RES_NicNcMbIncompatible,
+	RES_NicNcPfbusIncompatible,
+	RES_NicNcPfnetIncompatible,
 	
 }eResult;
 typedef enum
@@ -118,6 +120,10 @@ typedef enum
 #define NIC_FRAMEMAX			20
 #define MBS_COILMAX				16
 #define EE_VARMAX					47
+
+#define MBTCP_REGMAX			100
+#define PFBUS_REGMAX			131
+#define PFNET_REGMAX			100
 
 typedef struct	//modbus rtu slave
 {
@@ -278,7 +284,7 @@ typedef struct	//network status for ProfiBus: registers 200d - 299d
 }sNIC_NS_PFB;
 typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 {
-	uint16_t		regs[100];
+	uint16_t		regs[PFBUS_REGMAX];
 	uint16_t		length;												//register: 300d
 
 	uint32_t		flagsReg301_302;							//registers: 301d - 302d
@@ -302,7 +308,7 @@ typedef struct	//network confguration for ProfiBus: registers 300d - 987d
 	eBool				flagAddressChangeNotAllowed;	//register: 307d bit7
 	
 	uint8_t			lengthConfData;								//register: 308d highbyte
-	uint16_t		confData[122];								//registers: 309d - 430d
+	uint16_t		confData[PFBUS_REGMAX-9];			//registers: 309d - 430d
 }sNIC_NC_PFB;
 typedef struct	//network status for ProfiNet: registers 200d - 299d
 {

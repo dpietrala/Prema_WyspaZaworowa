@@ -110,7 +110,7 @@ static void Control_WriteConfigToFlash(void)
 	pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutHigh] 		= (uint16_t)(13000 >> 16);
 	
 	pC->Ee.wData[EeAdd_pfbusTimeout] 								= 1000;
-	pC->Ee.wData[EeAdd_pfbusAdress] 								= 2;
+	pC->Ee.wData[EeAdd_pfbusAdress] 								= 3;
 	pC->Ee.wData[EeAdd_pfbusBaudrate] 							= 15;
 	pC->Ee.wData[EeAdd_pfbusDPV1Enable] 						= 1;
 	pC->Ee.wData[EeAdd_pfbusSyncSupported] 					= 1;
@@ -277,7 +277,30 @@ static eResult Control_ReadModuleSystemInformation(void)
 	result = Control_WaitForNicComunicationIsDone(&pC->time0);
 	return result;
 }
-//*******************************************************************************
+// Modbus RTU ************************************************
+static eResult Control_ConfModbusRTU(void)
+{
+	eResult result = RES_OK;
+	pC->Mbs.address = (uint8_t)pC->Ee.rData[EeAdd_mbrtuAddress];
+	pC->Mbs.timeout	= pC->Ee.rData[EeAdd_mbrtuTimeout];
+	switch(pC->Ee.rData[EeAdd_mbrtuBaudrate])
+	{
+		case 0:		pC->Mbs.baud = 1200;		break;
+		case 1:		pC->Mbs.baud = 2400;		break;
+		case 2:		pC->Mbs.baud = 4800;		break;
+		case 3:		pC->Mbs.baud = 9600;		break;
+		case 4:		pC->Mbs.baud = 19200;		break;
+		case 5:		pC->Mbs.baud = 38400;		break;
+		case 6:		pC->Mbs.baud = 57600;		break;
+		case 7:		pC->Mbs.baud = 115200;	break;
+		default: 	pC->Mbs.baud = 9600;		break;
+	}
+	return result;
+}
+static void Control_RunModbusRTU(void)
+{
+}
+// Modbus TCP ************************************************
 static eResult Control_ComapreSystemInformationModbusTCP(void)
 {
 	eResult result = RES_OK;
@@ -425,7 +448,79 @@ static eResult Control_WriteConfigurationModbusTCP(void)
 	
 	return result;
 }
-//*******************************************************************************
+static eResult Control_ConfModbusTCP(void)
+{
+	pC->flaga1 = 0;
+	eResult result = RES_OK;
+	result = Control_ReadModuleSystemInformation();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 1;
+	
+	result = Control_ComapreSystemInformationModbusTCP();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 2;
+	
+	result = Control_ReadConfigurationFromModuleModbusTCP();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	
+	Control_PrepareConfigurationToWriteModbusTCP();
+	result = Control_CompareConfigurationModbusTCP();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 3;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	pC->flaga1 = 4;
+	
+	result = Control_WriteConfigurationModbusTCP();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 5;
+	
+	result = Control_ReadConfigurationFromModuleModbusTCP();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 6;
+	
+	Control_PrepareConfigurationToWriteModbusTCP();
+	result = Control_CompareConfigurationModbusTCP();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 7;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	else
+	{
+		pC->flaga1 = 8;
+		return result;
+	}
+}
+static void Control_RunModbusTCP(void)
+{
+	if(pC->Nic.mode.comStatus == NCS_comIsDone)
+		pC->Nic.mode.comStatus = NCS_comIsIdle;
+	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
+	{
+		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
+		NIC_StartComunication(1, 100);
+	}
+}
+// ProfiBUS **************************************************************
 static eResult Control_ComapreSystemInformationProfiBUS(void)
 {
 	eResult result = RES_OK;
@@ -460,120 +555,181 @@ static eResult Control_ComapreSystemInformationProfiBUS(void)
 static eResult Control_ReadConfigurationFromModuleProfiBUS(void)
 {
 	eResult result = RES_OK;
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationPfbus;
-	NIC_StartComunication(1, 10000);
+	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationPfbus300_399;
+	pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfbus400_430;
+	NIC_StartComunication(2, 10000);
 	result = Control_WaitForNicComunicationIsDone(&pC->time0);
 	return result;
 }
 static void Control_PrepareConfigurationToWriteProfiBUS(void)
 {
-//	pC->Nic.ncMbWrite = pC->Nic.ncMbDef;
-//	
-//	pC->Nic.ncMbWrite.wdgTimeout = pC->Ee.rData[EeAdd_mbtcpTimeout];
-//	pC->Nic.ncMbWrite.dataSwap = pC->Ee.rData[EeAdd_mbtcpDataSwap];
-//	pC->Nic.ncMbWrite.ipAddress[0] = pC->Ee.rData[EeAdd_mbtcpIP0];
-//	pC->Nic.ncMbWrite.ipAddress[1] = pC->Ee.rData[EeAdd_mbtcpIP1];
-//	pC->Nic.ncMbWrite.ipAddress[2] = pC->Ee.rData[EeAdd_mbtcpIP2];
-//	pC->Nic.ncMbWrite.ipAddress[3] = pC->Ee.rData[EeAdd_mbtcpIP3];
-//	pC->Nic.ncMbWrite.subnetMask[0] = pC->Ee.rData[EeAdd_mbtcpMask0];
-//	pC->Nic.ncMbWrite.subnetMask[1] = pC->Ee.rData[EeAdd_mbtcpMask1];
-//	pC->Nic.ncMbWrite.subnetMask[2] = pC->Ee.rData[EeAdd_mbtcpMask2];
-//	pC->Nic.ncMbWrite.subnetMask[3] = pC->Ee.rData[EeAdd_mbtcpMask3];
-//	pC->Nic.ncMbWrite.gateway[0] = pC->Ee.rData[EeAdd_mbtcpGateway0];
-//	pC->Nic.ncMbWrite.gateway[1] = pC->Ee.rData[EeAdd_mbtcpGateway1];
-//	pC->Nic.ncMbWrite.gateway[2] = pC->Ee.rData[EeAdd_mbtcpGateway2];
-//	pC->Nic.ncMbWrite.gateway[3] = pC->Ee.rData[EeAdd_mbtcpGateway3];
-//	pC->Nic.ncMbWrite.provSerwerConn = pC->Ee.rData[EeAdd_mbtcpSerwerCons];
-//	pC->Nic.ncMbWrite.sendAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpSendAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpSendAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.conAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpConnectAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpConnectAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.closeAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.ethAddress[0] = pC->Nic.ncMbRead.ethAddress[0];
-//	pC->Nic.ncMbWrite.ethAddress[1] = pC->Nic.ncMbRead.ethAddress[1];
-//	pC->Nic.ncMbWrite.ethAddress[2] = pC->Nic.ncMbRead.ethAddress[2];
-//	pC->Nic.ncMbWrite.ethAddress[3] = pC->Nic.ncMbRead.ethAddress[3];
-//	pC->Nic.ncMbWrite.ethAddress[4] = pC->Nic.ncMbRead.ethAddress[4];
-//	pC->Nic.ncMbWrite.ethAddress[5] = pC->Nic.ncMbRead.ethAddress[5];
-//	
-
-//	uint32_t idx = 0;
-//	NIC_Uint16ToTableUint16(pC->Nic.ncMbWrite.length, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.busStartup, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.wdgTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.provSerwerConn, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.responseTimeout/100, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.clientConWdgTimeout/100, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.protMode, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.sendAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.conAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.closeAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.dataSwap, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.flagsReg321_322, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ipAddress, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.subnetMask, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.gateway, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ethAddress, pC->Nic.ncMbWrite.regs, &idx, 6);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.flagsReg332_333, &idx, pC->Nic.ncMbWrite.regs);
+	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusDef;
+	
+	pC->Nic.ncPfbusWrite.wdgTimeout = pC->Ee.wData[EeAdd_pfbusTimeout];
+	pC->Nic.ncPfbusWrite.stationAddress = pC->Ee.wData[EeAdd_pfbusAdress];
+	pC->Nic.ncPfbusWrite.baudrate = pC->Ee.wData[EeAdd_pfbusBaudrate];
+	
+	pC->Nic.ncPfbusWrite.flagDpv1Enable = (eBool)pC->Ee.wData[EeAdd_pfbusDPV1Enable]; //register: 307d bit0
+	pC->Nic.ncPfbusWrite.flagSyncSupperted = (eBool)pC->Ee.wData[EeAdd_pfbusSyncSupported];
+	pC->Nic.ncPfbusWrite.flagFreezeSuported = (eBool)pC->Ee.wData[EeAdd_pfbusFreezeSupported];
+	pC->Nic.ncPfbusWrite.flagFailSafeSuported = (eBool)pC->Ee.wData[EeAdd_pfbusFailSafeSupported];
+	
+	pC->Nic.ncPfbusWrite.flagsReg307 = 0x0000;
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagDpv1Enable << 0);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagSyncSupperted << 1);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagFreezeSuported << 2);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagFailSafeSuported << 3);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagAlarmSap50Deactivate << 4);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagIoDataSwap << 5);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagAutoConfiguration << 6);
+	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagAddressChangeNotAllowed << 7);
+	
+	pC->Nic.ncPfbusWrite.lengthConfData = 2;
+	pC->Nic.ncPfbusWrite.confData[0] = 0xD0E0;
+	
+	uint32_t idx = 0;
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusWrite.length, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusWrite.flagsReg301_302, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusWrite.wdgTimeout, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusWrite.identNumber, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint8ToTableUint16(pC->Nic.ncPfbusWrite.baudrate, pC->Nic.ncPfbusWrite.stationAddress, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusWrite.flagsReg307, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint8ToTableUint16(pC->Nic.ncPfbusWrite.lengthConfData, 0x00, &idx, pC->Nic.ncPfbusWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusWrite.confData[0], &idx, pC->Nic.ncPfbusWrite.regs);
 }
 static eResult Control_CompareConfigurationProfiBUS(void)
 {
 	eResult result = RES_OK;
-//	for(uint32_t i=0;i<100;i++)
-//	{
-//		if(pC->Nic.ncMbRead.regs[i] != pC->Nic.ncMbWrite.regs[i])
-//			result = RES_NicNcMbIncompatible;
-//	}
+	for(uint32_t i=0;i<PFBUS_REGMAX;i++)
+	{
+		if(pC->Nic.ncPfbusRead.regs[i] != pC->Nic.ncPfbusWrite.regs[i])
+			result = RES_NicNcPfbusIncompatible;
+	}
 	return result;
 }
 static eResult Control_WriteConfigurationProfiBUS(void)
 {
 	eResult result = RES_OK;
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb;
-//	pC->Nic.mode.tabFunToSend[1] = NIC_WriteClrcfgFlagInCommandFlags;
-//	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
-//	NIC_StartComunication(2, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time1);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 1;
-//	
-//	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 2;
-//	
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
-//	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
-//	NIC_StartComunication(2, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time3);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 3;
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationPfbus300_399;
+	pC->Nic.mode.tabFunToSend[1] = NIC_WriteNetworkConfigurationPfbus400_430;
+	pC->Nic.mode.tabFunToSend[2] = NIC_WriteClrcfgFlagInCommandFlags;
+	pC->Nic.mode.tabFunToSend[3] = NIC_ReadSystemStatusComErrorFlags;
+	NIC_StartComunication(4, 10000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time1);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 1;
+	
+	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 2;
+	
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
+	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+	NIC_StartComunication(2, 10000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time3);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 3;
 
-//	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 4;
-//	
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
-//	NIC_StartComunication(1, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time5);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 5;
+	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 4;
+	
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
+	NIC_StartComunication(1, 10000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time5);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 5;
 	
 	return result;
 }
-//*******************************************************************************
+static eResult Control_ConfProfiBUS(void)
+{
+	pC->flaga1 = 0;
+	eResult result = RES_OK;
+	result = Control_ReadModuleSystemInformation();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 1;
+	
+	result = Control_ComapreSystemInformationProfiBUS();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 2;
+	
+	result = Control_ReadConfigurationFromModuleProfiBUS();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	
+	Control_PrepareConfigurationToWriteProfiBUS();
+	result = Control_CompareConfigurationProfiBUS();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 3;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	pC->flaga1 = 4;
+	
+	result = Control_WriteConfigurationProfiBUS();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 5;
+	
+	result = Control_ReadConfigurationFromModuleProfiBUS();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 6;
+	
+	Control_PrepareConfigurationToWriteProfiBUS();
+	result = Control_CompareConfigurationProfiBUS();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 7;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	else
+	{
+		pC->flaga1 = 8;
+		return result;
+	}
+}
+static void Control_RunProfiBUS(void)
+{
+	if(pC->Nic.mode.comStatus == NCS_comIsDone)
+		pC->Nic.mode.comStatus = NCS_comIsIdle;
+	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
+	{
+		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
+		NIC_StartComunication(1, 50);
+	}
+}
+// ProfiNET ************************************************************
 static eResult Control_ComapreSystemInformationProfiNET(void)
 {
 	eResult result = RES_OK;
@@ -721,151 +877,6 @@ static eResult Control_WriteConfigurationProfiNET(void)
 	
 	return result;
 }
-//********************************************************************************
-static void Control_ConfModbusRTU(void)
-{
-	pC->Mbs.address = (uint8_t)pC->Ee.rData[EeAdd_mbrtuAddress];
-	pC->Mbs.timeout	= pC->Ee.rData[EeAdd_mbrtuTimeout];
-	switch(pC->Ee.rData[EeAdd_mbrtuBaudrate])
-	{
-		case 0:		pC->Mbs.baud = 1200;		break;
-		case 1:		pC->Mbs.baud = 2400;		break;
-		case 2:		pC->Mbs.baud = 4800;		break;
-		case 3:		pC->Mbs.baud = 9600;		break;
-		case 4:		pC->Mbs.baud = 19200;		break;
-		case 5:		pC->Mbs.baud = 38400;		break;
-		case 6:		pC->Mbs.baud = 57600;		break;
-		case 7:		pC->Mbs.baud = 115200;	break;
-		default: 	pC->Mbs.baud = 9600;		break;
-	}
-	pC->Mode.workType = workTypeRun;
-}
-static eResult Control_ConfModbusTCP(void)
-{
-	pC->flaga1 = 0;
-	eResult result = RES_OK;
-	result = Control_ReadModuleSystemInformation();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 1;
-	
-	result = Control_ComapreSystemInformationModbusTCP();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 2;
-	
-	result = Control_ReadConfigurationFromModuleModbusTCP();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	
-	Control_PrepareConfigurationToWriteModbusTCP();
-	
-	result = Control_CompareConfigurationModbusTCP();
-	if(result == RES_OK)
-	{
-		pC->flaga1 = 3;
-		pC->Nic.mode.confStatus = NCS_confIsDone;
-		return result;
-	}
-	pC->flaga1 = 4;
-	
-	result = Control_WriteConfigurationModbusTCP();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 5;
-	
-	result = Control_ReadConfigurationFromModuleModbusTCP();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 6;
-	
-	Control_PrepareConfigurationToWriteModbusTCP();
-	result = Control_CompareConfigurationModbusTCP();
-	if(result == RES_OK)
-	{
-		pC->flaga1 = 7;
-		pC->Nic.mode.confStatus = NCS_confIsDone;
-		return result;
-	}
-	else
-	{
-		pC->flaga1 = 8;
-		return result;
-	}
-}
-static eResult Control_ConfProfiBUS(void)
-{
-	pC->flaga1 = 0;
-	eResult result = RES_OK;
-	result = Control_ReadModuleSystemInformation();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 1;
-	
-	result = Control_ComapreSystemInformationProfiBUS();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	pC->flaga1 = 2;
-	
-	result = Control_ReadConfigurationFromModuleProfiBUS();
-	if(result != RES_OK)
-	{
-		return result;
-	}
-	
-//	Control_PrepareConfigurationToWriteProfiBUS();
-//	
-//	result = Control_CompareConfigurationProfiBUS();
-//	if(result == RES_OK)
-//	{
-//		pC->flaga1 = 3;
-//		pC->Nic.mode.confStatus = NCS_confIsDone;
-//		return result;
-//	}
-//	pC->flaga1 = 4;
-//	
-//	result = Control_WriteConfigurationProfiBUS();
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga1 = 5;
-//	
-//	result = Control_ReadConfigurationFromModuleProfiBUS();
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga1 = 6;
-//	
-//	Control_PrepareConfigurationToWriteProfiBUS();
-//	result = Control_CompareConfigurationProfiBUS();
-//	if(result == RES_OK)
-//	{
-//		pC->flaga1 = 7;
-//		pC->Nic.mode.confStatus = NCS_confIsDone;
-//		return result;
-//	}
-//	else
-//	{
-//		pC->flaga1 = 8;
-//		return result;
-//	}
-}
 static eResult Control_ConfProfiNET(void)
 {
 	pC->flaga1 = 0;
@@ -891,7 +902,6 @@ static eResult Control_ConfProfiNET(void)
 	}
 	
 //	Control_PrepareConfigurationToWriteProfiNET();
-//	
 //	result = Control_CompareConfigurationProfiNET();
 //	if(result == RES_OK)
 //	{
@@ -929,30 +939,6 @@ static eResult Control_ConfProfiNET(void)
 //		return result;
 //	}
 }
-//*******************************************************************************
-static void Control_RunModbusRTU(void)
-{
-}
-static void Control_RunModbusTCP(void)
-{
-	if(pC->Nic.mode.comStatus == NCS_comIsDone)
-		pC->Nic.mode.comStatus = NCS_comIsIdle;
-	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
-	{
-		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 100);
-	}
-}
-static void Control_RunProfiBUS(void)
-{
-	if(pC->Nic.mode.comStatus == NCS_comIsDone)
-		pC->Nic.mode.comStatus = NCS_comIsIdle;
-	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
-	{
-		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 50);
-	}
-}
 static void Control_RunProfiNET(void)
 {
 	if(pC->Nic.mode.comStatus == NCS_comIsDone)
@@ -970,25 +956,25 @@ static void Control_WorkTypeStop(void)
 }
 void Control_WorkTypeConf(void)
 {
-//	delay_ms(5000);
+	delay_ms(3000);
 	eResult result = RES_OK;
 	pC->Mode.workType = workTypeConf;
 	Outputs_WorkTypeConf();
-	if(pC->Mode.protocol == Prot_Mbrtu)
+	
+	for(uint8_t i=0;i<3;i++)
 	{
-		Control_ConfModbusRTU();
-	}
-	else if(pC->Mode.protocol == Prot_Mbtcp)
-	{
-		result = Control_ConfModbusTCP();
-	}
-	else if(pC->Mode.protocol == Prot_Pfbus)
-	{
-		Control_ConfProfiBUS();
-	}
-	else if(pC->Mode.protocol == Prot_Pfnet)
-	{
-		Control_ConfProfiNET();
+		if(pC->Mode.protocol == Prot_Mbrtu)
+			result = Control_ConfModbusRTU();
+		else if(pC->Mode.protocol == Prot_Mbtcp)
+			result = Control_ConfModbusTCP();
+		else if(pC->Mode.protocol == Prot_Pfbus)
+			result = Control_ConfProfiBUS();
+		else if(pC->Mode.protocol == Prot_Pfnet)
+			Control_ConfProfiNET();
+		
+		pC->Status.nicComTimeoutError = false;
+		if(result == RES_OK)
+			break;
 	}
 	
 	if(result == RES_OK)
