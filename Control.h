@@ -40,7 +40,28 @@ typedef enum
 }eMBFun;
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
 
-typedef enum {NF_I = 0, NF_RC, NF_RSI, NF_RSC, NF_RNS_MB, NF_RNC_MB, NF_RNS_PFB, NF_RNC_PFB_300_399, NF_RNC_PFB_400_430, NF_RNS_PFN, NF_RNC_PFN, NF_RSSCEF, NF_RCF, NF_WR}eNicFun;
+typedef enum
+{
+	NF_I = 0, 
+	NF_RC, NF_RSI, 
+	NF_RSC, 
+	NF_RNS_MB, 
+	NF_RNC_MB_300_332, 
+	NF_RNS_PFB, 
+	NF_RNC_PFB_300_399, 
+	NF_RNC_PFB_400_430, 
+	NF_RNS_PFN, 
+	NF_RNC_PFN_300_399,
+	NF_RNC_PFN_400_499,
+	NF_RNC_PFN_500_599,
+	NF_RNC_PFN_600_699,
+	NF_RNC_PFN_700_799,
+	NF_RNC_PFN_800_899,
+	NF_RNC_PFN_900_987,
+	NF_RSSCEF, 
+	NF_RCF, 
+	NF_WR
+}eNicFun;
 typedef enum {NCS_comIsIdle = 0, NCS_comIsSending = 1, NCS_comIsWaiting = 2, NCS_comIsReading = 3, NCS_comIsDone = 4}eNicComStatus;
 typedef enum {NCS_confIsntDone = 0, NCS_confIsReading = 1, NCS_confIsChecking = 2, NCS_confIsWriting = 3, NCS_confIsDone = 4}eNicConfStatus;
 typedef enum 
@@ -121,9 +142,9 @@ typedef enum
 #define MBS_COILMAX				16
 #define EE_VARMAX					47
 
-#define MBTCP_REGMAX			100
+#define MBTCP_REGMAX			33
 #define PFBUS_REGMAX			131
-#define PFNET_REGMAX			100
+#define PFNET_REGMAX			688
 
 typedef struct	//modbus rtu slave
 {
@@ -250,7 +271,7 @@ typedef struct	//network status for ModbusTCP: registers 200d - 299d
 }sNIC_NS_MB;
 typedef struct	//network confguration for ModbusTCP: registers 300d - 987d
 {
-	uint16_t		regs[100];
+	uint16_t		regs[MBTCP_REGMAX];
 	uint16_t		length;												//register: 300d
 	uint32_t		busStartup;										//registers: 301d - 302d bit0
 	uint32_t		wdgTimeout;										//registers: 303d - 304d
@@ -316,33 +337,49 @@ typedef struct	//network status for ProfiNet: registers 200d - 299d
 }sNIC_NS_PFN;
 typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 {
-	uint16_t		regs[100];
+	uint16_t		regs[PFNET_REGMAX];
 	uint16_t		length;												//register: 300d
 	uint32_t		busStartup;										//registers: 301d - 302d bit0
 	uint32_t		wdgTimeout;										//registers: 303d - 304d
-	uint32_t		provSerwerConn;								//registers: 305d - 306d
-	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
-	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
-	uint32_t		protMode;											//registers: 311d - 312d
-	uint32_t		sendAckTimeout;								//registers: 313d - 314d
-	uint32_t		conAckTimeout;								//registers: 315d - 316d
-	uint32_t		closeAckTimeout;							//registers: 317d - 318d
-	uint32_t		dataSwap;											//registers: 319d - 320d
-	uint32_t		flagsReg321_322;							//registers: 321d - 322d
-	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
-	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
-	eBool				flagGatewayAvailabe;					//register: 321d bit 2
-	eBool				flagBootIp;										//register: 321d bit 3
-	eBool				flagDhcp;											//register: 321d bit 4
-	eBool				flagSetEthAddress;						//register: 321d bit 5
+	uint32_t		vendorId;											//registers: 305d - 306d
+	uint32_t		deviceId;											//registers: 307d - 308d
+	uint32_t		maxAR;												//registers: 309d - 310d, currently not used, set to 0
+	uint32_t		inputBytes;										//registers: 311d - 312d
+	uint32_t		outputBytes;									//registers: 313d - 314d
 	
-	uint8_t			ipAddress[4];									//registers: 323d - 324d
-	uint8_t			subnetMask[4];								//registers: 325d - 326d
-	uint8_t			gateway[4];										//registers: 327d - 328d
-	uint8_t			ethAddress[6];								//registers: 329d - 331d
-	uint32_t		flagsReg332_333;							//registers: 332d - 333d
-	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
-	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+	uint32_t		lengthNameOfStation;					//registers: 315d - 316d
+	uint8_t			nameOfStation[240];						//registers: 317d - 436d
+	uint32_t		lengthTypeOfStation;					//registers: 437d - 438d
+	uint8_t			typeOfStation[240];						//registers: 439d - 558d
+	uint8_t			deviceType[28];								//registers: 559d - 572d, used only for NIC-52RE, Character string zero-terminated,
+	uint8_t			orderId[20];									//registers: 573d - 582d
+	uint8_t			ipAddress[4];									//registers: 583d - 584d
+	uint8_t			subnetMask[4];								//registers: 585d - 586d
+	uint8_t			gateway[4];										//registers: 587d - 588d
+	uint16_t		hardwareRevision;							//register: 589d
+	uint16_t		softwareRevision1;						//register: 590d
+	uint16_t		softwareRevision2;						//register: 591d
+	uint16_t		softwareRevision3;						//register: 592d
+	uint16_t		softwareRevisionPrefix;				//register: 593d, high byte
+	uint16_t		maximumDiagRecords;						//register: 594d
+	uint16_t		instanceId;										//register: 595d
+	uint16_t		reserved1;										//register: 596d, must be set to 0
+	
+	uint32_t		numApi;												//registers: 597d - 598d
+	uint32_t		profileApi;										//registers: 599d - 600d
+	uint32_t		numSubmoduleItem;							//registers: 601d - 602d
+	uint16_t		slot;													//register: 603d
+	uint16_t		subslot;											//register: 604d
+	uint32_t		moduleId;											//registers: 605d - 606d
+	uint32_t		subModuleId;									//registers: 607d - 608d
+	uint32_t		provDataLen;									//registers: 609d - 610d
+	uint32_t		consDataLen;									//registers: 611d - 612d
+	uint32_t		dpmOffsetIn;									//registers: 613d - 614d
+	uint32_t		dpmOffsetOut;									//registers: 615d - 616d
+	uint16_t		offsetIopsProvider;						//register: 617d
+	uint16_t		offsetIopsConsumer;						//register: 618d
+	uint16_t		reserved2[4];									//registers: 619d - 622d, must be set to 0
+	uint16_t		structureSubmoduleOrApi[365];	//registers: 623d - 987d
 }sNIC_NC_PFN;
 typedef struct
 {

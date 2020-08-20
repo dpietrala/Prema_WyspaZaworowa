@@ -81,7 +81,7 @@ static void Control_ReadConfigFromFlash(void)
 }
 static void Control_WriteConfigToFlash(void)
 {
-	pC->Ee.wData[EeAdd_stmProt] 					= (uint16_t)Prot_Pfbus;
+	pC->Ee.wData[EeAdd_stmProt] 					= (uint16_t)Prot_Pfnet;
 	
 	pC->Ee.wData[EeAdd_mbrtuAddress] 			= 2;
 	pC->Ee.wData[EeAdd_mbrtuTimeout] 			= 1000;
@@ -89,7 +89,7 @@ static void Control_WriteConfigToFlash(void)
 	
 	pC->Ee.wData[EeAdd_mbtcpTimeout] 			= 1000;
 	pC->Ee.wData[EeAdd_mbtcpDataSwap] 		= 1;
-	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 12;
+	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 14;
 	pC->Ee.wData[EeAdd_mbtcpIP1] 					= 0;
 	pC->Ee.wData[EeAdd_mbtcpIP2] 					= 168;
 	pC->Ee.wData[EeAdd_mbtcpIP3] 					= 192;
@@ -335,7 +335,7 @@ static eResult Control_ComapreSystemInformationModbusTCP(void)
 static eResult Control_ReadConfigurationFromModuleModbusTCP(void)
 {
 	eResult result = RES_OK;
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationMb;
+	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationMb300_332;
 	NIC_StartComunication(1, 10000);
 	result = Control_WaitForNicComunicationIsDone(&pC->time0);
 	return result;
@@ -392,7 +392,7 @@ static void Control_PrepareConfigurationToWriteModbusTCP(void)
 static eResult Control_CompareConfigurationModbusTCP(void)
 {
 	eResult result = RES_OK;
-	for(uint32_t i=0;i<100;i++)
+	for(uint32_t i=0;i<MBTCP_REGMAX;i++)
 	{
 		if(pC->Nic.ncMbRead.regs[i] != pC->Nic.ncMbWrite.regs[i])
 			result = RES_NicNcMbIncompatible;
@@ -402,7 +402,7 @@ static eResult Control_CompareConfigurationModbusTCP(void)
 static eResult Control_WriteConfigurationModbusTCP(void)
 {
 	eResult result = RES_OK;
-	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb;
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb300_332;
 	pC->Nic.mode.tabFunToSend[1] = NIC_WriteClrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
 	NIC_StartComunication(2, 10000);
@@ -517,7 +517,7 @@ static void Control_RunModbusTCP(void)
 	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
 	{
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 100);
+		NIC_StartComunication(1, 50);
 	}
 }
 // ProfiBUS **************************************************************
@@ -764,8 +764,14 @@ static eResult Control_ComapreSystemInformationProfiNET(void)
 static eResult Control_ReadConfigurationFromModuleProfiNET(void)
 {
 	eResult result = RES_OK;
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationPfnet;
-	NIC_StartComunication(1, 10000);
+	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationPfnet300_399;
+	pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfnet400_499;
+	pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfnet500_599;
+	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationPfnet600_699;
+	pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationPfnet700_799;
+	pC->Nic.mode.tabFunToSend[5] = NIC_ReadNetworkConfigurationPfnet800_899;
+	pC->Nic.mode.tabFunToSend[6] = NIC_ReadNetworkConfigurationPfnet900_987;
+	NIC_StartComunication(7, 10000);
 	result = Control_WaitForNicComunicationIsDone(&pC->time0);
 	return result;
 }

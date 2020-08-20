@@ -96,6 +96,14 @@ void NIC_TableUint8ToTableUint16(uint8_t* source, uint16_t* dest, uint32_t* dest
 		*destidx += 1;
 	}
 }
+void NIC_TableUint16ToTableUint16(uint16_t* source, uint16_t* dest, uint32_t* destidx, uint32_t num)
+{
+	for(int i=0;i<num;i++)
+	{
+		dest[*destidx] = source[i];
+		*destidx += 1;
+	}
+}
 void NIC_Uint8ToTableUint16(uint8_t highbyte, uint8_t lowbyte, uint32_t* idx, uint16_t* tab)
 {
 	tab[*idx] = ((uint16_t)highbyte << 8) + ((uint16_t)lowbyte << 0);
@@ -686,97 +694,641 @@ void NIC_SetDefaultSystemInformationPfnet(void)
 }
 void NIC_SetDefaultConfigurationPfnet(void)
 {
-	pC->Nic.ncMbDef.length = 66;	//66 Bayts
-	pC->Nic.ncMbDef.busStartup = 0;	//Automatic
-	pC->Nic.ncMbDef.wdgTimeout = 1000;
-	pC->Nic.ncMbDef.provSerwerConn = 4;
-	pC->Nic.ncMbDef.responseTimeout = 2000;	//2000ms
-	pC->Nic.ncMbDef.clientConWdgTimeout = 1000; //1000ms
-	pC->Nic.ncMbDef.protMode = 1; //Server mode
-	pC->Nic.ncMbDef.sendAckTimeout = 31000; //31000ms
-	pC->Nic.ncMbDef.conAckTimeout = 31000; //31000ms
-	pC->Nic.ncMbDef.closeAckTimeout = 13000; //13000ms
-	pC->Nic.ncMbDef.dataSwap = 1; //Data will be swapped
-	pC->Nic.ncMbDef.flagsReg321_322 = 0x00000007; //IP address available, Netmask available, Gateway available
-	pC->Nic.ncMbDef.flagIpAddressAvailabe = true; //IP address available,
-	pC->Nic.ncMbDef.flagNetMaskAvailabe = true; //Netmask available,
-	pC->Nic.ncMbDef.flagGatewayAvailabe = true;	//Gateway available
-	pC->Nic.ncMbDef.flagBootIp = false;
-	pC->Nic.ncMbDef.flagDhcp = false;
-	pC->Nic.ncMbDef.flagSetEthAddress = false;
-	pC->Nic.ncMbDef.ipAddress[0] = 19;
-	pC->Nic.ncMbDef.ipAddress[1] = 0;
-	pC->Nic.ncMbDef.ipAddress[2] = 168;
-	pC->Nic.ncMbDef.ipAddress[3] = 192;
-	pC->Nic.ncMbDef.subnetMask[0] = 0;
-	pC->Nic.ncMbDef.subnetMask[1] = 255;
-	pC->Nic.ncMbDef.subnetMask[2] = 255;
-	pC->Nic.ncMbDef.subnetMask[3] = 255;
-	pC->Nic.ncMbDef.gateway[0] = 1;
-	pC->Nic.ncMbDef.gateway[1] = 0;
-	pC->Nic.ncMbDef.gateway[2] = 168;
-	pC->Nic.ncMbDef.gateway[3] = 192;
-	pC->Nic.ncMbDef.ethAddress[0] = 0;
-	pC->Nic.ncMbDef.ethAddress[1] = 0;
-	pC->Nic.ncMbDef.ethAddress[2] = 0;
-	pC->Nic.ncMbDef.ethAddress[3] = 0;
-	pC->Nic.ncMbDef.ethAddress[4] = 0;
-	pC->Nic.ncMbDef.ethAddress[5] = 0;
-	pC->Nic.ncMbDef.flagsReg332_333 = 0x00000000;
-	pC->Nic.ncMbDef.flagMapFc1ToFc3 = false;
-	pC->Nic.ncMbDef.flagSkipConfTcpipStack = false;
+	pC->Nic.ncPfnetDef.length = 844;
+	pC->Nic.ncPfnetDef.busStartup = 0;
+	pC->Nic.ncPfnetDef.wdgTimeout = 1000;
+	pC->Nic.ncPfnetDef.vendorId = 0x011E;
+	pC->Nic.ncPfnetDef.deviceId = 0x00000010A;
+	pC->Nic.ncPfnetDef.maxAR = 0;
+	pC->Nic.ncPfnetDef.inputBytes = 128;
+	pC->Nic.ncPfnetDef.outputBytes = 128;
 	
+	pC->Nic.ncPfnetDef.lengthNameOfStation = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[0] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[1] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[2] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[3] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[4] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[5] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[6] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[7] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[8] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[9] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[10] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[11] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[12] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[13] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[14] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[15] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[16] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[17] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[18] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[19] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[20] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[21] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[22] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[23] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[24] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[25] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[26] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[27] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[28] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[29] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[30] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[31] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[32] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[33] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[34] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[35] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[36] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[37] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[38] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[39] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[40] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[41] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[42] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[43] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[44] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[45] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[46] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[47] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[48] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[49] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[50] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[51] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[52] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[53] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[54] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[55] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[56] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[57] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[58] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[59] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[60] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[61] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[62] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[63] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[64] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[65] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[66] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[67] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[68] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[69] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[70] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[71] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[72] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[73] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[74] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[75] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[76] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[77] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[78] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[79] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[80] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[81] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[82] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[83] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[84] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[85] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[86] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[87] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[88] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[89] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[90] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[91] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[92] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[93] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[94] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[95] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[96] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[97] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[98] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[99] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[100] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[101] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[102] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[103] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[104] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[105] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[106] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[107] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[108] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[109] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[110] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[111] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[112] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[113] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[114] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[115] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[116] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[117] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[118] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[119] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[120] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[121] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[122] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[123] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[124] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[125] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[126] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[127] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[128] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[129] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[130] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[131] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[132] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[133] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[134] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[135] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[136] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[137] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[138] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[139] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[140] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[141] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[142] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[143] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[144] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[145] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[146] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[147] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[148] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[149] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[150] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[151] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[152] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[153] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[154] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[155] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[156] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[157] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[158] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[159] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[160] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[161] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[162] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[163] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[164] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[165] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[166] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[167] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[168] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[169] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[170] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[171] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[172] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[173] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[174] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[175] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[176] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[177] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[178] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[179] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[180] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[181] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[182] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[183] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[184] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[185] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[186] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[187] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[188] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[189] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[190] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[191] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[192] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[193] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[194] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[195] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[196] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[197] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[198] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[199] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[200] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[201] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[202] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[203] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[204] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[205] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[206] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[207] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[208] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[209] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[210] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[211] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[212] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[213] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[214] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[215] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[216] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[217] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[218] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[219] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[220] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[221] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[222] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[223] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[224] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[225] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[226] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[227] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[228] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[229] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[230] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[231] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[232] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[233] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[234] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[235] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[236] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[237] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[238] = 0;
+	pC->Nic.ncPfnetDef.nameOfStation[239] = 0;
 	
+	pC->Nic.ncPfnetDef.lengthTypeOfStation = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[0] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[1] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[2] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[3] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[4] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[5] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[6] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[7] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[8] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[9] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[10] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[11] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[12] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[13] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[14] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[15] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[16] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[17] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[18] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[19] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[20] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[21] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[22] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[23] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[24] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[25] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[26] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[27] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[28] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[29] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[30] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[31] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[32] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[33] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[34] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[35] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[36] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[37] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[38] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[39] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[40] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[41] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[42] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[43] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[44] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[45] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[46] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[47] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[48] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[49] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[50] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[51] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[52] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[53] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[54] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[55] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[56] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[57] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[58] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[59] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[60] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[61] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[62] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[63] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[64] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[65] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[66] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[67] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[68] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[69] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[70] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[71] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[72] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[73] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[74] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[75] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[76] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[77] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[78] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[79] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[80] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[81] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[82] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[83] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[84] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[85] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[86] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[87] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[88] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[89] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[90] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[91] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[92] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[93] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[94] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[95] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[96] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[97] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[98] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[99] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[100] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[101] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[102] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[103] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[104] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[105] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[106] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[107] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[108] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[109] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[110] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[111] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[112] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[113] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[114] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[115] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[116] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[117] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[118] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[119] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[120] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[121] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[122] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[123] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[124] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[125] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[126] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[127] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[128] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[129] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[130] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[131] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[132] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[133] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[134] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[135] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[136] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[137] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[138] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[139] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[140] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[141] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[142] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[143] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[144] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[145] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[146] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[147] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[148] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[149] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[150] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[151] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[152] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[153] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[154] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[155] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[156] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[157] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[158] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[159] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[160] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[161] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[162] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[163] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[164] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[165] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[166] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[167] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[168] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[169] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[170] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[171] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[172] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[173] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[174] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[175] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[176] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[177] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[178] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[179] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[180] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[181] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[182] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[183] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[184] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[185] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[186] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[187] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[188] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[189] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[190] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[191] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[192] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[193] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[194] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[195] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[196] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[197] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[198] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[199] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[200] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[201] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[202] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[203] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[204] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[205] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[206] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[207] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[208] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[209] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[210] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[211] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[212] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[213] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[214] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[215] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[216] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[217] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[218] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[219] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[220] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[221] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[222] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[223] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[224] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[225] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[226] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[227] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[228] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[229] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[230] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[231] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[232] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[233] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[234] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[235] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[236] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[237] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[238] = 0;
+	pC->Nic.ncPfnetDef.typeOfStation[239] = 0;
 	
+
+	pC->Nic.ncPfnetDef.deviceType[0] = 0;
+	pC->Nic.ncPfnetDef.deviceType[1] = 0;
+	pC->Nic.ncPfnetDef.deviceType[2] = 0;
+	pC->Nic.ncPfnetDef.deviceType[3] = 0;
+	pC->Nic.ncPfnetDef.deviceType[4] = 0;
+	pC->Nic.ncPfnetDef.deviceType[5] = 0;
+	pC->Nic.ncPfnetDef.deviceType[6] = 0;
+	pC->Nic.ncPfnetDef.deviceType[7] = 0;
+	pC->Nic.ncPfnetDef.deviceType[8] = 0;
+	pC->Nic.ncPfnetDef.deviceType[9] = 0;
+	pC->Nic.ncPfnetDef.deviceType[10] = 0;
+	pC->Nic.ncPfnetDef.deviceType[11] = 0;
+	pC->Nic.ncPfnetDef.deviceType[12] = 0;
+	pC->Nic.ncPfnetDef.deviceType[13] = 0;
+	pC->Nic.ncPfnetDef.deviceType[14] = 0;
+	pC->Nic.ncPfnetDef.deviceType[15] = 0;
+	pC->Nic.ncPfnetDef.deviceType[16] = 0;
+	pC->Nic.ncPfnetDef.deviceType[17] = 0;
+	pC->Nic.ncPfnetDef.deviceType[18] = 0;
+	pC->Nic.ncPfnetDef.deviceType[19] = 0;
+	pC->Nic.ncPfnetDef.deviceType[20] = 0;
+	pC->Nic.ncPfnetDef.deviceType[21] = 0;
+	pC->Nic.ncPfnetDef.deviceType[22] = 0;
+	pC->Nic.ncPfnetDef.deviceType[23] = 0;
+	pC->Nic.ncPfnetDef.deviceType[24] = 0;
+	pC->Nic.ncPfnetDef.deviceType[25] = 0;
+	pC->Nic.ncPfnetDef.deviceType[26] = 0;
+	pC->Nic.ncPfnetDef.deviceType[27] = 0;
 	
+	pC->Nic.ncPfnetDef.orderId[0] = 0;
+	pC->Nic.ncPfnetDef.orderId[1] = 0;
+	pC->Nic.ncPfnetDef.orderId[2] = 0;
+	pC->Nic.ncPfnetDef.orderId[3] = 0;
+	pC->Nic.ncPfnetDef.orderId[4] = 0;
+	pC->Nic.ncPfnetDef.orderId[5] = 0;
+	pC->Nic.ncPfnetDef.orderId[6] = 0;
+	pC->Nic.ncPfnetDef.orderId[7] = 0;
+	pC->Nic.ncPfnetDef.orderId[8] = 0;
+	pC->Nic.ncPfnetDef.orderId[9] = 0;
+	pC->Nic.ncPfnetDef.orderId[10] = 0;
+	pC->Nic.ncPfnetDef.orderId[11] = 0;
+	pC->Nic.ncPfnetDef.orderId[12] = 0;
+	pC->Nic.ncPfnetDef.orderId[13] = 0;
+	pC->Nic.ncPfnetDef.orderId[14] = 0;
+	pC->Nic.ncPfnetDef.orderId[15] = 0;
+	pC->Nic.ncPfnetDef.orderId[16] = 0;
+	pC->Nic.ncPfnetDef.orderId[17] = 0;
+	pC->Nic.ncPfnetDef.orderId[18] = 0;
+	pC->Nic.ncPfnetDef.orderId[19] = 0;
 	
+	pC->Nic.ncPfnetDef.ipAddress[0] = 0;
+	pC->Nic.ncPfnetDef.ipAddress[1] = 0;
+	pC->Nic.ncPfnetDef.ipAddress[2] = 0;
+	pC->Nic.ncPfnetDef.ipAddress[3] = 0;
+	pC->Nic.ncPfnetDef.subnetMask[0] = 0;
+	pC->Nic.ncPfnetDef.subnetMask[1] = 0;
+	pC->Nic.ncPfnetDef.subnetMask[2] = 0;
+	pC->Nic.ncPfnetDef.subnetMask[3] = 0;
+	pC->Nic.ncPfnetDef.gateway[0] = 0;
+	pC->Nic.ncPfnetDef.gateway[1] = 0;
+	pC->Nic.ncPfnetDef.gateway[2] = 0;
+	pC->Nic.ncPfnetDef.gateway[3] = 0;
 	
-//	uint16_t		length;												//register: 300d
-//	uint32_t		busStartup;										//registers: 301d - 302d bit0
-//	uint32_t		wdgTimeout;										//registers: 303d - 304d
-//	uint32_t		provSerwerConn;								//registers: 305d - 306d
-//	uint32_t		responseTimeout;							//registers: 307d - 308d * 100ms
-//	uint32_t		clientConWdgTimeout;					//registers: 309d - 310d * 100ms
-//	uint32_t		protMode;											//registers: 311d - 312d
-//	uint32_t		sendAckTimeout;								//registers: 313d - 314d
-//	uint32_t		conAckTimeout;								//registers: 315d - 316d
-//	uint32_t		closeAckTimeout;							//registers: 317d - 318d
-//	uint32_t		dataSwap;											//registers: 319d - 320d
-//	uint32_t		flagsReg321_322;							//registers: 321d - 322d
-//	eBool				flagIpAddressAvailabe;				//register: 321d bit 0
-//	eBool				flagNetMaskAvailabe;					//register: 321d bit 1
-//	eBool				flagGatewayAvailabe;					//register: 321d bit 2
-//	eBool				flagBootIp;										//register: 321d bit 3
-//	eBool				flagDhcp;											//register: 321d bit 4
-//	eBool				flagSetEthAddress;							//register: 321d bit 5
-//	
-//	uint8_t			ipAddress[4];									//registers: 323d - 324d
-//	uint8_t			subnetMask[4];								//registers: 325d - 326d
-//	uint8_t			gateway[4];										//registers: 327d - 328d
-//	uint8_t			ethAddress[6];								//registers: 329d - 331d
-//	uint32_t		flagsReg332_333;							//registers: 332d - 333d
-//	eBool				flagMapFc1ToFc3;							//register: 332d bit 0
-//	eBool				flagSkipConfTcpipStack;				//register: 332d bit 1
+	pC->Nic.ncPfnetDef.hardwareRevision = 0;
+	pC->Nic.ncPfnetDef.softwareRevision1 = 0;
+	pC->Nic.ncPfnetDef.softwareRevision2 = 0;
+	pC->Nic.ncPfnetDef.softwareRevision3 = 0;
+	pC->Nic.ncPfnetDef.softwareRevisionPrefix = ((uint16_t)'R' << 8);
 	
-//	
-//	uint32_t idx = 0;
-//	NIC_Uint16ToTableUint16(pC->Nic.ncMbDef.length, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.busStartup, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.wdgTimeout, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.provSerwerConn, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.responseTimeout/100, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.clientConWdgTimeout/100, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.protMode, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.sendAckTimeout, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.conAckTimeout, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.closeAckTimeout, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.dataSwap, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg321_322, &idx, pC->Nic.ncMbDef.regs);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ipAddress, pC->Nic.ncMbDef.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.subnetMask, pC->Nic.ncMbDef.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.gateway, pC->Nic.ncMbDef.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbDef.ethAddress, pC->Nic.ncMbDef.regs, &idx, 6);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbDef.flagsReg332_333, &idx, pC->Nic.ncMbDef.regs);
+	pC->Nic.ncPfnetDef.maximumDiagRecords = 256;
+	pC->Nic.ncPfnetDef.instanceId = 1;
+	pC->Nic.ncPfnetDef.reserved1 = 0;
+	
+	pC->Nic.ncPfnetDef.numApi = 1;
+	pC->Nic.ncPfnetDef.profileApi = 0;
+	pC->Nic.ncPfnetDef.numSubmoduleItem = 1;
+	pC->Nic.ncPfnetDef.slot = 0;
+	pC->Nic.ncPfnetDef.subslot = 0;
+	pC->Nic.ncPfnetDef.subModuleId = 0;
+	pC->Nic.ncPfnetDef.provDataLen = 0;
+	pC->Nic.ncPfnetDef.provDataLen = 0;
+	pC->Nic.ncPfnetDef.consDataLen = 0;
+	pC->Nic.ncPfnetDef.dpmOffsetIn = 0xFFFFFFFF;
+	pC->Nic.ncPfnetDef.dpmOffsetOut = 0xFFFFFFFF;
+	pC->Nic.ncPfnetDef.offsetIopsProvider = 0;
+	pC->Nic.ncPfnetDef.offsetIopsConsumer = 0;
+	
+	pC->Nic.ncPfnetDef.reserved2[0] = 0;
+	pC->Nic.ncPfnetDef.reserved2[1] = 0;
+	pC->Nic.ncPfnetDef.reserved2[2] = 0;
+	pC->Nic.ncPfnetDef.reserved2[3] = 0;
+	
+	for(uint32_t i=0;i<365;i++)
+		pC->Nic.ncPfnetDef.structureSubmoduleOrApi[i] = 0;
+
+
+	uint32_t idx = 0;
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.length, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.busStartup, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.wdgTimeout, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.vendorId, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.deviceId, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.maxAR, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.inputBytes, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.outputBytes, &idx, pC->Nic.ncPfnetDef.regs);
+	
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.lengthNameOfStation, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.nameOfStation, pC->Nic.ncPfnetDef.regs, &idx, 240);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.lengthTypeOfStation, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.typeOfStation, pC->Nic.ncPfnetDef.regs, &idx, 240);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.deviceType, pC->Nic.ncPfnetDef.regs, &idx, 28);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.orderId, pC->Nic.ncPfnetDef.regs, &idx, 20);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.ipAddress, pC->Nic.ncPfnetDef.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.subnetMask, pC->Nic.ncPfnetDef.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetDef.gateway, pC->Nic.ncPfnetDef.regs, &idx, 4);
+	
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.hardwareRevision, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.softwareRevision1, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.softwareRevision2, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.softwareRevision3, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.softwareRevisionPrefix, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.maximumDiagRecords, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.instanceId, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.reserved1, &idx, pC->Nic.ncPfnetDef.regs);
+	
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.numApi, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.profileApi, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.numSubmoduleItem, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.slot, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.subslot, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.moduleId, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.subModuleId, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.provDataLen, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.consDataLen, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.dpmOffsetIn, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetDef.dpmOffsetOut, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.offsetIopsProvider, &idx, pC->Nic.ncPfnetDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetDef.offsetIopsConsumer, &idx, pC->Nic.ncPfnetDef.regs);
+	
+	NIC_TableUint16ToTableUint16(pC->Nic.ncPfnetDef.reserved2, pC->Nic.ncPfnetDef.regs, &idx, 4);
+	NIC_TableUint16ToTableUint16(pC->Nic.ncPfnetDef.structureSubmoduleOrApi, pC->Nic.ncPfnetDef.regs, &idx, 365);
 }
 //**** Funkcje wysylajace do modulu *************************************
 void NIC_ReadCoils(void)
@@ -809,10 +1361,10 @@ void NIC_ReadNetworkStatusMb(void)
 	NIC_ReadRegisters(200, 100);
 	pC->Nic.mode.nicFun = NF_RNS_MB;
 }
-void NIC_ReadNetworkConfigurationMb(void)
+void NIC_ReadNetworkConfigurationMb300_332(void)
 {
-	NIC_ReadRegisters(300, 100);
-	pC->Nic.mode.nicFun = NF_RNC_MB;
+	NIC_ReadRegisters(300, 33);
+	pC->Nic.mode.nicFun = NF_RNC_MB_300_332;
 }
 void NIC_ReadNetworkStatusPfbus(void)
 {
@@ -834,11 +1386,42 @@ void NIC_ReadNetworkStatusPfnet(void)
 	NIC_ReadRegisters(200, 100);
 	pC->Nic.mode.nicFun = NF_RNS_PFN;
 }
-void NIC_ReadNetworkConfigurationPfnet(void)
+void NIC_ReadNetworkConfigurationPfnet300_399(void)
 {
 	NIC_ReadRegisters(300, 100);
-	pC->Nic.mode.nicFun = NF_RNC_PFN;
+	pC->Nic.mode.nicFun = NF_RNC_PFN_300_399;
 }
+void NIC_ReadNetworkConfigurationPfnet400_499(void)
+{
+	NIC_ReadRegisters(400, 100);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_400_499;
+}
+void NIC_ReadNetworkConfigurationPfnet500_599(void)
+{
+	NIC_ReadRegisters(500, 100);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_500_599;
+}
+void NIC_ReadNetworkConfigurationPfnet600_699(void)
+{
+	NIC_ReadRegisters(600, 100);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_600_699;
+}
+void NIC_ReadNetworkConfigurationPfnet700_799(void)
+{
+	NIC_ReadRegisters(700, 100);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_700_799;
+}
+void NIC_ReadNetworkConfigurationPfnet800_899(void)
+{
+	NIC_ReadRegisters(800, 100);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_800_899;
+}
+void NIC_ReadNetworkConfigurationPfnet900_987(void)
+{
+	NIC_ReadRegisters(900, 88);
+	pC->Nic.mode.nicFun = NF_RNC_PFN_900_987;
+}
+
 void NIC_WriteCoils(void)
 {
 	NIC_WriteRegs(2000, 1, &pC->Nic.cod.coils, 0);
@@ -851,9 +1434,9 @@ void NIC_WriteSystemConfiguration(void)
 	NIC_WriteRegs(100, 100, pC->Nic.scWrite.regs, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
-void NIC_WriteNetworkConfigurationMb(void)
+void NIC_WriteNetworkConfigurationMb300_332(void)
 {
-	NIC_WriteRegs(300, 100, pC->Nic.ncMbWrite.regs, 0);
+	NIC_WriteRegs(300, 33, pC->Nic.ncMbWrite.regs, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationPfbus300_399(void)
@@ -1100,7 +1683,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusMb(void)
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.nsMb.regs, 0, 100);
 	}
 }
-static void NIC_ReadResponseAfterReadNetworkConfigurationMb(void)
+static void NIC_ReadResponseAfterReadNetworkConfigurationMb300_332(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
 	uint8_t address = buf[0];
@@ -1149,7 +1732,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationMb(void)
 		pC->Nic.ncMbRead.flagSkipConfTcpipStack = (eBool)((pC->Nic.ncMbRead.flagsReg332_333 >> 1) & 0x01);
 		
 		idx = 3;
-		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncMbRead.regs, 0, 100);
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncMbRead.regs, 0, 33);
 	}
 }
 static void NIC_ReadResponseAfterReadNetworkStatusPfbus(void)
@@ -1260,7 +1843,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusPfnet(void)
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.nsPfnet.regs, 0, 100);
 	}
 }
-static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet(void)
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet300_399(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
 	uint8_t address = buf[0];
@@ -1280,36 +1863,162 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet(void)
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.provSerwerConn);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.responseTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.clientConWdgTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.protMode);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.sendAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.conAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.closeAckTimeout);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.dataSwap);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.flagsReg321_322);
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
-		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ethAddress, 6);
-		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.flagsReg332_333);
-		
-		pC->Nic.ncPfnetRead.responseTimeout *= 100;
-		pC->Nic.ncPfnetRead.clientConWdgTimeout *= 100;
-		
-		pC->Nic.ncPfnetRead.flagIpAddressAvailabe 	= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 0) & 0x01);
-		pC->Nic.ncPfnetRead.flagNetMaskAvailabe 		= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 1) & 0x01);
-		pC->Nic.ncPfnetRead.flagGatewayAvailabe 		= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 2) & 0x01);
-		pC->Nic.ncPfnetRead.flagBootIp 							= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 3) & 0x01);
-		pC->Nic.ncPfnetRead.flagDhcp 								= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 4) & 0x01);
-		pC->Nic.ncPfnetRead.flagSetEthAddress 			= (eBool)((pC->Nic.ncPfnetRead.flagsReg321_322 >> 5) & 0x01);
-		
-		pC->Nic.ncPfnetRead.flagMapFc1ToFc3 				= (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 0) & 0x01);
-		pC->Nic.ncPfnetRead.flagSkipConfTcpipStack 	= (eBool)((pC->Nic.ncPfnetRead.flagsReg332_333 >> 1) & 0x01);
 		
 		idx = 3;
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.ncPfnetRead.regs, 0, 100);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet400_499(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet500_599(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet600_699(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet700_799(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet800_899(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
+	}
+}
+static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet900_987(void)
+{
+	uint8_t* buf = pC->Nic.bufread;
+	uint8_t address = buf[0];
+	uint8_t bytes = buf[2];
+	
+	if(address != pC->Nic.mode.address)
+		return;
+	uint16_t crc1 = NIC_Crc16(buf, bytes+3);
+	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
+	if(crc1 != crc2)
+	{
+		return;
+	}
+	else
+	{
+		uint32_t idx = 3;
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.ncPfnetRead.length);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.busStartup);
+		NIC_BytesToUint32(buf, &idx, &pC->Nic.ncPfnetRead.wdgTimeout);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.ipAddress, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.subnetMask, 4);
+		NIC_BytesToTableUint8(buf, &idx, pC->Nic.ncPfnetRead.gateway, 4);
 	}
 }
 static void NIC_ReadResponseAfterWriteReisters(void)
@@ -1368,8 +2077,8 @@ static void NIC_ReadResponse(void)
 		case NF_RNS_MB:
 			NIC_ReadResponseAfterReadNetworkStatusMb();
 			break;
-		case NF_RNC_MB:
-			NIC_ReadResponseAfterReadNetworkConfigurationMb();
+		case NF_RNC_MB_300_332:
+			NIC_ReadResponseAfterReadNetworkConfigurationMb300_332();
 			break;
 		case NF_RNS_PFB:
 			NIC_ReadResponseAfterReadNetworkStatusPfbus();
@@ -1383,8 +2092,26 @@ static void NIC_ReadResponse(void)
 		case NF_RNS_PFN:
 			NIC_ReadResponseAfterReadNetworkStatusPfnet();
 			break;
-		case NF_RNC_PFN:
-			NIC_ReadResponseAfterReadNetworkConfigurationPfnet();
+		case NF_RNC_PFN_300_399:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet300_399();
+			break;
+		case NF_RNC_PFN_400_499:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet400_499();
+			break;
+		case NF_RNC_PFN_500_599:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet500_599();
+			break;
+		case NF_RNC_PFN_600_699:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet600_699();
+			break;
+		case NF_RNC_PFN_700_799:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet700_799();
+			break;
+		case NF_RNC_PFN_800_899:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet800_899();
+			break;
+		case NF_RNC_PFN_900_987:
+			NIC_ReadResponseAfterReadNetworkConfigurationPfnet900_987();
 			break;
 		case NF_WR:
 			NIC_ReadResponseAfterWriteReisters();
