@@ -766,8 +766,8 @@ static eResult Control_ReadConfigurationFromModuleProfiNET(void)
 	eResult result = RES_OK;
 	pC->Nic.mode.tabFunToSend[0] = NIC_ReadNetworkConfigurationPfnet300_399;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfnet400_499;
-	pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfnet500_599;
-	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationPfnet600_699;
+	pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfnet500_598;
+	pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationPfnet599_699;
 	pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationPfnet700_799;
 	pC->Nic.mode.tabFunToSend[5] = NIC_ReadNetworkConfigurationPfnet800_899;
 	pC->Nic.mode.tabFunToSend[6] = NIC_ReadNetworkConfigurationPfnet900_987;
@@ -991,8 +991,6 @@ void Control_WorkTypeConf(void)
 	{
 		pC->Mode.workType = workTypeError;
 	}
-	
-//	delay_ms(5000);
 }
 static void Control_WorkTypeRun(void)
 {
