@@ -81,27 +81,27 @@ static void Control_ReadConfigFromFlash(void)
 }
 static void Control_WriteConfigToFlash(void)
 {
-	pC->Ee.wData[EeAdd_stmProt] 					= (uint16_t)Prot_Pfnet;
+	pC->Ee.wData[EeAdd_stmProt] 										= (uint16_t)Prot_Pfnet;
 	
-	pC->Ee.wData[EeAdd_mbrtuAddress] 			= 2;
-	pC->Ee.wData[EeAdd_mbrtuTimeout] 			= 1000;
-	pC->Ee.wData[EeAdd_mbrtuBaudrate] 		= 7;
+	pC->Ee.wData[EeAdd_mbrtuAddress] 								= 2;
+	pC->Ee.wData[EeAdd_mbrtuTimeout] 								= 1000;
+	pC->Ee.wData[EeAdd_mbrtuBaudrate] 							= 7;
 	
-	pC->Ee.wData[EeAdd_mbtcpTimeout] 			= 1000;
-	pC->Ee.wData[EeAdd_mbtcpDataSwap] 		= 1;
-	pC->Ee.wData[EeAdd_mbtcpIP0] 					= 14;
-	pC->Ee.wData[EeAdd_mbtcpIP1] 					= 0;
-	pC->Ee.wData[EeAdd_mbtcpIP2] 					= 168;
-	pC->Ee.wData[EeAdd_mbtcpIP3] 					= 192;
-	pC->Ee.wData[EeAdd_mbtcpMask0] 				= 0;
-	pC->Ee.wData[EeAdd_mbtcpMask1] 				= 255;
-	pC->Ee.wData[EeAdd_mbtcpMask2] 				= 255;
-	pC->Ee.wData[EeAdd_mbtcpMask3] 				= 255;
-	pC->Ee.wData[EeAdd_mbtcpGateway0] 		= 1;
-	pC->Ee.wData[EeAdd_mbtcpGateway1] 		= 0;
-	pC->Ee.wData[EeAdd_mbtcpGateway2] 		= 168;
-	pC->Ee.wData[EeAdd_mbtcpGateway3] 		= 192;
-	pC->Ee.wData[EeAdd_mbtcpSerwerCons] 	= 4;
+	pC->Ee.wData[EeAdd_mbtcpTimeout] 								= 1000;
+	pC->Ee.wData[EeAdd_mbtcpDataSwap] 							= 1;
+	pC->Ee.wData[EeAdd_mbtcpIP0] 										= 14;
+	pC->Ee.wData[EeAdd_mbtcpIP1] 										= 0;
+	pC->Ee.wData[EeAdd_mbtcpIP2] 										= 168;
+	pC->Ee.wData[EeAdd_mbtcpIP3] 										= 192;
+	pC->Ee.wData[EeAdd_mbtcpMask0] 									= 0;
+	pC->Ee.wData[EeAdd_mbtcpMask1] 									= 255;
+	pC->Ee.wData[EeAdd_mbtcpMask2] 									= 255;
+	pC->Ee.wData[EeAdd_mbtcpMask3] 									= 255;
+	pC->Ee.wData[EeAdd_mbtcpGateway0] 							= 1;
+	pC->Ee.wData[EeAdd_mbtcpGateway1] 							= 0;
+	pC->Ee.wData[EeAdd_mbtcpGateway2] 							= 168;
+	pC->Ee.wData[EeAdd_mbtcpGateway3] 							= 192;
+	pC->Ee.wData[EeAdd_mbtcpSerwerCons] 						= 4;
 	pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutLow] 			= (uint16_t)31000;
 	pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutHigh] 		= (uint16_t)(31000 >> 16);
 	pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutLow] 	= (uint16_t)31000;
@@ -117,21 +117,94 @@ static void Control_WriteConfigToFlash(void)
 	pC->Ee.wData[EeAdd_pfbusFreezeSupported] 				= 1;
 	pC->Ee.wData[EeAdd_pfbusFailSafeSupported] 			= 1;
 	
-	pC->Ee.wData[EeAdd_pfnetTimeout] 		= 1000;
-	pC->Ee.wData[EeAdd_pfnetVendorId] 	= 1;
-	pC->Ee.wData[EeAdd_pfnetDeviceId] 	= 1;
-	pC->Ee.wData[EeAdd_pfnetIP0] 				= 19;
-	pC->Ee.wData[EeAdd_pfnetIP1] 				= 0;
-	pC->Ee.wData[EeAdd_pfnetIP2] 				= 168;
-	pC->Ee.wData[EeAdd_pfnetIP3] 				= 192;
-	pC->Ee.wData[EeAdd_pfnetMask0] 			= 0;
-	pC->Ee.wData[EeAdd_pfnetMask1] 			= 255;
-	pC->Ee.wData[EeAdd_pfnetMask2] 			= 255;
-	pC->Ee.wData[EeAdd_pfnetMask3] 			= 255;
-	pC->Ee.wData[EeAdd_pfnetGateway0] 	= 1;
-	pC->Ee.wData[EeAdd_pfnetGateway1] 	= 0;
-	pC->Ee.wData[EeAdd_pfnetGateway2] 	= 168;
-	pC->Ee.wData[EeAdd_pfnetGateway3] 	= 192;
+	pC->Ee.wData[EeAdd_pfnetTimeout] 							= 1000;
+	pC->Ee.wData[EeAdd_pfnetVendorId] 						= 0x011E;
+	pC->Ee.wData[EeAdd_pfnetDeviceId] 						= 0x010A;
+	pC->Ee.wData[EeAdd_pfnetLengthNameOfStation] 	= 10;
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 0] 			= 'n';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 1] 			= 'i';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 2] 			= 'c';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 3] 			= '5';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 4] 			= '0';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 5] 			= 'r';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 6] 			= 'e';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 7] 			= 'p';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 8] 			= 'n';
+	pC->Ee.wData[EeAdd_pfnetNameOfStation + 9] 			= 's';
+	for(uint16_t i=10;i<240;i++)
+		pC->Ee.wData[EeAdd_pfnetNameOfStation + i] 		= 0;
+	pC->Ee.wData[EeAdd_pfnetLengthTypeOfStation] 		= 19;
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 0] 			= 'D';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 1] 			= 'e';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 2] 			= 'f';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 3] 			= 'a';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 4] 			= 'u';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 5] 			= 'l';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 6] 			= 't';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 7] 			= '.';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 8] 			= 'D';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 9] 			= 'e';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 10] 		= 'v';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 11] 		= 'i';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 12] 		= 'c';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 13] 		= 'e';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 14] 		= '.';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 15] 		= 'T';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 16] 		= 'y';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 17] 		= 'p';
+	pC->Ee.wData[EeAdd_pfnetTypeOfStation + 18] 		= 'e';
+	for(uint16_t i=19;i<240;i++)
+		pC->Ee.wData[EeAdd_pfnetTypeOfStation + i] 		= 0;
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 0] 				= 'D';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 1] 				= 'e';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 2] 				= 'f';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 3] 				= 'a';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 4] 				= 'u';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 5] 				= 'l';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 6] 				= 't';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 7] 				= '.';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 8] 				= 'D';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 9] 				= 'e';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 10] 				= 'v';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 11] 				= 'i';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 12] 				= 'c';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 13] 				= 'e';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 14] 				= '.';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 15] 				= 'T';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 16] 				= 'y';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 17] 				= 'p';
+	pC->Ee.wData[EeAdd_pfnetDeviceType + 18] 				= 'e';
+	for(uint16_t i=19;i<28;i++)
+		pC->Ee.wData[EeAdd_pfnetDeviceType + i] 			= 0;
+	pC->Ee.wData[EeAdd_pfnetOrderId + 0] 			= '1';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 1] 			= '5';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 2] 			= '4';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 3] 			= '1';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 4] 			= '.';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 5] 			= 'l';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 6] 			= '0';
+	pC->Ee.wData[EeAdd_pfnetOrderId + 7] 			= '0';
+	for(uint16_t i=7;i<20;i++)
+		pC->Ee.wData[EeAdd_pfnetOrderId + i] 		= 0;
+	pC->Ee.wData[EeAdd_pfnetIP0] 										= 19;
+	pC->Ee.wData[EeAdd_pfnetIP1] 										= 0;
+	pC->Ee.wData[EeAdd_pfnetIP2] 										= 168;
+	pC->Ee.wData[EeAdd_pfnetIP3] 										= 192;
+	pC->Ee.wData[EeAdd_pfnetMask0] 									= 0;
+	pC->Ee.wData[EeAdd_pfnetMask1] 									= 255;
+	pC->Ee.wData[EeAdd_pfnetMask2] 									= 255;
+	pC->Ee.wData[EeAdd_pfnetMask3] 									= 255;
+	pC->Ee.wData[EeAdd_pfnetGateway0] 							= 1;
+	pC->Ee.wData[EeAdd_pfnetGateway1] 							= 0;
+	pC->Ee.wData[EeAdd_pfnetGateway2] 							= 168;
+	pC->Ee.wData[EeAdd_pfnetGateway3] 							= 192;
+	
+	pC->Ee.wData[EeAdd_pfnetHardwareRevision] 			= 1;
+	pC->Ee.wData[EeAdd_pfnetSoftwareRevision1] 			= 1;
+	pC->Ee.wData[EeAdd_pfnetSoftwareRevision2] 			= 5;
+	pC->Ee.wData[EeAdd_pfnetSoftwareRevision3] 			= 0;
+	pC->Ee.wData[EeAdd_pfnetSoftwareRevisionPrefix] = ((uint16_t)'R' << 0);
+	pC->Ee.wData[EeAdd_pfnetInstanceId] 						= 1;
 	
 	
 	FLASH_Unlock();
@@ -565,14 +638,14 @@ static void Control_PrepareConfigurationToWriteProfiBUS(void)
 {
 	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusDef;
 	
-	pC->Nic.ncPfbusWrite.wdgTimeout = pC->Ee.wData[EeAdd_pfbusTimeout];
-	pC->Nic.ncPfbusWrite.stationAddress = pC->Ee.wData[EeAdd_pfbusAdress];
-	pC->Nic.ncPfbusWrite.baudrate = pC->Ee.wData[EeAdd_pfbusBaudrate];
+	pC->Nic.ncPfbusWrite.wdgTimeout = pC->Ee.rData[EeAdd_pfbusTimeout];
+	pC->Nic.ncPfbusWrite.stationAddress = pC->Ee.rData[EeAdd_pfbusAdress];
+	pC->Nic.ncPfbusWrite.baudrate = pC->Ee.rData[EeAdd_pfbusBaudrate];
 	
-	pC->Nic.ncPfbusWrite.flagDpv1Enable = (eBool)pC->Ee.wData[EeAdd_pfbusDPV1Enable]; //register: 307d bit0
-	pC->Nic.ncPfbusWrite.flagSyncSupperted = (eBool)pC->Ee.wData[EeAdd_pfbusSyncSupported];
-	pC->Nic.ncPfbusWrite.flagFreezeSuported = (eBool)pC->Ee.wData[EeAdd_pfbusFreezeSupported];
-	pC->Nic.ncPfbusWrite.flagFailSafeSuported = (eBool)pC->Ee.wData[EeAdd_pfbusFailSafeSupported];
+	pC->Nic.ncPfbusWrite.flagDpv1Enable = (eBool)pC->Ee.rData[EeAdd_pfbusDPV1Enable]; //register: 307d bit0
+	pC->Nic.ncPfbusWrite.flagSyncSupperted = (eBool)pC->Ee.rData[EeAdd_pfbusSyncSupported];
+	pC->Nic.ncPfbusWrite.flagFreezeSuported = (eBool)pC->Ee.rData[EeAdd_pfbusFreezeSupported];
+	pC->Nic.ncPfbusWrite.flagFailSafeSuported = (eBool)pC->Ee.rData[EeAdd_pfbusFailSafeSupported];
 	
 	pC->Nic.ncPfbusWrite.flagsReg307 = 0x0000;
 	pC->Nic.ncPfbusWrite.flagsReg307 += (pC->Nic.ncPfbusWrite.flagDpv1Enable << 0);
@@ -777,109 +850,152 @@ static eResult Control_ReadConfigurationFromModuleProfiNET(void)
 }
 static void Control_PrepareConfigurationToWriteProfiNET(void)
 {
-//	pC->Nic.ncMbWrite = pC->Nic.ncMbDef;
-//	
-//	pC->Nic.ncMbWrite.wdgTimeout = pC->Ee.rData[EeAdd_mbtcpTimeout];
-//	pC->Nic.ncMbWrite.dataSwap = pC->Ee.rData[EeAdd_mbtcpDataSwap];
-//	pC->Nic.ncMbWrite.ipAddress[0] = pC->Ee.rData[EeAdd_mbtcpIP0];
-//	pC->Nic.ncMbWrite.ipAddress[1] = pC->Ee.rData[EeAdd_mbtcpIP1];
-//	pC->Nic.ncMbWrite.ipAddress[2] = pC->Ee.rData[EeAdd_mbtcpIP2];
-//	pC->Nic.ncMbWrite.ipAddress[3] = pC->Ee.rData[EeAdd_mbtcpIP3];
-//	pC->Nic.ncMbWrite.subnetMask[0] = pC->Ee.rData[EeAdd_mbtcpMask0];
-//	pC->Nic.ncMbWrite.subnetMask[1] = pC->Ee.rData[EeAdd_mbtcpMask1];
-//	pC->Nic.ncMbWrite.subnetMask[2] = pC->Ee.rData[EeAdd_mbtcpMask2];
-//	pC->Nic.ncMbWrite.subnetMask[3] = pC->Ee.rData[EeAdd_mbtcpMask3];
-//	pC->Nic.ncMbWrite.gateway[0] = pC->Ee.rData[EeAdd_mbtcpGateway0];
-//	pC->Nic.ncMbWrite.gateway[1] = pC->Ee.rData[EeAdd_mbtcpGateway1];
-//	pC->Nic.ncMbWrite.gateway[2] = pC->Ee.rData[EeAdd_mbtcpGateway2];
-//	pC->Nic.ncMbWrite.gateway[3] = pC->Ee.rData[EeAdd_mbtcpGateway3];
-//	pC->Nic.ncMbWrite.provSerwerConn = pC->Ee.rData[EeAdd_mbtcpSerwerCons];
-//	pC->Nic.ncMbWrite.sendAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpSendAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpSendAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.conAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpConnectAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpConnectAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.closeAckTimeout = ((uint32_t)pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutLow] << 0);
-//	pC->Nic.ncMbWrite.ethAddress[0] = pC->Nic.ncMbRead.ethAddress[0];
-//	pC->Nic.ncMbWrite.ethAddress[1] = pC->Nic.ncMbRead.ethAddress[1];
-//	pC->Nic.ncMbWrite.ethAddress[2] = pC->Nic.ncMbRead.ethAddress[2];
-//	pC->Nic.ncMbWrite.ethAddress[3] = pC->Nic.ncMbRead.ethAddress[3];
-//	pC->Nic.ncMbWrite.ethAddress[4] = pC->Nic.ncMbRead.ethAddress[4];
-//	pC->Nic.ncMbWrite.ethAddress[5] = pC->Nic.ncMbRead.ethAddress[5];
-//	
+	pC->Nic.ncPfnetWrite = pC->Nic.ncPfnetDef;
+	pC->Nic.ncPfnetWrite.wdgTimeout = pC->Ee.rData[EeAdd_pfnetTimeout];
+	pC->Nic.ncPfnetWrite.vendorId = pC->Ee.rData[EeAdd_pfnetVendorId];
+	pC->Nic.ncPfnetWrite.deviceId = pC->Ee.rData[EeAdd_pfnetDeviceId];
+	
+	pC->Nic.ncPfnetWrite.lengthNameOfStation = pC->Ee.rData[EeAdd_pfnetLengthNameOfStation];
+	for(uint16_t i=0;i<240;i++)
+		pC->Nic.ncPfnetWrite.nameOfStation[i] = pC->Ee.rData[EeAdd_pfnetNameOfStation + i];
+	pC->Nic.ncPfnetWrite.lengthTypeOfStation = pC->Ee.rData[EeAdd_pfnetLengthTypeOfStation];
+	for(uint16_t i=0;i<240;i++)
+		pC->Nic.ncPfnetWrite.typeOfStation[i] = pC->Ee.rData[EeAdd_pfnetTypeOfStation + i];
+		
+	for(uint16_t i=0;i<28;i++)
+		pC->Nic.ncPfnetWrite.deviceType[i] = pC->Ee.rData[EeAdd_pfnetDeviceType + i];
+	
+	for(uint16_t i=0;i<20;i++)
+		pC->Nic.ncPfnetWrite.orderId[i] = pC->Ee.rData[EeAdd_pfnetOrderId + i];
+	
+	pC->Nic.ncPfnetWrite.ipAddress[0] = pC->Ee.rData[EeAdd_pfnetIP0];
+	pC->Nic.ncPfnetWrite.ipAddress[1] = pC->Ee.rData[EeAdd_pfnetIP1];
+	pC->Nic.ncPfnetWrite.ipAddress[2] = pC->Ee.rData[EeAdd_pfnetIP2];
+	pC->Nic.ncPfnetWrite.ipAddress[3] = pC->Ee.rData[EeAdd_pfnetIP3];
+	pC->Nic.ncPfnetWrite.subnetMask[0] = pC->Ee.rData[EeAdd_pfnetMask0];
+	pC->Nic.ncPfnetWrite.subnetMask[1] = pC->Ee.rData[EeAdd_pfnetMask1];
+	pC->Nic.ncPfnetWrite.subnetMask[2] = pC->Ee.rData[EeAdd_pfnetMask2];
+	pC->Nic.ncPfnetWrite.subnetMask[3] = pC->Ee.rData[EeAdd_pfnetMask3];
+	pC->Nic.ncPfnetWrite.gateway[0] = pC->Ee.rData[EeAdd_pfnetGateway0];
+	pC->Nic.ncPfnetWrite.gateway[1] = pC->Ee.rData[EeAdd_pfnetGateway1];
+	pC->Nic.ncPfnetWrite.gateway[2] = pC->Ee.rData[EeAdd_pfnetGateway2];
+	pC->Nic.ncPfnetWrite.gateway[3] = pC->Ee.rData[EeAdd_pfnetGateway3];
+	
+	pC->Nic.ncPfnetWrite.hardwareRevision = pC->Ee.rData[EeAdd_pfnetHardwareRevision];
+	pC->Nic.ncPfnetWrite.softwareRevision1 = pC->Ee.rData[EeAdd_pfnetSoftwareRevision1];
+	pC->Nic.ncPfnetWrite.softwareRevision2 = pC->Ee.rData[EeAdd_pfnetSoftwareRevision2];
+	pC->Nic.ncPfnetWrite.softwareRevision3 = pC->Ee.rData[EeAdd_pfnetSoftwareRevision3];
+	pC->Nic.ncPfnetWrite.softwareRevisionPrefix = pC->Ee.rData[EeAdd_pfnetSoftwareRevisionPrefix];
+	pC->Nic.ncPfnetWrite.instanceId = pC->Ee.rData[EeAdd_pfnetInstanceId];
 
-//	uint32_t idx = 0;
-//	NIC_Uint16ToTableUint16(pC->Nic.ncMbWrite.length, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.busStartup, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.wdgTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.provSerwerConn, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.responseTimeout/100, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.clientConWdgTimeout/100, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.protMode, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.sendAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.conAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.closeAckTimeout, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.dataSwap, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.flagsReg321_322, &idx, pC->Nic.ncMbWrite.regs);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ipAddress, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.subnetMask, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.gateway, pC->Nic.ncMbWrite.regs, &idx, 4);
-//	NIC_TableUint8ToTableUint16(pC->Nic.ncMbWrite.ethAddress, pC->Nic.ncMbWrite.regs, &idx, 6);
-//	NIC_Uint32ToTableUint16(pC->Nic.ncMbWrite.flagsReg332_333, &idx, pC->Nic.ncMbWrite.regs);
+	uint32_t idx = 0;
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.length, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.busStartup, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.wdgTimeout, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.vendorId, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.deviceId, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.maxAR, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.inputBytes, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.outputBytes, &idx, pC->Nic.ncPfnetWrite.regs);
+	
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.lengthNameOfStation, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.nameOfStation, pC->Nic.ncPfnetWrite.regs, &idx, 240);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.lengthTypeOfStation, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.typeOfStation, pC->Nic.ncPfnetWrite.regs, &idx, 240);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.deviceType, pC->Nic.ncPfnetWrite.regs, &idx, 28);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.orderId, pC->Nic.ncPfnetWrite.regs, &idx, 20);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.ipAddress, pC->Nic.ncPfnetWrite.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.subnetMask, pC->Nic.ncPfnetWrite.regs, &idx, 4);
+	NIC_TableUint8ToTableUint16(pC->Nic.ncPfnetWrite.gateway, pC->Nic.ncPfnetWrite.regs, &idx, 4);
+	
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.hardwareRevision, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.softwareRevision1, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.softwareRevision2, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.softwareRevision3, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.softwareRevisionPrefix, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.maximumDiagRecords, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.instanceId, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.reserved1, &idx, pC->Nic.ncPfnetWrite.regs);
+	
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.numApi, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.profileApi, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.numSubmoduleItem, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.slot, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.subslot, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.moduleId, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.subModuleId, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.provDataLen, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.consDataLen, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.dpmOffsetIn, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.ncPfnetWrite.dpmOffsetOut, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.offsetIopsProvider, &idx, pC->Nic.ncPfnetWrite.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.ncPfnetWrite.offsetIopsConsumer, &idx, pC->Nic.ncPfnetWrite.regs);
+	
+	NIC_TableUint16ToTableUint16(pC->Nic.ncPfnetWrite.reserved2, pC->Nic.ncPfnetWrite.regs, &idx, 4);
+	NIC_TableUint16ToTableUint16(pC->Nic.ncPfnetWrite.structureSubmoduleOrApi, pC->Nic.ncPfnetWrite.regs, &idx, 365);
 }
 static eResult Control_CompareConfigurationProfiNET(void)
 {
 	eResult result = RES_OK;
-//	for(uint32_t i=0;i<100;i++)
-//	{
-//		if(pC->Nic.ncMbRead.regs[i] != pC->Nic.ncMbWrite.regs[i])
-//			result = RES_NicNcMbIncompatible;
-//	}
+	for(uint32_t i=0;i<PFNET_REGMAX;i++)
+	{
+		if(pC->Nic.ncPfnetRead.regs[i] != pC->Nic.ncPfnetWrite.regs[i])
+			result = RES_NicNcPfnetIncompatible;
+	}
 	return result;
 }
 static eResult Control_WriteConfigurationProfiNET(void)
 {
 	eResult result = RES_OK;
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationMb;
-//	pC->Nic.mode.tabFunToSend[1] = NIC_WriteClrcfgFlagInCommandFlags;
-//	pC->Nic.mode.tabFunToSend[2] = NIC_ReadSystemStatusComErrorFlags;
-//	NIC_StartComunication(2, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time1);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 1;
-//	
-//	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 2;
-//	
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
-//	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
-//	NIC_StartComunication(2, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time3);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 3;
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteNetworkConfigurationPfnet300_399;
+	pC->Nic.mode.tabFunToSend[1] = NIC_WriteNetworkConfigurationPfnet400_499;
+	pC->Nic.mode.tabFunToSend[2] = NIC_WriteNetworkConfigurationPfnet500_598;
+	pC->Nic.mode.tabFunToSend[3] = NIC_WriteNetworkConfigurationPfnet599_699;
+	pC->Nic.mode.tabFunToSend[4] = NIC_WriteNetworkConfigurationPfnet700_799;
+	pC->Nic.mode.tabFunToSend[5] = NIC_WriteNetworkConfigurationPfnet800_899;
+	pC->Nic.mode.tabFunToSend[6] = NIC_WriteNetworkConfigurationPfnet900_987;
+	pC->Nic.mode.tabFunToSend[7] = NIC_WriteClrcfgFlagInCommandFlags;
+	pC->Nic.mode.tabFunToSend[8] = NIC_ReadSystemStatusComErrorFlags;
+	NIC_StartComunication(9, 15000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time1);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 1;
+	
+	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 2;
+	
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
+	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+	NIC_StartComunication(2, 10000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time3);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 3;
 
-//	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 4;
-//	
-//	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
-//	NIC_StartComunication(1, 10000);
-//	result = Control_WaitForNicComunicationIsDone(&pC->time5);
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga2 = 5;
+	result = Control_WaitForNicFlagIsChanged(pC->Nic.sscef.flagFlsCfg, false, 10000);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 4;
+	
+	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
+	NIC_StartComunication(1, 10000);
+	result = Control_WaitForNicComunicationIsDone(&pC->time5);
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga2 = 5;
 	
 	return result;
 }
@@ -907,43 +1023,47 @@ static eResult Control_ConfProfiNET(void)
 		return result;
 	}
 	
-//	Control_PrepareConfigurationToWriteProfiNET();
-//	result = Control_CompareConfigurationProfiNET();
-//	if(result == RES_OK)
-//	{
-//		pC->flaga1 = 3;
-//		pC->Nic.mode.confStatus = NCS_confIsDone;
-//		return result;
-//	}
-//	pC->flaga1 = 4;
-//	
-//	result = Control_WriteConfigurationProfiNET();
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga1 = 5;
-//	
-//	result = Control_ReadConfigurationFromModuleProfiNET();
-//	if(result != RES_OK)
-//	{
-//		return result;
-//	}
-//	pC->flaga1 = 6;
-//	
-//	Control_PrepareConfigurationToWriteProfiNET();
-//	result = Control_CompareConfigurationProfiNET();
-//	if(result == RES_OK)
-//	{
-//		pC->flaga1 = 7;
-//		pC->Nic.mode.confStatus = NCS_confIsDone;
-//		return result;
-//	}
-//	else
-//	{
-//		pC->flaga1 = 8;
-//		return result;
-//	}
+	
+	
+	Control_PrepareConfigurationToWriteProfiNET();
+	result = Control_CompareConfigurationProfiNET();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 3;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	pC->flaga1 = 4;
+	
+	delay_ms(2000);
+	
+	result = Control_WriteConfigurationProfiNET();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 5;
+	
+	result = Control_ReadConfigurationFromModuleProfiNET();
+	if(result != RES_OK)
+	{
+		return result;
+	}
+	pC->flaga1 = 6;
+	
+	Control_PrepareConfigurationToWriteProfiNET();
+	result = Control_CompareConfigurationProfiNET();
+	if(result == RES_OK)
+	{
+		pC->flaga1 = 7;
+		pC->Nic.mode.confStatus = NCS_confIsDone;
+		return result;
+	}
+	else
+	{
+		pC->flaga1 = 8;
+		return result;
+	}
 }
 static void Control_RunProfiNET(void)
 {
@@ -951,8 +1071,17 @@ static void Control_RunProfiNET(void)
 		pC->Nic.mode.comStatus = NCS_comIsIdle;
 	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
 	{
+		
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 50);
+		
+		pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfnet300_399;
+		pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfnet400_499;
+		pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationPfnet500_598;
+		pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationPfnet599_699;
+		pC->Nic.mode.tabFunToSend[5] = NIC_ReadNetworkConfigurationPfnet700_799;
+		pC->Nic.mode.tabFunToSend[6] = NIC_ReadNetworkConfigurationPfnet800_899;
+		pC->Nic.mode.tabFunToSend[7] = NIC_ReadNetworkConfigurationPfnet900_987;
+		NIC_StartComunication(8, 1000);
 	}
 }
 //*******************************************************************************
@@ -976,7 +1105,7 @@ void Control_WorkTypeConf(void)
 		else if(pC->Mode.protocol == Prot_Pfbus)
 			result = Control_ConfProfiBUS();
 		else if(pC->Mode.protocol == Prot_Pfnet)
-			Control_ConfProfiNET();
+			result = Control_ConfProfiNET();
 		
 		pC->Status.nicComTimeoutError = false;
 		if(result == RES_OK)
