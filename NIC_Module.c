@@ -520,7 +520,7 @@ void NIC_SetDefaultConfigurationPfbus(void)
 	pC->Nic.ncPfbusDef.flagAddressSwitchEnable = false;
 	pC->Nic.ncPfbusDef.flagBaudrateSwitchEnable = false;
 	pC->Nic.ncPfbusDef.wdgTimeout = 1000;
-	pC->Nic.ncPfbusDef.identNumber = 0x000000C10;
+	pC->Nic.ncPfbusDef.identNumber = 0x0C10;
 	pC->Nic.ncPfbusDef.stationAddress = 2;
 	pC->Nic.ncPfbusDef.baudrate = 15;
 	

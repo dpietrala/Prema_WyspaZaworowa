@@ -110,6 +110,7 @@ static void Control_WriteConfigToFlash(void)
 	pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutHigh] 		= (uint16_t)(13000 >> 16);
 	
 	pC->Ee.wData[EeAdd_pfbusTimeout] 								= 1000;
+	pC->Ee.wData[EeAdd_pfbusIdentNumber] 						= 0x01C1;
 	pC->Ee.wData[EeAdd_pfbusAdress] 								= 3;
 	pC->Ee.wData[EeAdd_pfbusBaudrate] 							= 15;
 	pC->Ee.wData[EeAdd_pfbusDPV1Enable] 						= 1;
@@ -639,6 +640,7 @@ static void Control_PrepareConfigurationToWriteProfiBUS(void)
 	pC->Nic.ncPfbusWrite = pC->Nic.ncPfbusDef;
 	
 	pC->Nic.ncPfbusWrite.wdgTimeout = pC->Ee.rData[EeAdd_pfbusTimeout];
+	pC->Nic.ncPfbusWrite.identNumber = pC->Ee.rData[EeAdd_pfbusIdentNumber];
 	pC->Nic.ncPfbusWrite.stationAddress = pC->Ee.rData[EeAdd_pfbusAdress];
 	pC->Nic.ncPfbusWrite.baudrate = pC->Ee.rData[EeAdd_pfbusBaudrate];
 	
