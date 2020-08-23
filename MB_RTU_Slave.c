@@ -58,7 +58,7 @@ uint16_t MBS_Crc16(uint8_t* buf, uint32_t len)
 			}
     }
   }
-  return crc;  
+  return crc;
 }
 
 static void MBS_SetRead(void)

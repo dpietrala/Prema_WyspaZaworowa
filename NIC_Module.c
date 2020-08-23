@@ -193,7 +193,7 @@ void NIC_SetDefaultSystemInformationMb(void)
 	pC->Nic.siDefMb.hardOpChann3 = 65534;		//doesnt matter
 	pC->Nic.siDefMb.virtualDPMSize = 65536;	//doesnt matter
 	pC->Nic.siDefMb.manufCode = 1;					//doesnt matter
-	pC->Nic.siDefMb.prodCode = 4896;				//doesnt matter
+	pC->Nic.siDefMb.prodDate = 4896;				//doesnt matter
 	
 	tabidx = 0;
 	pC->Nic.siDefMb.ethMACAddr[tabidx++] = 0x00; 	//doesnt matter
@@ -389,7 +389,7 @@ void NIC_SetDefaultSystemInformationPfbus(void)
 	pC->Nic.siDefPfbus.hardOpChann3 = 65534;		//doesnt matter
 	pC->Nic.siDefPfbus.virtualDPMSize = 65536;	//doesnt matter
 	pC->Nic.siDefPfbus.manufCode = 1;						//doesnt matter
-	pC->Nic.siDefPfbus.prodCode = 4907;					//doesnt matter
+	pC->Nic.siDefPfbus.prodDate = 4907;					//doesnt matter
 	
 	tabidx = 0;
 	pC->Nic.siDefPfbus.ethMACAddr[tabidx++] = 0x00; //doesnt matter
@@ -571,7 +571,7 @@ void NIC_SetDefaultSystemInformationPfnet(void)
 	pC->Nic.siDefPfnet.hardOpChann3 = 65534;		//doesnt matter
 	pC->Nic.siDefPfnet.virtualDPMSize = 65536;	//doesnt matter
 	pC->Nic.siDefPfnet.manufCode = 1;					//doesnt matter
-	pC->Nic.siDefPfnet.prodCode = 4896;				//doesnt matter
+	pC->Nic.siDefPfnet.prodDate = 4896;				//doesnt matter
 	
 	tabidx = 0;
 	pC->Nic.siDefPfnet.ethMACAddr[tabidx++] = 0x00; //doesnt matter
@@ -1203,7 +1203,7 @@ static void NIC_ReadResponseAfterReadSystemInformations(void)
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.si.hardOpChann3);
 		NIC_BytesToUint32(buf, &idx, &pC->Nic.si.virtualDPMSize);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.si.manufCode);
-		NIC_BytesToUint16(buf, &idx, &pC->Nic.si.prodCode);
+		NIC_BytesToUint16(buf, &idx, &pC->Nic.si.prodDate);
 		NIC_BytesToTableUint8(buf, &idx, pC->Nic.si.ethMACAddr, 0, 6);
 		idx += 4; //reserved bytes
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.si.firm);

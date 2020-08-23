@@ -192,7 +192,7 @@ typedef struct	//system information: registers 0d - 99d
 	uint16_t		hardOpChann3;									//start registers: 9d
 	uint32_t		virtualDPMSize;								//start registers: 10d
 	uint16_t		manufCode;										//start registers: 12d
-	uint16_t		prodCode;											//start registers: 13d
+	uint16_t		prodDate;											//start registers: 13d
 	uint8_t			ethMACAddr[6];								//start registers: 14d - 16d
 	//uint8_t		reserved[4];									//start registers: 17d - 18d
 	uint16_t		firm;													//start registers: 19d
@@ -232,12 +232,12 @@ typedef struct	//system configuration: registers 100d - 199d
 }sNIC_SC;
 typedef struct	//system and command status and errors: registers 988d - 998d
 {
-	uint32_t		systemStatus;									//registers: 988d - 989d, see 12.2.3 System Error, page 90
-	uint32_t		systemError;									//registers: 990d - 991d, see 12.2.4 Comunication State, page 90
+	uint32_t		systemStatus;									//registers: 988d - 989d, currently not suported
+	uint32_t		systemError;									//registers: 990d - 991d, see 12.2.3 System Error, page 90
 	uint16_t		errorLogInd;									//register: 992d, not suported!!!
 	uint16_t		errorCounter;									//register: 993d
 	uint32_t		comError;											//registers: 994d - 995d
-	uint32_t		comStatus;										//registers: 996d - 997d
+	uint32_t		comStatus;										//registers: 996d - 997d, see 12.2.4 Comunication State, page 90
 	uint16_t		recPacketSize;								//register: 998d
 	uint16_t		flagsSystem;									//start registers: 999d, see 12.2.5 System Flags, page 91
 	eBool				flagReady;										//bit 0
