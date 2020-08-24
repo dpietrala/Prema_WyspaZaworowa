@@ -6,5 +6,6 @@
 void MBS_Conf(void);
 void MBS_ClrStr(uint8_t*, uint32_t);
 uint16_t MBS_Crc16(uint8_t*, uint32_t);
+void Config_SendConfStmToPc(void);
 
 #endif

@@ -74,13 +74,19 @@ static void Control_ReadConfigFromFlash(void)
 {
 	FLASH_Unlock();
 	EE_Init();
-	for(uint16_t i=0;i<EE_VARMAX;i++)
-		EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.rData[i]);
+	uint16_t check = 0x0000;
+	EE_ReadVariable(pC->Ee.VirtAddVarTab[0], &check);
+	if(check == EE_CONFIGWASUPLOADED)
+	{
+		for(uint16_t i=0;i<EE_VARMAX;i++)
+			EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.rData[i]);
+		pC->Mode.protocol = (eProtocol)pC->Ee.rData[EeAdd_stmProt];
+	}
 	FLASH_Lock();
-	pC->Mode.protocol = (eProtocol)pC->Ee.rData[EeAdd_stmProt];
 }
-static void Control_WriteConfigToFlash(void)
+void Control_WriteConfigToFlash(void)
 {
+	pC->Ee.wData[EeAdd_configWasUploaded] 					= (uint16_t)EE_CONFIGWASUPLOADED;
 	pC->Ee.wData[EeAdd_stmProt] 										= (uint16_t)Prot_Pfnet;
 	
 	pC->Ee.wData[EeAdd_mbrtuAddress] 								= 2;
@@ -230,7 +236,7 @@ void Control_SystemInit(void)
 	Control_LedConf();
 	Control_StructConf();
 	Control_AdcConf();
-	Control_WriteConfigToFlash();
+//	Control_WriteConfigToFlash();
 	Control_ReadConfigFromFlash();
 }
 void Control_SystemStart(void)
@@ -1087,10 +1093,6 @@ static void Control_RunProfiNET(void)
 	}
 }
 //*******************************************************************************
-static void Control_WorkTypeStop(void)
-{
-	Outputs_WorkTypeStop();
-}
 void Control_WorkTypeConf(void)
 {
 	delay_ms(3000);
