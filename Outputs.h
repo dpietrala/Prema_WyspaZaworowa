@@ -132,8 +132,7 @@
 #define OUT15_ON				OUT15_PORT->ODR &= ~GPIO_ODR_ODR_4
 
 
-void Outputs_Conf(void);
-void Outputs_WorkTypeStop(void);
+eResult Outputs_Conf(void);
 void Outputs_WorkTypeRun(void);
 void Outputs_WorkTypeConf(void);
 void Outputs_WorkTypeError(void);

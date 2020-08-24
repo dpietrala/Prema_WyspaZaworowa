@@ -26,8 +26,9 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
   }
   return crc;  
 }
-static void NIC_ComConf(void)
+eResult NIC_ComConf(void)
 {
+	eResult result = RES_OK;
 	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
 	DMA1_Stream5->NDTR 	= (uint16_t)NIC_BUFMAX;
@@ -44,10 +45,7 @@ static void NIC_ComConf(void)
 	USART2->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
 	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
 	NVIC_EnableIRQ(USART2_IRQn);
-}
-void NIC_Conf(void)
-{
-	NIC_ComConf();
+	return result;
 }
 void NIC_BytesToUint8(uint8_t* buf, uint32_t* idx, uint8_t* val)
 {
@@ -1069,6 +1067,11 @@ void NIC_ReadNetworkConfigurationPfnet900_987(void)
 void NIC_WriteCoils(void)
 {
 	NIC_WriteRegs(2000, 1, &pC->Nic.cod.coils, 0);
+	pC->Nic.mode.nicFun = NF_WR;
+}
+void NIC_WriteStatus(void)
+{
+	NIC_WriteRegs(2001, 1, &pC->Nic.cod.status, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteSystemConfiguration(void)

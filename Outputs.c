@@ -1,7 +1,9 @@
 #include "Outputs.h"
 extern sControl* pC;
-void Outputs_Conf(void)
+eResult Outputs_Conf(void)
 {
+	eResult result = RES_OK;
+	
 	OUT0_PORT->MODER &= ~OUT0_MODERALL;
 	OUT0_PORT->MODER |= OUT0_MODER;
 	OUT0_PORT->PUPDR |= OUT0_PUPDR;
@@ -99,6 +101,8 @@ void Outputs_Conf(void)
 	OUT13_PORT->OTYPER |= OUT13_OTYPER;
 	OUT14_PORT->OTYPER |= OUT14_OTYPER;
 	OUT15_PORT->OTYPER |= OUT15_OTYPER;
+	
+	return result;
 }
 static void Outputs_ChangeState(void)
 {
@@ -153,11 +157,6 @@ static void Outputs_ChangeState(void)
 	if((temp & 0x01) == RESET)		OUT15_OFF;
 	else													OUT15_ON;
 }
-void Outputs_WorkTypeStop(void)
-{
-	pC->Outs.coils = 0x00;
-	Outputs_ChangeState();
-}
 void Outputs_WorkTypeConf(void)
 {
 	pC->Outs.coils = 0x00;
@@ -165,15 +164,6 @@ void Outputs_WorkTypeConf(void)
 }
 void Outputs_WorkTypeRun(void)
 {
-	if(pC->Mode.protocol == Prot_Mbrtu)
-		pC->Outs.coils = pC->Mbs.coils;
-	else if(pC->Mode.protocol == Prot_Mbtcp)
-		pC->Outs.coils = pC->Nic.cid.coils;
-	else if(pC->Mode.protocol == Prot_Pfbus)
-		pC->Outs.coils = pC->Nic.cid.coils;
-	else if(pC->Mode.protocol == Prot_Pfnet)
-		pC->Outs.coils = pC->Nic.cid.coils;
-	
 	Outputs_ChangeState();
 }
 void Outputs_WorkTypeError(void)

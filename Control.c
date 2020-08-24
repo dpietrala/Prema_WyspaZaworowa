@@ -1,8 +1,8 @@
 #include "Control.h"
 extern sControl* pC;
-eResult result = RES_OK;
-static void Control_RccSystemInit(void)
+static eResult Control_RccSystemInit(void)
 {
+	eResult result = RES_OK;
 	uint32_t PLL_M=8, PLL_N=200, PLL_P=2, PLL_Q=7;
 	RCC->CR |= RCC_CR_HSEON;								//W³¹czenie HSE
 	while(!(RCC->CR & RCC_CR_HSERDY));						//czekamy a¿ HSE bêdzie gotowy
@@ -13,22 +13,30 @@ static void Control_RccSystemInit(void)
 	while(!(RCC->CR & RCC_CR_PLLRDY));						//czekanie a¿ PLL gotowa
 	RCC->CFGR |= RCC_CFGR_SW_PLL;							//PLL jako Ÿród³o dla SYSCLK
 	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL); //czekanie a¿ PLL bedzie gotowe jako SYSCLK
+	return result;
 }
-static void Control_RccConf(void)
+static eResult Control_RccConf(void)
 {
+	eResult result = RES_OK;
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN | RCC_APB1ENR_TIM6EN;
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_ADC1EN;
+	
+	return result;
 }
-static void Control_LedConf(void)
+static eResult Control_LedConf(void)
 {
+	eResult result = RES_OK;
 	LED_PORT->MODER 	|= GPIO_MODER_MODER8_0;
 	LED_PORT->PUPDR 	|= GPIO_PUPDR_PUPDR8_0;
 	LED1_OFF;
+	
+	return result;
 }
-static void Control_StructConf(void)
+static eResult Control_StructConf(void)
 {
-//	pC->Mode.protocol = Prot_Pfnet;
+	eResult result = RES_OK;
+	pC->Mode.protocol = Prot_Mbrtu;
 	pC->Mode.workType = workTypeStop;
 	
 	for(uint32_t i=0;i<EE_VARMAX;i++)
@@ -54,9 +62,12 @@ static void Control_StructConf(void)
 	NIC_SetDefaultConfigurationPfbus();
 	NIC_SetDefaultSystemInformationPfnet();
 	NIC_SetDefaultConfigurationPfnet();
+	
+	return result;
 }
-static void Control_AdcConf(void)
+static eResult Control_AdcConf(void)
 {
+	eResult result = RES_OK;
 	DMA2_Stream0->PAR = (uint32_t)&ADC1->DR;
 	DMA2_Stream0->M0AR = (uint32_t)pC->Mode.adcValue;
 	DMA2_Stream0->NDTR = (uint16_t)(200);
@@ -69,9 +80,12 @@ static void Control_AdcConf(void)
 	ADC1->SMPR1 |= ADC_SMPR1_SMP18;
 	ADC1->SQR3 |= (18<<0);
 	ADC1->CR2 |= ADC_CR2_SWSTART;
+	
+	return result;
 }
-static void Control_ReadConfigFromFlash(void)
+static eResult Control_ReadConfigFromFlash(void)
 {
+	eResult result = RES_OK;
 	FLASH_Unlock();
 	EE_Init();
 	uint16_t check = 0x0000;
@@ -82,10 +96,17 @@ static void Control_ReadConfigFromFlash(void)
 			EE_ReadVariable(pC->Ee.VirtAddVarTab[i], &pC->Ee.rData[i]);
 		pC->Mode.protocol = (eProtocol)pC->Ee.rData[EeAdd_stmProt];
 	}
+	else
+	{
+		result = RES_EeReadingConfigIncorrect;
+	}
 	FLASH_Lock();
+	
+	return result;
 }
-void Control_WriteConfigToFlash(void)
+eResult Control_WriteConfigToFlash(void)
 {
+	eResult result = RES_OK;
 	pC->Ee.wData[EeAdd_configWasUploaded] 					= (uint16_t)EE_CONFIGWASUPLOADED;
 	pC->Ee.wData[EeAdd_stmProt] 										= (uint16_t)Prot_Pfnet;
 	
@@ -219,29 +240,18 @@ void Control_WriteConfigToFlash(void)
 	for(uint16_t i=0;i<EE_VARMAX;i++)
 		EE_WriteVariable(pC->Ee.VirtAddVarTab[i], pC->Ee.wData[i]);
 	FLASH_Lock();
+	
+	return result;
 }
-static void Control_TimsConf(void)
+static eResult Control_TimsConf(void)
 {
+	eResult result = RES_OK;
 	TIM6->PSC = 50-1;
 	TIM6->ARR = 10000;
 	TIM6->DIER |= TIM_DIER_UIE;
 	TIM6->CR1 |= TIM_CR1_CEN;
 	NVIC_EnableIRQ(TIM6_DAC_IRQn);
-}
-void Control_SystemInit(void)
-{
-	Control_RccSystemInit();
-	SysTick_Config(100000);
-	Control_RccConf();
-	Control_LedConf();
-	Control_StructConf();
-	Control_AdcConf();
-//	Control_WriteConfigToFlash();
-	Control_ReadConfigFromFlash();
-}
-void Control_SystemStart(void)
-{
-	Control_TimsConf();
+	return result;
 }
 static void Control_LedAct(void)
 {
@@ -252,13 +262,22 @@ static void Control_LedAct(void)
 	}
 	else if(pC->Mode.workType == workTypeConf)
 	{
+		LED1_OFF;
+		pC->Mode.ledTime = 0;
+	}
+	else if(pC->Mode.workType == workTypeRun)
+	{
 		LED1_ON;
 		pC->Mode.ledTime = 0;
 	}
-	else if(pC->Mode.ledTime >= pC->Mode.ledPeriod)
+	else if(pC->Mode.workType == workTypeError)
 	{
-		LED1_TOG;
-		pC->Mode.ledTime = 0;
+		pC->Mode.ledPeriod = 100;
+		if(pC->Mode.ledTime >= pC->Mode.ledPeriod)
+		{
+			LED1_TOG;
+			pC->Mode.ledTime = 0;
+		}
 	}
 }
 void delay_ms(uint32_t ms)
@@ -274,21 +293,29 @@ static void Control_CheckStatus(void)
 		pC->Nic.mode.comTime++;
 	
 	if(pC->Nic.mode.comTime >= pC->Nic.mode.comTimeout)
-	{
 		pC->Status.nicComTimeoutError = true;
-	}
 	else
-	{
 		pC->Status.nicComTimeoutError = false;
-	}
+	
 	if(pC->Nic.mode.flagTime >= pC->Nic.mode.flagTimeout)
-	{
 		pC->Status.nicFlagTimeoutError = true;
-	}
 	else
-	{
 		pC->Status.nicFlagTimeoutError = false;
-	}
+	
+	pC->Status.status = 0x00000000;
+	pC->Status.status += pC->Status.incorrectConfigReadingFromFlash << 0;
+	pC->Status.status += pC->Status.nicComTimeoutError << 1;
+	pC->Status.status += pC->Status.nicFlagTimeoutError << 2;
+	pC->Status.status += pC->Status.nicIncompDevNumber << 3;
+	pC->Status.status += pC->Status.nicIncompDevClass << 4;
+	pC->Status.status += pC->Status.nicIncompProtClass << 5;
+	pC->Status.status += pC->Status.nicIncompFirmName << 6;
+	pC->Status.status += pC->Status.nicIncorretConfigWriting << 7;
+	
+	if(pC->Mode.workType == workTypeRun)
+		pC->Nic.cod.status = 0x0001;
+	else
+		pC->Nic.cod.status = 0x0000;
 }
 void SysTick_Handler(void)
 {
@@ -375,9 +402,19 @@ static eResult Control_ConfModbusRTU(void)
 		case 7:		pC->Mbs.baud = 115200;	break;
 		default: 	pC->Mbs.baud = 9600;		break;
 	}
+	
+	pC->Mbs.unittime = 1000000/pC->Mbs.baud;
+	pC->Mbs.fun = MF_I;
+	pC->Mbs.coils = 0;
+	for(uint16_t j=0;j<MBS_REGMAX;j++)
+		pC->Mbs.hregs[j] = 0;
+	
 	return result;
 }
 static void Control_RunModbusRTU(void)
+{
+}
+static void Control_ErrorModbusRTU(void)
 {
 }
 // Modbus TCP ************************************************
@@ -597,7 +634,24 @@ static void Control_RunModbusTCP(void)
 	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
 	{
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 50);
+		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[3] = NIC_WriteStatus;
+		
+		NIC_StartComunication(4, 100);
+	}
+}
+static void Control_ErrorModbusTCP(void)
+{
+	if(pC->Nic.mode.comStatus == NCS_comIsDone)
+		pC->Nic.mode.comStatus = NCS_comIsIdle;
+	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
+	{
+		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[1] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteStatus;
+		
+		NIC_StartComunication(3, 100);
 	}
 }
 // ProfiBUS **************************************************************
@@ -807,7 +861,24 @@ static void Control_RunProfiBUS(void)
 	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
 	{
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-		NIC_StartComunication(1, 50);
+		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[3] = NIC_WriteStatus;
+		
+		NIC_StartComunication(4, 100);
+	}
+}
+static void Control_ErrorProfiBUS(void)
+{
+	if(pC->Nic.mode.comStatus == NCS_comIsDone)
+		pC->Nic.mode.comStatus = NCS_comIsIdle;
+	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
+	{
+		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[1] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteStatus;
+		
+		NIC_StartComunication(3, 100);
 	}
 }
 // ProfiNET ************************************************************
@@ -1009,21 +1080,18 @@ static eResult Control_WriteConfigurationProfiNET(void)
 }
 static eResult Control_ConfProfiNET(void)
 {
-	pC->flaga1 = 0;
 	eResult result = RES_OK;
 	result = Control_ReadModuleSystemInformation();
 	if(result != RES_OK)
 	{
 		return result;
 	}
-	pC->flaga1 = 1;
 	
 	result = Control_ComapreSystemInformationProfiNET();
 	if(result != RES_OK)
 	{
 		return result;
 	}
-	pC->flaga1 = 2;
 	
 	result = Control_ReadConfigurationFromModuleProfiNET();
 	if(result != RES_OK)
@@ -1031,45 +1099,35 @@ static eResult Control_ConfProfiNET(void)
 		return result;
 	}
 	
-	
-	
 	Control_PrepareConfigurationToWriteProfiNET();
 	result = Control_CompareConfigurationProfiNET();
 	if(result == RES_OK)
 	{
-		pC->flaga1 = 3;
 		pC->Nic.mode.confStatus = NCS_confIsDone;
 		return result;
 	}
-	pC->flaga1 = 4;
-	
-	delay_ms(2000);
 	
 	result = Control_WriteConfigurationProfiNET();
 	if(result != RES_OK)
 	{
 		return result;
 	}
-	pC->flaga1 = 5;
 	
 	result = Control_ReadConfigurationFromModuleProfiNET();
 	if(result != RES_OK)
 	{
 		return result;
 	}
-	pC->flaga1 = 6;
 	
 	Control_PrepareConfigurationToWriteProfiNET();
 	result = Control_CompareConfigurationProfiNET();
 	if(result == RES_OK)
 	{
-		pC->flaga1 = 7;
 		pC->Nic.mode.confStatus = NCS_confIsDone;
 		return result;
 	}
 	else
 	{
-		pC->flaga1 = 8;
 		return result;
 	}
 }
@@ -1079,27 +1137,52 @@ static void Control_RunProfiNET(void)
 		pC->Nic.mode.comStatus = NCS_comIsIdle;
 	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
 	{
-		
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
+		pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[3] = NIC_WriteStatus;
 		
-		pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfnet300_399;
-		pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfnet400_499;
-		pC->Nic.mode.tabFunToSend[3] = NIC_ReadNetworkConfigurationPfnet500_598;
-		pC->Nic.mode.tabFunToSend[4] = NIC_ReadNetworkConfigurationPfnet599_699;
-		pC->Nic.mode.tabFunToSend[5] = NIC_ReadNetworkConfigurationPfnet700_799;
-		pC->Nic.mode.tabFunToSend[6] = NIC_ReadNetworkConfigurationPfnet800_899;
-		pC->Nic.mode.tabFunToSend[7] = NIC_ReadNetworkConfigurationPfnet900_987;
-		NIC_StartComunication(8, 1000);
+		NIC_StartComunication(4, 100);
+	}
+}
+static void Control_ErrorProfiNET(void)
+{
+	if(pC->Nic.mode.comStatus == NCS_comIsDone)
+		pC->Nic.mode.comStatus = NCS_comIsIdle;
+	if(pC->Nic.mode.comStatus == NCS_comIsIdle)
+	{
+		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
+		pC->Nic.mode.tabFunToSend[1] = NIC_WriteCoils;
+		pC->Nic.mode.tabFunToSend[2] = NIC_WriteStatus;
+		
+		NIC_StartComunication(3, 100);
 	}
 }
 //*******************************************************************************
 void Control_WorkTypeConf(void)
 {
-	delay_ms(3000);
 	eResult result = RES_OK;
-	pC->Mode.workType = workTypeConf;
-	Outputs_WorkTypeConf();
+	pC->Mode.workType = workTypeStop;
+	Control_RccSystemInit();
+	SysTick_Config(100000);
+	Control_RccConf();
+	Control_LedConf();
+	Control_StructConf();
+	Control_AdcConf();
+	MBS_ComConf();
+	NIC_ComConf();
+	Outputs_Conf();
+	result = Control_ReadConfigFromFlash();
+	if(result != RES_OK)
+	{
+		pC->Mode.workType = workTypeError;
+		pC->Status.incorrectConfigReadingFromFlash = true;
+		Control_TimsConf();
+		return;
+	}
 	
+	delay_ms(3000);
+	pC->Mode.workType = workTypeConf;
 	for(uint8_t i=0;i<3;i++)
 	{
 		if(pC->Mode.protocol == Prot_Mbrtu)
@@ -1117,17 +1200,14 @@ void Control_WorkTypeConf(void)
 	}
 	
 	if(result == RES_OK)
-	{
 		pC->Mode.workType = workTypeRun;
-	}
 	else
-	{
 		pC->Mode.workType = workTypeError;
-	}
+	
+	Control_TimsConf();
 }
 static void Control_WorkTypeRun(void)
 {
-	pC->Mode.ledPeriod = 500;
 	Outputs_WorkTypeRun();
 	if(pC->Mode.protocol == Prot_Mbrtu)
 	{
@@ -1148,8 +1228,23 @@ static void Control_WorkTypeRun(void)
 }
 static void Control_WorkTypeError(void)
 {
-	pC->Mode.ledPeriod = 100;
 	Outputs_WorkTypeError();
+	if(pC->Mode.protocol == Prot_Mbrtu)
+	{
+		Control_ErrorModbusRTU();
+	}
+	else if(pC->Mode.protocol == Prot_Mbtcp)
+	{
+		Control_ErrorModbusTCP();
+	}
+	else if(pC->Mode.protocol == Prot_Pfbus)
+	{
+		Control_ErrorProfiBUS();
+	}
+	else if(pC->Mode.protocol == Prot_Pfnet)
+	{
+		Control_ErrorProfiNET();
+	}
 }
 //*******************************************************************************
 static void Control_Act(void)

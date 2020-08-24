@@ -8,18 +8,12 @@ static void MBS_SetRead(void)
 {
 	GPIOA->ODR &= ~GPIO_ODR_OD11;
 }
-void MBS_Conf(void)
+eResult MBS_ComConf(void)
 {
+	eResult result = RES_OK;
+	
 	MBS_ClrStr(pC->Mbs.bufread, MBS_BUFMAX);
 	MBS_ClrStr(pC->Mbs.bufwrite, MBS_BUFMAX);
-	pC->Mbs.baud = 115200;
-	pC->Mbs.unittime = 1000000/pC->Mbs.baud;
-	pC->Mbs.fun = MF_I;
-	pC->Mbs.address = 2;
-	pC->Mbs.coils = 0;
-	for(uint16_t j=0;j<MBS_REGMAX;j++)
-		pC->Mbs.hregs[j] = 0;
-	
 	
 	DMA2_Stream2->PAR 	= (uint32_t)&USART1->DR;
 	DMA2_Stream2->M0AR 	= (uint32_t)pC->Mbs.bufread;
@@ -37,10 +31,12 @@ void MBS_Conf(void)
 	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
 	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
 	GPIOA->AFR[1] = 0x00000770;
-	USART1->BRR = 50000000/pC->Mbs.baud;
+	USART1->BRR = 50000000/9600;
 	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
 	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
 	NVIC_EnableIRQ(USART1_IRQn);
+	
+	return result;
 }
 static void MBS_ReloadDmaToSend(uint16_t num)
 {
@@ -662,7 +658,7 @@ static void Config_ReadTelemReq(void)
 	uint8_t* buf = pC->Mbs.bufread;
 	uint16_t crc1 = Config_Crc16(buf, 6);
 	uint16_t crc2 = ((uint16_t)buf[6]<<8) + ((uint16_t)buf[7]<<0);
-	if(crc1 == crc2)
+	//if(crc1 == crc2)
 	{
 		Config_SendTelemStmToPc();
 	}

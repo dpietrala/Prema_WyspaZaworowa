@@ -2,11 +2,6 @@
 #define _CONTROL
 #include <stm32f4xx.h>
 #include <STM32F410Rx.h>
-#include "NIC_Module.h"
-#include "MB_RTU_Slave.h"
-#include "Outputs.h"
-#include "Flash.h"
-#include "Eeprom.h"
 
 //MF_I 		= 0x00 - modbus function is idle
 //MF_RnDQ = 0x01 - modbus function is read 1 digital quits
@@ -39,7 +34,6 @@ typedef enum
 	MF_DT = 0x08, MF_WnDQ = 0x0f, MF_WnHR = 0x10, MF_ID = 0x11,
 }eMBFun;
 typedef enum {MFE_IF = 0x01, MFE_IDR = 0x02, MFE_IV = 0x03, MFE_SE = 0x04,MFE_PC = 0x05, MFE_SNR = 0x06, MFE_NC = 0x07, MFE_PE = 0x08}eMBError;
-
 typedef enum
 {
 	NF_I = 0, 
@@ -73,7 +67,9 @@ typedef enum
 	RES_NicNcMbIncompatible,
 	RES_NicNcPfbusIncompatible,
 	RES_NicNcPfnetIncompatible,
+	RES_EeReadingConfigIncorrect,
 }eResult;
+
 typedef enum
 {
 	EeAdd_configWasUploaded = 0,
@@ -143,6 +139,12 @@ typedef enum
 	EeAdd_pfnetInstanceId = 584,
 }eEeAdd;
 typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
+
+#include "NIC_Module.h"
+#include "MB_RTU_Slave.h"
+#include "Outputs.h"
+#include "Flash.h"
+#include "Eeprom.h"
 
 #define LED_PORT		GPIOA
 #define LED1_PIN		GPIO_ODR_ODR_8
@@ -283,6 +285,7 @@ typedef struct	//command flags: register 1999d
 typedef struct	//cyclic output data: registers 2000d - 2993d
 {
 	uint16_t		coils;
+	uint16_t		status;
 }sNIC_COD;
 typedef struct	//network status for ModbusTCP: registers 200d - 299d
 {
@@ -448,6 +451,8 @@ typedef struct
 typedef struct	//outputs
 {
 	uint16_t			coils;
+	uint16_t			newCoilsReq;
+	uint16_t			prevCoilsReq;
 }sOutputs;
 typedef struct	//Mode
 {
@@ -468,13 +473,14 @@ typedef struct	//Eeprom emulation
 typedef struct
 {
 	uint32_t	status;
+	eBool			incorrectConfigReadingFromFlash;
 	eBool			nicComTimeoutError;
 	eBool			nicFlagTimeoutError;
 	eBool			nicIncompDevNumber;
 	eBool			nicIncompDevClass;
 	eBool			nicIncompProtClass;
 	eBool			nicIncompFirmName;
-	eBool			nicInvalidConfigWriting;
+	eBool			nicIncorretConfigWriting;
 }sStatus;
 typedef struct
 {
@@ -497,10 +503,8 @@ typedef struct
 	uint32_t			time5;
 }sControl;
 
-void Control_SystemInit(void);
-void Control_SystemStart(void);
 void delay_ms(uint32_t ms);
 void Control_WorkTypeConf(void);
-void Control_WriteConfigToFlash(void);
+eResult Control_WriteConfigToFlash(void);
 
 #endif

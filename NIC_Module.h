@@ -14,7 +14,7 @@ void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab);
 void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab);
 
 
-void NIC_Conf(void);
+eResult NIC_ComConf(void);
 void NIC_ReadCoils(void);
 void NIC_ReadSystemInformation(void);
 void NIC_ReadSystemConfiguration(void);
@@ -34,6 +34,7 @@ void NIC_ReadNetworkConfigurationPfnet700_799(void);
 void NIC_ReadNetworkConfigurationPfnet800_899(void);
 void NIC_ReadNetworkConfigurationPfnet900_987(void);
 void NIC_WriteCoils(void);
+void NIC_WriteStatus(void);
 void NIC_WriteSystemConfiguration(void);
 void NIC_WriteNetworkConfigurationMb300_332(void);
 void NIC_WriteNetworkConfigurationPfbus300_399(void);
