@@ -6,6 +6,5 @@ int main(void)
 	Control_WorkTypeConf();
   while(1)
   {
-		
 	}
 }

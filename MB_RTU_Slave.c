@@ -2,7 +2,8 @@
 extern sControl* pC;
 static void MBS_SetSend(void)
 {
-	GPIOA->ODR |= GPIO_ODR_OD11;
+	for(uint32_t i=0;i<100000;i++)
+		GPIOA->ODR |= GPIO_ODR_OD11;
 }
 static void MBS_SetRead(void)
 {
@@ -26,10 +27,11 @@ eResult MBS_ComConf(void)
 	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 	
 	GPIOA->MODER |= GPIO_MODER_MODER11_0;
+//	GPIOA->PUPDR |= GPIO_PUPDR_PUPD11_1;
 	MBS_SetRead();
 	
 	GPIOA->MODER |= GPIO_MODER_MODER9_1 | GPIO_MODER_MODER10_1;
-	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
+//	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR9_0 | GPIO_PUPDR_PUPDR10_0;
 	GPIOA->AFR[1] = 0x00000770;
 	USART1->BRR = 50000000/9600;
 	USART1->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
@@ -199,10 +201,11 @@ static void MBS_Response_RnHR(void)
 	bufw[index++] = crc;
 	bufw[index++] = crc >> 8;
 	
-	MBS_ReloadDmaToSend(index);
+	MBS_ReloadDmaToSend(index+4);
 }
 static void MBS_Response_WnHR(void)
 {
+	pC->Mbs.statusMbrtu[7]++;
 	uint8_t* bufr = pC->Mbs.bufread;
 	uint8_t* bufw = pC->Mbs.bufwrite;
 	MBS_ClrStr(bufw, MBS_BUFMAX);
@@ -222,7 +225,7 @@ static void MBS_Response_WnHR(void)
 	bufw[6] = crc;
 	bufw[7] = crc >> 8;
 	
-	MBS_ReloadDmaToSend(8);
+	MBS_ReloadDmaToSend(10);
 }
 static void MBS_ReadRequest_RnDQ(void)
 {
@@ -284,6 +287,7 @@ static void MBS_ReadRequest_RnHR(void)
 		}
 		else
 		{
+			pC->Mbs.statusMbrtu[5]++;
 			MBS_Response_RnHR();
 		}
 	}
@@ -306,6 +310,7 @@ static void MBS_ReadRequest_WnHR(void)
 		}
 		else
 		{
+			pC->Mbs.statusMbrtu[6]++;
 			MBS_Response_WnHR();
 		}
 	}
@@ -332,7 +337,6 @@ static void MBS_ReadRequest(void)
 			default:																break;
 		}
 	}
-	
 }
 // Funkcje zwiazane z konfiguracja z poziomu PC **************************************
 static uint16_t Config_Crc16(uint8_t* packet, uint32_t nBytes)
@@ -349,7 +353,7 @@ static uint16_t Config_Crc16(uint8_t* packet, uint32_t nBytes)
 	}
 	return crc;
 }
-void Config_SendConfStmToPc(void)
+static void Config_SendConfStmToPc(void)
 {
 	uint8_t* buf = pC->Mbs.bufwrite;
 	MBS_ClrStr(buf, MBS_BUFMAX);
@@ -365,6 +369,7 @@ void Config_SendConfStmToPc(void)
 	
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuTimeout] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuTimeout] >> 0;
+	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuDataSwap] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuAddress] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuBaudrate] >> 0;
 	
@@ -396,9 +401,10 @@ void Config_SendConfStmToPc(void)
 	buf[idx++] = pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutHigh] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutLow] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbtcpCloseAckTimeoutLow] >> 0;
-	
+
 	buf[idx++] = pC->Ee.rData[EeAdd_pfbusTimeout] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfbusTimeout] >> 0;
+	buf[idx++] = pC->Ee.rData[EeAdd_pfbusDataSwap] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfbusIdentNumber] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfbusIdentNumber] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfbusAdress] >> 0;
@@ -410,6 +416,7 @@ void Config_SendConfStmToPc(void)
 	
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetTimeout] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetTimeout] >> 0;
+	buf[idx++] = pC->Ee.rData[EeAdd_pfnetDataSwap] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetVendorId] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetVendorId] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetDeviceId] >> 8;
@@ -444,10 +451,7 @@ void Config_SendConfStmToPc(void)
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetSoftwareRevision2] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetSoftwareRevision3] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetSoftwareRevision3] >> 0;
-	buf[idx++] = pC->Ee.rData[EeAdd_pfnetSoftwareRevisionPrefix] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_pfnetSoftwareRevisionPrefix] >> 0;
-	buf[idx++] = pC->Ee.rData[EeAdd_pfnetInstanceId] >> 8;
-	buf[idx++] = pC->Ee.rData[EeAdd_pfnetInstanceId] >> 0;
 	
 	uint16_t crc = Config_Crc16(buf, idx);
 	buf[idx++] = crc >> 8;
@@ -455,6 +459,7 @@ void Config_SendConfStmToPc(void)
 	
 	MBS_ReloadDmaToSend(idx + 2); //bo konwerter USB RS485 obcina dwa bajty ostatnie
 }
+
 static void Config_SendTelemStmToPc(void)
 {
 	uint8_t* buf = pC->Mbs.bufwrite;
@@ -471,12 +476,12 @@ static void Config_SendTelemStmToPc(void)
 	buf[idx++] = pC->Outs.coils >> 0;
 	buf[idx++] = pC->Mode.workType >> 0;
 	buf[idx++] = pC->Mode.protocol >> 0;
-	buf[idx++] = (uint16_t)((int16_t)(pC->Mode.mcuTemp * 10)) >> 8;
-	buf[idx++] = (uint16_t)((int16_t)(pC->Mode.mcuTemp * 10)) >> 0;
-	buf[idx++] = pC->Status.status >> 24;
-	buf[idx++] = pC->Status.status >> 16;
-	buf[idx++] = pC->Status.status >> 8;
-	buf[idx++] = pC->Status.status >> 0;
+	buf[idx++] = (uint16_t)((int16_t)(pC->Status.statTemp * 10)) >> 8;
+	buf[idx++] = (uint16_t)((int16_t)(pC->Status.statTemp * 10)) >> 0;
+//	buf[idx++] = pC->Status.status >> 24;
+//	buf[idx++] = pC->Status.status >> 16;
+//	buf[idx++] = pC->Status.status >> 8;
+//	buf[idx++] = pC->Status.status >> 0;
 	
 	buf[idx++] = pC->Nic.si.devNumber >> 24;
 	buf[idx++] = pC->Nic.si.devNumber >> 16;
@@ -540,7 +545,6 @@ static void Config_SendTelemStmToPc(void)
 	uint16_t crc = Config_Crc16(buf, idx);
 	buf[idx++] = crc >> 8;
 	buf[idx++] = crc >> 0;
-	pC->flaga5 = idx;
 	
 	MBS_ReloadDmaToSend(idx + 2); //bo konwerter USB RS485 obcina dwa bajty ostatnie
 }
@@ -557,8 +561,8 @@ static void Config_ReadConfReq(void)
 static void Config_ReadConfPcToStm(void)
 {
 	uint8_t* buf = pC->Mbs.bufread;
-	uint16_t crc1 = Config_Crc16(buf, 608);
-	uint16_t crc2 = ((uint16_t)buf[608]<<8) + ((uint16_t)buf[609]<<0);
+	uint16_t crc1 = Config_Crc16(buf, 606);
+	uint16_t crc2 = ((uint16_t)buf[606]<<8) + ((uint16_t)buf[607]<<0);
 	if(crc1 == crc2)
 	{
 		uint32_t idx = 6;
@@ -566,6 +570,7 @@ static void Config_ReadConfPcToStm(void)
 
 		pC->Ee.wData[EeAdd_mbrtuTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
+		pC->Ee.wData[EeAdd_mbrtuDataSwap] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_mbrtuAddress] 								= buf[idx++];
 		pC->Ee.wData[EeAdd_mbrtuBaudrate] 							= buf[idx++];
 		
@@ -600,6 +605,7 @@ static void Config_ReadConfPcToStm(void)
 		
 		pC->Ee.wData[EeAdd_pfbusTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
+		pC->Ee.wData[EeAdd_pfbusDataSwap] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_pfbusIdentNumber] 						= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_pfbusAdress] 								= buf[idx++];
@@ -611,6 +617,7 @@ static void Config_ReadConfPcToStm(void)
 		
 		pC->Ee.wData[EeAdd_pfnetTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
+		pC->Ee.wData[EeAdd_pfnetDataSwap] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_pfnetVendorId] 							= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_pfnetDeviceId] 							= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
@@ -621,7 +628,7 @@ static void Config_ReadConfPcToStm(void)
 		pC->Ee.wData[EeAdd_pfnetLengthTypeOfStation] 		= buf[idx++];
 		for(uint16_t i=0;i<240;i++)
 			pC->Ee.wData[EeAdd_pfnetTypeOfStation + i] 		= buf[idx++];
-		for(uint16_t i=0;i<240;i++)
+		for(uint16_t i=0;i<28;i++)
 			pC->Ee.wData[EeAdd_pfnetDeviceType + i] 			= buf[idx++];
 		for(uint16_t i=0;i<20;i++)
 			pC->Ee.wData[EeAdd_pfnetOrderId + i] 					= buf[idx++];
@@ -647,8 +654,6 @@ static void Config_ReadConfPcToStm(void)
 		pC->Ee.wData[EeAdd_pfnetSoftwareRevision3] 			= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_pfnetSoftwareRevisionPrefix] = buf[idx++];
-		pC->Ee.wData[EeAdd_pfnetInstanceId] 						= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
-		idx += 2;
 		
 		Control_WriteConfigToFlash();
 	}
@@ -658,7 +663,7 @@ static void Config_ReadTelemReq(void)
 	uint8_t* buf = pC->Mbs.bufread;
 	uint16_t crc1 = Config_Crc16(buf, 6);
 	uint16_t crc2 = ((uint16_t)buf[6]<<8) + ((uint16_t)buf[7]<<0);
-	//if(crc1 == crc2)
+	if(crc1 == crc2)
 	{
 		Config_SendTelemStmToPc();
 	}
@@ -684,6 +689,7 @@ static void Config_ReadFrame(void)
 // Funkcje ogólne **************************************
 static void ReadFromUsart(void)
 {
+	pC->Mbs.statusMbrtu[8]++;
 	uint8_t* buf = pC->Mbs.bufread;
 	if(buf[0] == 247 && buf[1] == 248 && buf[2] == 249 && buf[3] == 250 && buf[4] == 251)
 	{
@@ -691,6 +697,7 @@ static void ReadFromUsart(void)
 	}
 	else if(buf[0] == pC->Mbs.address && pC->Mode.protocol == Prot_Mbrtu)
 	{
+		pC->Mbs.statusMbrtu[9]++;
 		MBS_ReadRequest();
 	}
 	MBS_ReloadDmaToRead();

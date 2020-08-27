@@ -316,14 +316,14 @@ void NIC_SetDefaultConfigurationMb(void)
 	pC->Nic.ncMbDef.length = 66;	//66 Bayts
 	pC->Nic.ncMbDef.busStartup = 0;	//Automatic
 	pC->Nic.ncMbDef.wdgTimeout = 1000;
-	pC->Nic.ncMbDef.provSerwerConn = 4;
+	pC->Nic.ncMbDef.provSerwerConn = 16;
 	pC->Nic.ncMbDef.responseTimeout = 2000;	//2000ms
 	pC->Nic.ncMbDef.clientConWdgTimeout = 1000; //1000ms
 	pC->Nic.ncMbDef.protMode = 1; //Server mode
 	pC->Nic.ncMbDef.sendAckTimeout = 31000; //31000ms
 	pC->Nic.ncMbDef.conAckTimeout = 31000; //31000ms
 	pC->Nic.ncMbDef.closeAckTimeout = 13000; //13000ms
-	pC->Nic.ncMbDef.dataSwap = 1; //Data will be swapped
+	pC->Nic.ncMbDef.dataSwap = 0; //Data will not be swapped
 	pC->Nic.ncMbDef.flagsReg321_322 = 0x00000007; //IP address available, Netmask available, Gateway available
 	pC->Nic.ncMbDef.flagIpAddressAvailabe = true; //IP address available,
 	pC->Nic.ncMbDef.flagNetMaskAvailabe = true; //Netmask available,
@@ -512,23 +512,27 @@ void NIC_SetDefaultConfigurationPfbus(void)
 	for(uint16_t i=0;i<PFBUS_REGMAX;i++)
 		pC->Nic.ncPfbusDef.regs[i] = 0x0000;
 	
-	pC->Nic.ncPfbusDef.length = 18;	//18 Bayts
-	pC->Nic.ncPfbusDef.flagsReg301_302 = 0x00000000;
 	pC->Nic.ncPfbusDef.flagBusStartup = false;
 	pC->Nic.ncPfbusDef.flagAddressSwitchEnable = false;
 	pC->Nic.ncPfbusDef.flagBaudrateSwitchEnable = false;
+	
+	pC->Nic.ncPfbusDef.flagsReg301_302 = 0x00000000;
+	pC->Nic.ncPfbusDef.flagsReg301_302 += (pC->Nic.ncPfbusDef.flagBusStartup << 0);
+	pC->Nic.ncPfbusDef.flagsReg301_302 += (pC->Nic.ncPfbusDef.flagAddressSwitchEnable << 4);
+	pC->Nic.ncPfbusDef.flagsReg301_302 += (pC->Nic.ncPfbusDef.flagBaudrateSwitchEnable << 5);
+	
 	pC->Nic.ncPfbusDef.wdgTimeout = 1000;
 	pC->Nic.ncPfbusDef.identNumber = 0x0C10;
-	pC->Nic.ncPfbusDef.stationAddress = 2;
+	pC->Nic.ncPfbusDef.stationAddress = 3;
 	pC->Nic.ncPfbusDef.baudrate = 15;
 	
-	pC->Nic.ncPfbusDef.flagDpv1Enable = true; //register: 307d bit0
+	pC->Nic.ncPfbusDef.flagDpv1Enable = true;
 	pC->Nic.ncPfbusDef.flagSyncSupperted = true;
 	pC->Nic.ncPfbusDef.flagFreezeSuported = true;
 	pC->Nic.ncPfbusDef.flagFailSafeSuported = true;
-	pC->Nic.ncPfbusDef.flagAlarmSap50Deactivate = true;
-	pC->Nic.ncPfbusDef.flagIoDataSwap = true;
-	pC->Nic.ncPfbusDef.flagAutoConfiguration = true;
+	pC->Nic.ncPfbusDef.flagAlarmSap50Deactivate = false;
+	pC->Nic.ncPfbusDef.flagIoDataSwap = false;
+	pC->Nic.ncPfbusDef.flagAutoConfiguration = false;
 	pC->Nic.ncPfbusDef.flagAddressChangeNotAllowed = true;
 	pC->Nic.ncPfbusDef.flagsReg307 = 0x0000;
 	pC->Nic.ncPfbusDef.flagsReg307 += (pC->Nic.ncPfbusDef.flagDpv1Enable << 0);
@@ -540,10 +544,12 @@ void NIC_SetDefaultConfigurationPfbus(void)
 	pC->Nic.ncPfbusDef.flagsReg307 += (pC->Nic.ncPfbusDef.flagAutoConfiguration << 6);
 	pC->Nic.ncPfbusDef.flagsReg307 += (pC->Nic.ncPfbusDef.flagAddressChangeNotAllowed << 7);
 	
+	pC->Nic.ncPfbusDef.lengthConfData = 4;
+	pC->Nic.ncPfbusDef.confData[0] = 0xD0E0;	//Input0, Output0
+	pC->Nic.ncPfbusDef.confData[1] = 0xD0D0;	//Input3, Input1
 	
-	pC->Nic.ncPfbusDef.lengthConfData = 2;
-	pC->Nic.ncPfbusDef.confData[0] = 0xD0E0;
-	
+	pC->Nic.ncPfbusDef.length = 16 + pC->Nic.ncPfbusDef.lengthConfData;
+
 	uint32_t idx = 0;
 	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusDef.length, &idx, pC->Nic.ncPfbusDef.regs);
 	NIC_Uint32ToTableUint16(pC->Nic.ncPfbusDef.flagsReg301_302, &idx, pC->Nic.ncPfbusDef.regs);
@@ -552,7 +558,8 @@ void NIC_SetDefaultConfigurationPfbus(void)
 	NIC_Uint8ToTableUint16(pC->Nic.ncPfbusDef.baudrate, pC->Nic.ncPfbusDef.stationAddress, &idx, pC->Nic.ncPfbusDef.regs);
 	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusDef.flagsReg307, &idx, pC->Nic.ncPfbusDef.regs);
 	NIC_Uint8ToTableUint16(pC->Nic.ncPfbusDef.lengthConfData, 0x00, &idx, pC->Nic.ncPfbusDef.regs);
-	NIC_Uint16ToTableUint16(pC->Nic.ncPfbusDef.confData[0], &idx, pC->Nic.ncPfbusDef.regs);
+	NIC_TableUint16ToTableUint16(pC->Nic.ncPfbusDef.confData, pC->Nic.ncPfbusDef.regs, &idx, pC->Nic.ncPfbusDef.lengthConfData/2);
+	
 }
 void NIC_SetDefaultSystemInformationPfnet(void)
 {
@@ -692,14 +699,14 @@ void NIC_SetDefaultSystemInformationPfnet(void)
 }
 void NIC_SetDefaultConfigurationPfnet(void)
 {
-	pC->Nic.ncPfnetDef.length = 844;
+	pC->Nic.ncPfnetDef.length = 924;
 	pC->Nic.ncPfnetDef.busStartup = 0x0300;
 	pC->Nic.ncPfnetDef.wdgTimeout = 1000;
 	pC->Nic.ncPfnetDef.vendorId = 0x011E;
 	pC->Nic.ncPfnetDef.deviceId = 0x010A;
 	pC->Nic.ncPfnetDef.maxAR = 0;
-	pC->Nic.ncPfnetDef.inputBytes = 2;
-	pC->Nic.ncPfnetDef.outputBytes = 2;
+	pC->Nic.ncPfnetDef.inputBytes = 4;
+	pC->Nic.ncPfnetDef.outputBytes = 10;
 	
 	pC->Nic.ncPfnetDef.lengthNameOfStation = 10;
 	pC->Nic.ncPfnetDef.nameOfStation[0] = 'n';
@@ -712,7 +719,7 @@ void NIC_SetDefaultConfigurationPfnet(void)
 	pC->Nic.ncPfnetDef.nameOfStation[7] = 'p';
 	pC->Nic.ncPfnetDef.nameOfStation[8] = 'n';
 	pC->Nic.ncPfnetDef.nameOfStation[9] = 's';
-	for(uint16_t i=10;i<240;i++)
+	for(uint16_t i=pC->Nic.ncPfnetDef.lengthNameOfStation;i<240;i++)
 		pC->Nic.ncPfnetDef.nameOfStation[i] = 0;
 	
 	pC->Nic.ncPfnetDef.lengthTypeOfStation = 19;
@@ -735,7 +742,7 @@ void NIC_SetDefaultConfigurationPfnet(void)
 	pC->Nic.ncPfnetDef.typeOfStation[16] = 'y';
 	pC->Nic.ncPfnetDef.typeOfStation[17] = 'p';
 	pC->Nic.ncPfnetDef.typeOfStation[18] = 'e';
-	for(uint16_t i=19;i<240;i++)
+	for(uint16_t i=pC->Nic.ncPfnetDef.lengthTypeOfStation;i<240;i++)
 		pC->Nic.ncPfnetDef.typeOfStation[i] = 0;
 		
 	pC->Nic.ncPfnetDef.deviceType[0] = 'D';
@@ -812,7 +819,7 @@ void NIC_SetDefaultConfigurationPfnet(void)
 	
 	pC->Nic.ncPfnetDef.numApi = 1;
 	pC->Nic.ncPfnetDef.profileApi = 0;
-	pC->Nic.ncPfnetDef.numSubmoduleItem = 6;
+	pC->Nic.ncPfnetDef.numSubmoduleItem = 8;
 	pC->Nic.ncPfnetDef.slot = 0;
 	pC->Nic.ncPfnetDef.subslot = 1;
 	pC->Nic.ncPfnetDef.moduleId = 0x0101;
@@ -921,8 +928,50 @@ void NIC_SetDefaultConfigurationPfnet(void)
 	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[89] = 0x0000;
 	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[90] = 0xFFFF;
 	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[91] = 0xFFFF;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[92] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[93] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[94] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[95] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[96] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[97] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[98] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[99] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[100] = 0x0006;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[101] = 0x0001;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[102] = 0x0034;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[103] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[104] = 0x0033;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[105] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[106] = 0x0002;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[107] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[108] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[109] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[110] = 0xffff;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[111] = 0xffff;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[112] = 0x0002;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[113] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[114] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[115] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[116] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[117] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[118] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[119] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[120] = 0x0007;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[121] = 0x0001;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[122] = 0x0034;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[123] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[124] = 0x0033;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[125] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[126] = 0x0002;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[127] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[128] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[129] = 0x0000;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[130] = 0xffff;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[131] = 0xffff;
+	pC->Nic.ncPfnetDef.structureSubmoduleOrApi[132] = 0x0004;
 	
-	for(uint32_t i=92;i<365;i++)
+	
+	for(uint32_t i=133;i<365;i++)
 		pC->Nic.ncPfnetDef.structureSubmoduleOrApi[i] = 0x0000;
 
 
@@ -1003,10 +1052,10 @@ void NIC_ReadNetworkStatusMb(void)
 	NIC_ReadRegisters(200, 100);
 	pC->Nic.mode.nicFun = NF_RNS_MB;
 }
-void NIC_ReadNetworkConfigurationMb300_332(void)
+void NIC_ReadNetworkConfigurationMb300_333(void)
 {
-	NIC_ReadRegisters(300, 33);
-	pC->Nic.mode.nicFun = NF_RNC_MB_300_332;
+	NIC_ReadRegisters(300, 34);
+	pC->Nic.mode.nicFun = NF_RNC_MB_300_333;
 }
 void NIC_ReadNetworkStatusPfbus(void)
 {
@@ -1064,14 +1113,31 @@ void NIC_ReadNetworkConfigurationPfnet900_987(void)
 	pC->Nic.mode.nicFun = NF_RNC_PFN_900_987;
 }
 
-void NIC_WriteCoils(void)
+void NIC_WriteStatusMb(void)
 {
-	NIC_WriteRegs(2000, 1, &pC->Nic.cod.coils, 0);
+	uint16_t temptab[STATUS_TABMAX];
+	for(uint16_t i=0;i<STATUS_TABMAX;i++)
+		temptab[i] = Control_DataSwap(pC->Nic.cod.statusMbtcp[i], pC->Mode.dataSwapMbtcp);
+	
+	NIC_WriteRegs(2000, 3, temptab, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
-void NIC_WriteStatus(void)
+void NIC_WriteStatusPfbus(void)
 {
-	NIC_WriteRegs(2001, 1, &pC->Nic.cod.status, 0);
+	uint16_t temptab[STATUS_TABMAX];
+	for(uint16_t i=0;i<STATUS_TABMAX;i++)
+		temptab[i] = Control_DataSwap(pC->Nic.cod.statusPfbus[i], pC->Mode.dataSwapPfbus);
+	
+	NIC_WriteRegs(2000, 3, temptab, 0);
+	pC->Nic.mode.nicFun = NF_WR;
+}
+void NIC_WriteStatusPfnet(void)
+{
+	uint16_t temptab[STATUS_TABMAX];
+	for(uint16_t i=0;i<STATUS_TABMAX;i++)
+		temptab[i] = Control_DataSwap(pC->Nic.cod.statusPfnet[i], pC->Mode.dataSwapPfnet);
+	
+	NIC_WriteRegs(2000, 3, temptab, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteSystemConfiguration(void)
@@ -1081,9 +1147,9 @@ void NIC_WriteSystemConfiguration(void)
 	NIC_WriteRegs(100, 100, pC->Nic.scWrite.regs, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
-void NIC_WriteNetworkConfigurationMb300_332(void)
+void NIC_WriteNetworkConfigurationMb300_333(void)
 {
-	NIC_WriteRegs(300, 33, pC->Nic.ncMbWrite.regs, 0);
+	NIC_WriteRegs(300, 34, pC->Nic.ncMbWrite.regs, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationPfbus300_399(void)
@@ -1175,7 +1241,13 @@ static void NIC_ReadResponseAfterReadCoils(void)
 	}
 	else
 	{
-		pC->Nic.cid.coils = ((uint16_t)buf[3]<<8) + ((uint16_t)buf[4]<<0);
+		uint16_t temp = ((uint16_t)buf[3]<<8) + ((uint16_t)buf[4]<<0);
+		if(pC->Mode.protocol == Prot_Mbtcp)
+			pC->Nic.cid.coils = Control_DataSwap(temp, pC->Mode.dataSwapMbtcp);
+		else if(pC->Mode.protocol == Prot_Pfbus)
+			pC->Nic.cid.coils = Control_DataSwap(temp, pC->Mode.dataSwapPfbus);
+		else if(pC->Mode.protocol == Prot_Pfnet)
+			pC->Nic.cid.coils = Control_DataSwap(temp, pC->Mode.dataSwapPfnet);
 	}
 }
 static void NIC_ReadResponseAfterReadSystemInformations(void)
@@ -1360,7 +1432,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusMb(void)
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.nsMb.regs, 0, 100);
 	}
 }
-static void NIC_ReadResponseAfterReadNetworkConfigurationMb300_332(void)
+static void NIC_ReadResponseAfterReadNetworkConfigurationMb300_333(void)
 {
 	uint8_t* buf = pC->Nic.bufread;
 	uint8_t address = buf[0];
@@ -1775,8 +1847,8 @@ static void NIC_ReadResponse(void)
 		case NF_RNS_MB:
 			NIC_ReadResponseAfterReadNetworkStatusMb();
 			break;
-		case NF_RNC_MB_300_332:
-			NIC_ReadResponseAfterReadNetworkConfigurationMb300_332();
+		case NF_RNC_MB_300_333:
+			NIC_ReadResponseAfterReadNetworkConfigurationMb300_333();
 			break;
 		case NF_RNS_PFB:
 			NIC_ReadResponseAfterReadNetworkStatusPfbus();

@@ -107,6 +107,23 @@ eResult Outputs_Conf(void)
 static void Outputs_ChangeState(void)
 {
 	uint16_t temp;
+	uint16_t tab[16];
+	for(uint16_t i=0;i<16;i++)
+	{
+		temp = pC->Outs.coilsReq >> i;
+		tab[i] = (temp & 0x01);
+	}
+	for(uint16_t i=0;i<8;i++)
+	{
+		if(tab[i] == 1)
+			tab[i + 8] = 0;
+	}
+	pC->Outs.coils = 0;
+	for(uint16_t i=0;i<16;i++)
+	{
+		pC->Outs.coils += tab[i] << i;
+	}
+	
 	temp = pC->Outs.coils >> 0;
 	if((temp & 0x01) == RESET)		OUT0_OFF;
 	else													OUT0_ON;
@@ -157,17 +174,30 @@ static void Outputs_ChangeState(void)
 	if((temp & 0x01) == RESET)		OUT15_OFF;
 	else													OUT15_ON;
 }
-void Outputs_WorkTypeConf(void)
+void Outputs_RunModbusRTU(void)
 {
-	pC->Outs.coils = 0x00;
+}
+void Outputs_RunModbusTCP(void)
+{
+	if(pC->Status.flagBusMbtcpCommunicating && pC->Status.flagBusMbtcpRunning)
+	{
+		pC->Outs.coilsReq = pC->Nic.cid.coils;
+	}
 	Outputs_ChangeState();
 }
-void Outputs_WorkTypeRun(void)
+void Outputs_RunProfiBUS(void)
 {
+	if(pC->Status.flagBusPfbusCommunicating && pC->Status.flagBusPfbusRunning)
+	{
+		pC->Outs.coilsReq = pC->Nic.cid.coils;
+	}
 	Outputs_ChangeState();
 }
-void Outputs_WorkTypeError(void)
+void Outputs_RunProfiNET(void)
 {
-	pC->Outs.coils = 0x00;
+	if(pC->Status.flagBusPfnetCommunicating && pC->Status.flagBusPfnetRunning)
+	{
+		pC->Outs.coilsReq = pC->Nic.cid.coils;
+	}
 	Outputs_ChangeState();
 }

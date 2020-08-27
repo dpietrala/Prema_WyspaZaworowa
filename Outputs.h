@@ -133,9 +133,11 @@
 
 
 eResult Outputs_Conf(void);
-void Outputs_WorkTypeRun(void);
-void Outputs_WorkTypeConf(void);
-void Outputs_WorkTypeError(void);
+
+void Outputs_RunModbusRTU(void);
+void Outputs_RunModbusTCP(void);
+void Outputs_RunProfiBUS(void);
+void Outputs_RunProfiNET(void);
 
 
 #endif

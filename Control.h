@@ -40,7 +40,7 @@ typedef enum
 	NF_RC, NF_RSI, 
 	NF_RSC, 
 	NF_RNS_MB, 
-	NF_RNC_MB_300_332, 
+	NF_RNC_MB_300_333, 
 	NF_RNS_PFB, 
 	NF_RNC_PFB_300_399, 
 	NF_RNC_PFB_400_430, 
@@ -76,67 +76,69 @@ typedef enum
 	EeAdd_stmProt = 1,
 	
 	EeAdd_mbrtuTimeout = 2,
-	EeAdd_mbrtuAddress = 3,
-	EeAdd_mbrtuBaudrate = 4,
+	EeAdd_mbrtuDataSwap = 3,
+	EeAdd_mbrtuAddress = 4,
+	EeAdd_mbrtuBaudrate = 5,
 	
-	EeAdd_mbtcpTimeout = 5,
-	EeAdd_mbtcpDataSwap = 6,
-	EeAdd_mbtcpIP0 = 7,
-	EeAdd_mbtcpIP1 = 5,
-	EeAdd_mbtcpIP2 = 6,
-	EeAdd_mbtcpIP3 = 10,
-	EeAdd_mbtcpMask0 = 11,
-	EeAdd_mbtcpMask1 = 12,
-	EeAdd_mbtcpMask2 = 13,
-	EeAdd_mbtcpMask3 = 14,
-	EeAdd_mbtcpGateway0 = 15,
-	EeAdd_mbtcpGateway1 = 16,
-	EeAdd_mbtcpGateway2 = 17,
-	EeAdd_mbtcpGateway3 = 18,
-	EeAdd_mbtcpSerwerCons = 19,
-	EeAdd_mbtcpSendAckTimeoutLow = 20,
-	EeAdd_mbtcpSendAckTimeoutHigh = 21,
-	EeAdd_mbtcpConnectAckTimeoutLow = 22,
-	EeAdd_mbtcpConnectAckTimeoutHigh = 23,
-	EeAdd_mbtcpCloseAckTimeoutLow = 24,
-	EeAdd_mbtcpCloseAckTimeoutHigh = 25,
+	EeAdd_mbtcpTimeout = 6,
+	EeAdd_mbtcpDataSwap = 7,
+	EeAdd_mbtcpIP0 = 8,
+	EeAdd_mbtcpIP1 = 9,
+	EeAdd_mbtcpIP2 = 10,
+	EeAdd_mbtcpIP3 = 11,
+	EeAdd_mbtcpMask0 = 12,
+	EeAdd_mbtcpMask1 = 13,
+	EeAdd_mbtcpMask2 = 14,
+	EeAdd_mbtcpMask3 = 15,
+	EeAdd_mbtcpGateway0 = 16,
+	EeAdd_mbtcpGateway1 = 17,
+	EeAdd_mbtcpGateway2 = 18,
+	EeAdd_mbtcpGateway3 = 19,
+	EeAdd_mbtcpSerwerCons = 20,
+	EeAdd_mbtcpSendAckTimeoutLow = 21,
+	EeAdd_mbtcpSendAckTimeoutHigh = 22,
+	EeAdd_mbtcpConnectAckTimeoutLow = 23,
+	EeAdd_mbtcpConnectAckTimeoutHigh = 24,
+	EeAdd_mbtcpCloseAckTimeoutLow = 25,
+	EeAdd_mbtcpCloseAckTimeoutHigh = 26,
 	
-	EeAdd_pfbusTimeout = 26,
-	EeAdd_pfbusIdentNumber = 27,
-	EeAdd_pfbusAdress = 28,
-	EeAdd_pfbusBaudrate = 29,
-	EeAdd_pfbusDPV1Enable = 30,
-	EeAdd_pfbusSyncSupported = 31,
-	EeAdd_pfbusFreezeSupported = 32,
-	EeAdd_pfbusFailSafeSupported = 33,
+	EeAdd_pfbusTimeout = 27,
+	EeAdd_pfbusDataSwap = 28,
+	EeAdd_pfbusIdentNumber = 29,
+	EeAdd_pfbusAdress = 30,
+	EeAdd_pfbusBaudrate = 31,
+	EeAdd_pfbusDPV1Enable = 32,
+	EeAdd_pfbusSyncSupported = 33,
+	EeAdd_pfbusFreezeSupported = 34,
+	EeAdd_pfbusFailSafeSupported = 35,
 	
-	EeAdd_pfnetTimeout = 34,
-	EeAdd_pfnetVendorId = 35,
-	EeAdd_pfnetDeviceId = 36,
-	EeAdd_pfnetLengthNameOfStation = 37,
-	EeAdd_pfnetNameOfStation = 38,
-	EeAdd_pfnetLengthTypeOfStation = 278,
-	EeAdd_pfnetTypeOfStation = 279,
-	EeAdd_pfnetDeviceType = 519,
-	EeAdd_pfnetOrderId = 547,
-	EeAdd_pfnetIP0 = 567,
-	EeAdd_pfnetIP1 = 568,
-	EeAdd_pfnetIP2 = 569,
-	EeAdd_pfnetIP3 = 570,
-	EeAdd_pfnetMask0 = 571,
-	EeAdd_pfnetMask1 = 572,
-	EeAdd_pfnetMask2 = 573,
-	EeAdd_pfnetMask3 = 574,
-	EeAdd_pfnetGateway0 = 575,
-	EeAdd_pfnetGateway1 = 576,
-	EeAdd_pfnetGateway2 = 577,
-	EeAdd_pfnetGateway3 = 578,
-	EeAdd_pfnetHardwareRevision = 579,
-	EeAdd_pfnetSoftwareRevision1 = 580,
-	EeAdd_pfnetSoftwareRevision2 = 581,
-	EeAdd_pfnetSoftwareRevision3 = 582,
-	EeAdd_pfnetSoftwareRevisionPrefix = 583,
-	EeAdd_pfnetInstanceId = 584,
+	EeAdd_pfnetTimeout = 36,
+	EeAdd_pfnetDataSwap = 37,
+	EeAdd_pfnetVendorId = 38,
+	EeAdd_pfnetDeviceId = 39,
+	EeAdd_pfnetLengthNameOfStation = 40,
+	EeAdd_pfnetNameOfStation = 41,
+	EeAdd_pfnetLengthTypeOfStation = 281,
+	EeAdd_pfnetTypeOfStation = 282,
+	EeAdd_pfnetDeviceType = 522,
+	EeAdd_pfnetOrderId = 550,
+	EeAdd_pfnetIP0 = 570,
+	EeAdd_pfnetIP1 = 571,
+	EeAdd_pfnetIP2 = 572,
+	EeAdd_pfnetIP3 = 573,
+	EeAdd_pfnetMask0 = 574,
+	EeAdd_pfnetMask1 = 575,
+	EeAdd_pfnetMask2 = 576,
+	EeAdd_pfnetMask3 = 577,
+	EeAdd_pfnetGateway0 = 578,
+	EeAdd_pfnetGateway1 = 579,
+	EeAdd_pfnetGateway2 = 580,
+	EeAdd_pfnetGateway3 = 581,
+	EeAdd_pfnetHardwareRevision = 582,
+	EeAdd_pfnetSoftwareRevision1 = 583,
+	EeAdd_pfnetSoftwareRevision2 = 584,
+	EeAdd_pfnetSoftwareRevision3 = 585,
+	EeAdd_pfnetSoftwareRevisionPrefix = 586,
 }eEeAdd;
 typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
 
@@ -157,13 +159,13 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 #define MBS_BUFMAX 							1000
 #define NIC_BUFMAX 							1000
 #define MBS_REGMAX							100
-#define NIC_REGMAX							100
 #define NIC_FRAMEMAX						20
 #define MBS_COILMAX							16
-#define EE_VARMAX								585
+#define EE_VARMAX								587
 #define EE_CONFIGWASUPLOADED		0xACAD
+#define STATUS_TABMAX						10
 
-#define MBTCP_REGMAX						33
+#define MBTCP_REGMAX						34
 #define PFBUS_REGMAX						131
 #define PFNET_REGMAX						688
 
@@ -175,6 +177,7 @@ typedef struct	//modbus rtu slave
 	uint8_t				bufread[MBS_BUFMAX];
 	uint8_t 			bufwrite[MBS_BUFMAX];
 	
+	uint16_t			statusMbrtu[10];
 	uint8_t				address;
 	eMBError			error;
 	uint32_t			tick;
@@ -284,8 +287,9 @@ typedef struct	//command flags: register 1999d
 }sNIC_CF;
 typedef struct	//cyclic output data: registers 2000d - 2993d
 {
-	uint16_t		coils;
-	uint16_t		status;
+	uint16_t		statusMbtcp[STATUS_TABMAX];
+	uint16_t		statusPfbus[STATUS_TABMAX];
+	uint16_t		statusPfnet[STATUS_TABMAX];
 }sNIC_COD;
 typedef struct	//network status for ModbusTCP: registers 200d - 299d
 {
@@ -451,18 +455,19 @@ typedef struct
 typedef struct	//outputs
 {
 	uint16_t			coils;
-	uint16_t			newCoilsReq;
-	uint16_t			prevCoilsReq;
+	uint16_t			coilsReq;
 }sOutputs;
 typedef struct	//Mode
 {
 	uint32_t			tick;
 	eProtocol			protocol;
 	eWorkType			workType;
-	uint16_t			adcValue[200];
-	float					mcuTemp;
 	uint32_t			ledPeriod;
 	uint32_t			ledTime;
+	eBool					dataSwapMbrtu;
+	eBool					dataSwapMbtcp;
+	eBool					dataSwapPfbus;
+	eBool					dataSwapPfnet;
 }sMode;
 typedef struct	//Eeprom emulation
 {
@@ -472,15 +477,88 @@ typedef struct	//Eeprom emulation
 }sEe;
 typedef struct
 {
-	uint32_t	status;
-	eBool			incorrectConfigReadingFromFlash;
-	eBool			nicComTimeoutError;
-	eBool			nicFlagTimeoutError;
-	eBool			nicIncompDevNumber;
-	eBool			nicIncompDevClass;
-	eBool			nicIncompProtClass;
-	eBool			nicIncompFirmName;
-	eBool			nicIncorretConfigWriting;
+	uint16_t	flagsStm32;
+	eBool			flagIncorrectConfigReadingFromFlash;
+	eBool			flagNicComTimeoutError;
+	eBool			flagNicFlagTimeoutError;
+	uint16_t	statAdcValue[200];
+	double		statTemp;
+	
+	uint16_t	flagsMbrtu;
+	uint32_t	statBusMbrtuSystemError;
+	uint16_t	statBusMbrtuCounterError;
+	uint32_t	statBusMbrtuComError;
+	uint32_t	statBusMbrtuComStatus;
+	eBool			flagBusMbrtuCorrectModule;
+	eBool			flagBusMbrtuCorrectDevNumber;
+	eBool			flagBusMbrtuCorrectDevClass;
+	eBool			flagBusMbrtuCorrectProtClass;
+	eBool			flagBusMbrtuCorrectFirmName;
+	eBool			flagBusMbrtuConfigUploadError;
+	eBool			flagBusMbrtuConfigUploaded;
+	eBool			flagBusMbrtuReady;
+	eBool			flagBusMbrtuError;
+	eBool			flagBusMbrtuCommunicating;
+	eBool			flagBusMbrtuNcfError;
+	eBool			flagBusMbrtuBusOn;
+	eBool			flagBusMbrtuRunning;
+	
+	uint16_t	flagsMbtcp;
+	uint32_t	statBusMbtcpSystemError;
+	uint16_t	statBusMbtcpCounterError;
+	uint32_t	statBusMbtcpComError;
+	uint32_t	statBusMbtcpComStatus;
+	eBool			flagBusMbtcpCorrectModule;
+	eBool			flagBusMbtcpCorrectDevNumber;
+	eBool			flagBusMbtcpCorrectDevClass;
+	eBool			flagBusMbtcpCorrectProtClass;
+	eBool			flagBusMbtcpCorrectFirmName;
+	eBool			flagBusMbtcpConfigUploadError;
+	eBool			flagBusMbtcpConfigUploaded;
+	eBool			flagBusMbtcpReady;
+	eBool			flagBusMbtcpError;
+	eBool			flagBusMbtcpCommunicating;
+	eBool			flagBusMbtcpNcfError;
+	eBool			flagBusMbtcpBusOn;
+	eBool			flagBusMbtcpRunning;
+	
+	uint16_t	flagsPfbus;
+	uint32_t	statBusPfbusSystemError;
+	uint16_t	statBusPfbusCounterError;
+	uint32_t	statBusPfbusComError;
+	uint32_t	statBusPfbusComStatus;
+	eBool			flagBusPfbusCorrectModule;
+	eBool			flagBusPfbusCorrectDevNumber;
+	eBool			flagBusPfbusCorrectDevClass;
+	eBool			flagBusPfbusCorrectProtClass;
+	eBool			flagBusPfbusCorrectFirmName;
+	eBool			flagBusPfbusConfigUploadError;
+	eBool			flagBusPfbusConfigUploaded;
+	eBool			flagBusPfbusReady;
+	eBool			flagBusPfbusError;
+	eBool			flagBusPfbusCommunicating;
+	eBool			flagBusPfbusNcfError;
+	eBool			flagBusPfbusBusOn;
+	eBool			flagBusPfbusRunning;
+	
+	uint16_t	flagsPfnet;
+	uint32_t	statBusPfnetSystemError;
+	uint16_t	statBusPfnetCounterError;
+	uint32_t	statBusPfnetComError;
+	uint32_t	statBusPfnetComStatus;
+	eBool			flagBusPfnetCorrectModule;
+	eBool			flagBusPfnetCorrectDevNumber;
+	eBool			flagBusPfnetCorrectDevClass;
+	eBool			flagBusPfnetCorrectProtClass;
+	eBool			flagBusPfnetCorrectFirmName;
+	eBool			flagBusPfnetConfigUploadError;
+	eBool			flagBusPfnetConfigUploaded;
+	eBool			flagBusPfnetReady;
+	eBool			flagBusPfnetError;
+	eBool			flagBusPfnetCommunicating;
+	eBool			flagBusPfnetNcfError;
+	eBool			flagBusPfnetBusOn;
+	eBool			flagBusPfnetRunning;
 }sStatus;
 typedef struct
 {
@@ -490,21 +568,11 @@ typedef struct
 	sOutputs			Outs;
 	sEe						Ee;
 	sStatus				Status;
-	uint32_t			flaga1;
-	uint32_t			flaga2;
-	uint32_t			flaga3;
-	uint32_t			flaga4;
-	uint32_t			flaga5;
-	uint32_t			time0;
-	uint32_t			time1;
-	uint32_t			time2;
-	uint32_t			time3;
-	uint32_t			time4;
-	uint32_t			time5;
 }sControl;
 
 void delay_ms(uint32_t ms);
 void Control_WorkTypeConf(void);
 eResult Control_WriteConfigToFlash(void);
+uint16_t Control_DataSwap(uint16_t in, eBool flag);
 
 #endif
