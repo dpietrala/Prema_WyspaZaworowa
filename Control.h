@@ -64,6 +64,7 @@ typedef enum
 	RES_NicComTimeout,
 	RES_NicFlagTimeout,
 	RES_NicSiIncompatible,
+	RES_NicScIncompatible,
 	RES_NicNcMbIncompatible,
 	RES_NicNcPfbusIncompatible,
 	RES_NicNcPfnetIncompatible,
@@ -164,7 +165,11 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 #define EE_VARMAX								587
 #define EE_CONFIGWASUPLOADED		0xACAD
 #define STATUS_TABMAX						10
+#define NIC_COMPOSSETBAUDMAX		8
+#define NIC_COMPOSSETPARRMAX		3
 
+#define SI_REGMAX								100
+#define SC_REGMAX								100
 #define MBTCP_REGMAX						34
 #define PFBUS_REGMAX						131
 #define PFNET_REGMAX						688
@@ -188,7 +193,7 @@ typedef struct	//modbus rtu slave
 }sMBS;
 typedef struct	//system information: registers 0d - 99d
 {
-	uint16_t		regs[100];
+	uint16_t		regs[SI_REGMAX];
 	uint32_t		devNumber;										//start registers: 0d
 	uint32_t		serNumber;										//start registers: 2d
 	uint16_t		devClass;											//start registers: 4d
@@ -217,7 +222,7 @@ typedef struct	//system information: registers 0d - 99d
 }sNIC_SI;
 typedef struct	//system configuration: registers 100d - 199d
 {
-	uint16_t		regs[100];
+	uint16_t		regs[SC_REGMAX];
 	uint16_t		ssioType;											//start registers: 100d
 	uint16_t		ssioAddress;									//start registers: 101d
 	uint32_t		ssioBaud;											//start registers: 102d
@@ -233,7 +238,7 @@ typedef struct	//system configuration: registers 100d - 199d
 	uint16_t		ssioOffsetAddressFbOut;				//start registers: 113d
 	uint16_t		ssioWatchdogTime;							//start registers: 114d
 	uint16_t		ssioSwapShiftDir;							//start registers: 115d
-	//uint16_t	reserved[4];									//start registers: 116d - 119d
+	uint16_t		reserved[4];									//start registers: 116d - 119d
 	uint16_t		offsetAddressOutDataImage;		//start registers: 120d
 	uint16_t		numMappData;									//start registers: 121d
 	uint16_t		mapData[78];									//start registers: 122d - 199d
@@ -409,6 +414,7 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 }sNIC_NC_PFN;
 typedef struct
 {
+	uint32_t				comPossibleSettings[NIC_COMPOSSETBAUDMAX];
 	uint8_t					address;
 	eNicFun 				nicFun;
 	uint32_t				comTime;
@@ -424,14 +430,16 @@ typedef struct
 }sNIC_Mode;
 typedef struct
 {
+	
 	uint8_t				bufread[NIC_BUFMAX];
 	uint8_t 			bufwrite[NIC_BUFMAX];
-
+	
 	sNIC_Mode			mode;
 	sNIC_SI				si;
 	sNIC_SI				siDefMb;
 	sNIC_SI				siDefPfbus;
 	sNIC_SI				siDefPfnet;
+	sNIC_SC				scDef;
 	sNIC_SC				scRead;
 	sNIC_SC				scWrite;
 	sNIC_SSCEF		sscef;
@@ -481,6 +489,7 @@ typedef struct
 	eBool			flagIncorrectConfigReadingFromFlash;
 	eBool			flagNicComTimeoutError;
 	eBool			flagNicFlagTimeoutError;
+	eBool			flagNicCrcError;
 	uint16_t	statAdcValue[200];
 	double		statTemp;
 	

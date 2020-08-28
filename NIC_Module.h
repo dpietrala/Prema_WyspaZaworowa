@@ -13,8 +13,7 @@ void NIC_Uint8ToTableUint16(uint8_t highbyte, uint8_t lowbyte, uint32_t* idx, ui
 void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab);
 void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab);
 
-
-eResult NIC_ComConf(void);
+eResult NIC_ComConf(uint32_t baud, uint32_t parity);
 void NIC_ReadCoils(void);
 void NIC_ReadSystemInformation(void);
 void NIC_ReadSystemConfiguration(void);
@@ -36,6 +35,7 @@ void NIC_ReadNetworkConfigurationPfnet900_987(void);
 void NIC_WriteStatusMb(void);
 void NIC_WriteStatusPfbus(void);
 void NIC_WriteStatusPfnet(void);
+void NIC_WriteSystemConfigurationBaudrate(void);
 void NIC_WriteSystemConfiguration(void);
 void NIC_WriteNetworkConfigurationMb300_333(void);
 void NIC_WriteNetworkConfigurationPfbus300_399(void);
@@ -53,6 +53,7 @@ void NIC_WriteInitFlagInCommandFlags(void);
 void NIC_WriteCommandFlags(void);
 void NIC_StartComunication(uint8_t num, uint32_t timeout);
 void NIC_ConverseConfiguratonToRegsMb(void);
+void NIC_SetDefaultSystemConfiguration(void);
 void NIC_SetDefaultSystemInformationMb(void);
 void NIC_SetDefaultConfigurationMb(void);
 void NIC_SetDefaultSystemInformationPfbus(void);

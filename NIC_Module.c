@@ -26,13 +26,15 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
   }
   return crc;  
 }
-eResult NIC_ComConf(void)
+eResult NIC_ComConf(uint32_t baud, uint32_t parity)
 {
 	eResult result = RES_OK;
+	DMA1_Stream5->CR		&= DMA_SxCR_EN;
 	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
 	DMA1_Stream5->NDTR 	= (uint16_t)NIC_BUFMAX;
 	DMA1_Stream5->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA1_Stream6->CR		&= DMA_SxCR_EN;
 	DMA1_Stream6->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream6->M0AR 	= (uint32_t)pC->Nic.bufwrite;
 	DMA1_Stream6->NDTR 	= (uint16_t)NIC_BUFMAX;
@@ -41,7 +43,13 @@ eResult NIC_ComConf(void)
 	GPIOA->MODER |= GPIO_MODER_MODER2_1 | GPIO_MODER_MODER3_1;
 	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0;
 	GPIOA->AFR[0] |= 0x00007700;
-	USART2->BRR = 25000000/115200;
+	
+	USART2->CR1 = 0x00;
+	if(parity == 1)
+		USART2->CR1 |= USART_CR1_PCE;
+	else if(parity == 2)
+		USART2->CR1 |= USART_CR1_PCE | USART_CR1_PS;
+	USART2->BRR = 25000000/baud;
 	USART2->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
 	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
 	NVIC_EnableIRQ(USART2_IRQn);
@@ -175,6 +183,51 @@ static void NIC_WriteRegs(uint16_t addr0, uint16_t numregs, uint16_t* regs, uint
 	buf[index++] = crc >> 8;
 	
 	NIC_SendData(buf, index);
+}
+void NIC_SetDefaultSystemConfiguration(void)
+{
+	pC->Nic.scDef.ssioType = 0;
+	pC->Nic.scDef.ssioAddress = 0;
+	pC->Nic.scDef.ssioBaud = 100000;
+	pC->Nic.scDef.ssioNumInBytes = 0;
+	pC->Nic.scDef.ssioNumOutBytes = 0;
+	pC->Nic.scDef.shifType = 0;
+	pC->Nic.scDef.shifBaud = 1152;
+	pC->Nic.scDef.shifAddress = 2;
+	pC->Nic.scDef.flagsShifConf = 16;
+	pC->Nic.scDef.ssioNumBytesSsioIn = 0;
+	pC->Nic.scDef.ssioNumBytesSsioOut = 0;
+	pC->Nic.scDef.ssioOffsetAddressFbIn = 0;
+	pC->Nic.scDef.ssioOffsetAddressFbOut = 0;
+	pC->Nic.scDef.ssioWatchdogTime = 1000;
+	pC->Nic.scDef.ssioSwapShiftDir = 0;
+	for(uint16_t i=0;i<4;i++)
+		pC->Nic.scDef.reserved[i] = 0;
+	pC->Nic.scDef.offsetAddressOutDataImage = 0;
+	pC->Nic.scDef.numMappData = 0;
+	for(uint16_t i=0;i<78;i++)
+		pC->Nic.scDef.mapData[i] = 0;
+	
+	uint32_t idx = 0;
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioType, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioAddress, &idx, pC->Nic.scDef.regs);
+	NIC_Uint32ToTableUint16(pC->Nic.scDef.ssioBaud, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioNumInBytes, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioNumOutBytes, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.shifType, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.shifBaud, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.shifAddress, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.flagsShifConf, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioNumBytesSsioIn, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioNumBytesSsioOut, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioOffsetAddressFbIn, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioOffsetAddressFbOut, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioWatchdogTime, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.ssioSwapShiftDir, &idx, pC->Nic.scDef.regs);
+	NIC_TableUint16ToTableUint16(pC->Nic.scDef.reserved, pC->Nic.scDef.regs, &idx, 4);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.numMappData, &idx, pC->Nic.scDef.regs);
+	NIC_Uint16ToTableUint16(pC->Nic.scDef.offsetAddressOutDataImage, &idx, pC->Nic.scDef.regs);
+	NIC_TableUint16ToTableUint16(pC->Nic.scDef.mapData, pC->Nic.scDef.regs, &idx, 78);
 }
 void NIC_SetDefaultSystemInformationMb(void)
 {
@@ -1140,11 +1193,14 @@ void NIC_WriteStatusPfnet(void)
 	NIC_WriteRegs(2000, 3, temptab, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
+void NIC_WriteSystemConfigurationBaudrate(void)
+{
+	NIC_WriteRegs(107, 1, &pC->Nic.scWrite.shifBaud, 0);
+	pC->Nic.mode.nicFun = NF_WR;
+}
 void NIC_WriteSystemConfiguration(void)
 {
-	pC->Nic.scWrite = pC->Nic.scRead;
-	pC->Nic.scWrite.regs[4] = 5;
-	NIC_WriteRegs(100, 100, pC->Nic.scWrite.regs, 0);
+	NIC_WriteRegs(100, SC_REGMAX, pC->Nic.scWrite.regs, 0);
 	pC->Nic.mode.nicFun = NF_WR;
 }
 void NIC_WriteNetworkConfigurationMb300_333(void)
@@ -1237,6 +1293,7 @@ static void NIC_ReadResponseAfterReadCoils(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1262,6 +1319,7 @@ static void NIC_ReadResponseAfterReadSystemInformations(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1308,6 +1366,7 @@ static void NIC_ReadResponseAfterReadSystemConfiguration(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1328,7 +1387,7 @@ static void NIC_ReadResponseAfterReadSystemConfiguration(void)
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.ssioOffsetAddressFbOut);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.ssioWatchdogTime);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.ssioSwapShiftDir);
-		idx += 8; //reserved bytes
+		NIC_BytesToTableUint16(buf, &idx, pC->Nic.scRead.reserved, 0, 4);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.offsetAddressOutDataImage);
 		NIC_BytesToUint16(buf, &idx, &pC->Nic.scRead.numMappData);
 		NIC_BytesToTableUint16(buf, &idx, pC->Nic.scRead.mapData, 0, 78);
@@ -1349,6 +1408,7 @@ static void NIC_ReadResponseAfterReadSystemStatusComErrorFlags(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1390,6 +1450,7 @@ static void NIC_ReadResponseAfterReadCommandFlags(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1424,6 +1485,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusMb(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1444,6 +1506,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationMb300_333(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1496,6 +1559,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusPfbus(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1516,6 +1580,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfbus300_399(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1561,6 +1626,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfbus400_430(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1584,6 +1650,7 @@ static void NIC_ReadResponseAfterReadNetworkStatusPfnet(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1604,6 +1671,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet300_399(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1636,6 +1704,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet400_499(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1661,6 +1730,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet500_598(void) //99
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1698,6 +1768,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet599_699(void) //10
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1734,6 +1805,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet700_799(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1757,6 +1829,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet800_899(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1780,6 +1853,7 @@ static void NIC_ReadResponseAfterReadNetworkConfigurationPfnet900_987(void)
 	uint16_t crc2 = ((uint16_t)buf[bytes+3]<<0) + ((uint16_t)buf[bytes+3+1]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1802,6 +1876,7 @@ static void NIC_ReadResponseAfterWriteReisters(void)
 	uint16_t crc2 = ((uint16_t)buf[6]<<0) + ((uint16_t)buf[7]<<8);
 	if(crc1 != crc2)
 	{
+		pC->Status.flagNicCrcError = true;
 		return;
 	}
 	else
@@ -1823,6 +1898,7 @@ void NIC_StartComunication(uint8_t num, uint32_t timeout)
 }
 static void NIC_ReadResponse(void)
 {
+//	pC->Status.flagNicCrcError = false;
 	NIC_ChangeComStatus(NCS_comIsReading);
 	uint8_t* buf = pC->Nic.bufread;
 	switch(pC->Nic.mode.nicFun)

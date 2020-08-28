@@ -115,8 +115,8 @@ static void Outputs_ChangeState(void)
 	}
 	for(uint16_t i=0;i<8;i++)
 	{
-		if(tab[i] == 1)
-			tab[i + 8] = 0;
+		if(tab[i + 8] == 1)
+			tab[i] = 0;
 	}
 	pC->Outs.coils = 0;
 	for(uint16_t i=0;i<16;i++)
