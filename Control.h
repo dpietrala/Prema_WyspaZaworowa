@@ -74,72 +74,73 @@ typedef enum
 typedef enum
 {
 	EeAdd_configWasUploaded = 0,
-	EeAdd_stmProt = 1,
+	EeAdd_stmProt 					= 1,
 	
-	EeAdd_mbrtuTimeout = 2,
-	EeAdd_mbrtuDataSwap = 3,
-	EeAdd_mbrtuAddress = 4,
-	EeAdd_mbrtuBaudrate = 5,
+	EeAdd_mbrtuTimeout 			= 2,
+	EeAdd_mbrtuDataSwap 		= 3,
+	EeAdd_mbrtuAddress 			= 4,
+	EeAdd_mbrtuBaudrate 		= 5,
+	EeAdd_mbrtuParity 			= 6,
 	
-	EeAdd_mbtcpTimeout = 6,
-	EeAdd_mbtcpDataSwap = 7,
-	EeAdd_mbtcpIP0 = 8,
-	EeAdd_mbtcpIP1 = 9,
-	EeAdd_mbtcpIP2 = 10,
-	EeAdd_mbtcpIP3 = 11,
-	EeAdd_mbtcpMask0 = 12,
-	EeAdd_mbtcpMask1 = 13,
-	EeAdd_mbtcpMask2 = 14,
-	EeAdd_mbtcpMask3 = 15,
-	EeAdd_mbtcpGateway0 = 16,
-	EeAdd_mbtcpGateway1 = 17,
-	EeAdd_mbtcpGateway2 = 18,
-	EeAdd_mbtcpGateway3 = 19,
-	EeAdd_mbtcpSerwerCons = 20,
-	EeAdd_mbtcpSendAckTimeoutLow = 21,
-	EeAdd_mbtcpSendAckTimeoutHigh = 22,
-	EeAdd_mbtcpConnectAckTimeoutLow = 23,
-	EeAdd_mbtcpConnectAckTimeoutHigh = 24,
-	EeAdd_mbtcpCloseAckTimeoutLow = 25,
-	EeAdd_mbtcpCloseAckTimeoutHigh = 26,
+	EeAdd_mbtcpTimeout 			= 7,
+	EeAdd_mbtcpDataSwap 		= 8,
+	EeAdd_mbtcpIP0 					= 9,
+	EeAdd_mbtcpIP1 					= 10,
+	EeAdd_mbtcpIP2					= 11,
+	EeAdd_mbtcpIP3 					= 12,
+	EeAdd_mbtcpMask0 				= 13,
+	EeAdd_mbtcpMask1 				= 14,
+	EeAdd_mbtcpMask2 				= 15,
+	EeAdd_mbtcpMask3 				= 16,
+	EeAdd_mbtcpGateway0 		= 17,
+	EeAdd_mbtcpGateway1 		= 18,
+	EeAdd_mbtcpGateway2 		= 19,
+	EeAdd_mbtcpGateway3 		= 20,
+	EeAdd_mbtcpSerwerCons 	= 21,
+	EeAdd_mbtcpSendAckTimeoutLow 			= 22,
+	EeAdd_mbtcpSendAckTimeoutHigh 		= 23,
+	EeAdd_mbtcpConnectAckTimeoutLow 	= 24,
+	EeAdd_mbtcpConnectAckTimeoutHigh 	= 25,
+	EeAdd_mbtcpCloseAckTimeoutLow 		= 26,
+	EeAdd_mbtcpCloseAckTimeoutHigh 		= 27,
 	
-	EeAdd_pfbusTimeout = 27,
-	EeAdd_pfbusDataSwap = 28,
-	EeAdd_pfbusIdentNumber = 29,
-	EeAdd_pfbusAdress = 30,
-	EeAdd_pfbusBaudrate = 31,
-	EeAdd_pfbusDPV1Enable = 32,
-	EeAdd_pfbusSyncSupported = 33,
-	EeAdd_pfbusFreezeSupported = 34,
-	EeAdd_pfbusFailSafeSupported = 35,
-	
-	EeAdd_pfnetTimeout = 36,
-	EeAdd_pfnetDataSwap = 37,
-	EeAdd_pfnetVendorId = 38,
-	EeAdd_pfnetDeviceId = 39,
-	EeAdd_pfnetLengthNameOfStation = 40,
-	EeAdd_pfnetNameOfStation = 41,
-	EeAdd_pfnetLengthTypeOfStation = 281,
-	EeAdd_pfnetTypeOfStation = 282,
-	EeAdd_pfnetDeviceType = 522,
-	EeAdd_pfnetOrderId = 550,
-	EeAdd_pfnetIP0 = 570,
-	EeAdd_pfnetIP1 = 571,
-	EeAdd_pfnetIP2 = 572,
-	EeAdd_pfnetIP3 = 573,
-	EeAdd_pfnetMask0 = 574,
-	EeAdd_pfnetMask1 = 575,
-	EeAdd_pfnetMask2 = 576,
-	EeAdd_pfnetMask3 = 577,
-	EeAdd_pfnetGateway0 = 578,
-	EeAdd_pfnetGateway1 = 579,
-	EeAdd_pfnetGateway2 = 580,
-	EeAdd_pfnetGateway3 = 581,
-	EeAdd_pfnetHardwareRevision = 582,
-	EeAdd_pfnetSoftwareRevision1 = 583,
-	EeAdd_pfnetSoftwareRevision2 = 584,
-	EeAdd_pfnetSoftwareRevision3 = 585,
-	EeAdd_pfnetSoftwareRevisionPrefix = 586,
+	EeAdd_pfbusTimeout 						= 28,
+	EeAdd_pfbusDataSwap 					= 29,
+	EeAdd_pfbusIdentNumber 				= 30,
+	EeAdd_pfbusAdress 						= 31,
+	EeAdd_pfbusBaudrate 					= 32,
+	EeAdd_pfbusDPV1Enable 				= 33,
+	EeAdd_pfbusSyncSupported 			= 34,
+	EeAdd_pfbusFreezeSupported 		= 35,
+	EeAdd_pfbusFailSafeSupported 	= 36,
+
+	EeAdd_pfnetTimeout 							= 37,
+	EeAdd_pfnetDataSwap 						= 38,
+	EeAdd_pfnetVendorId 						= 39,
+	EeAdd_pfnetDeviceId 						= 40,
+	EeAdd_pfnetLengthNameOfStation 	= 41,
+	EeAdd_pfnetNameOfStation 				= 42,
+	EeAdd_pfnetLengthTypeOfStation 	= 282,
+	EeAdd_pfnetTypeOfStation 				= 283,
+	EeAdd_pfnetDeviceType 					= 523,
+	EeAdd_pfnetOrderId 							= 551,
+	EeAdd_pfnetIP0 									= 571,
+	EeAdd_pfnetIP1 									= 572,
+	EeAdd_pfnetIP2 									= 573,
+	EeAdd_pfnetIP3 									= 574,
+	EeAdd_pfnetMask0 								= 575,
+	EeAdd_pfnetMask1 								= 576,
+	EeAdd_pfnetMask2 								= 577,
+	EeAdd_pfnetMask3 								= 578,
+	EeAdd_pfnetGateway0 						= 579,
+	EeAdd_pfnetGateway1 						= 580,
+	EeAdd_pfnetGateway2 						= 581,
+	EeAdd_pfnetGateway3 						= 582,
+	EeAdd_pfnetHardwareRevision 		= 583,
+	EeAdd_pfnetSoftwareRevision1 		= 584,
+	EeAdd_pfnetSoftwareRevision2 		= 585,
+	EeAdd_pfnetSoftwareRevision3 		= 586,
+	EeAdd_pfnetSoftwareRevisionPrefix = 587,
 	
 }eEeAdd;
 typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
@@ -160,10 +161,11 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 
 #define MBS_BUFMAX 							1000
 #define NIC_BUFMAX 							1000
-#define MBS_REGMAX							100
+#define MBS_HREGMAX							5
+#define MBS_IREGMAX							3
 #define NIC_FRAMEMAX						20
 #define MBS_COILMAX							16
-#define EE_VARMAX								587
+#define EE_VARMAX								588
 #define EE_CONFIGWASUPLOADED		0xACAD
 #define STATUS_TABMAX						10
 #define NIC_COMPOSSETBAUDMAX		8
@@ -180,19 +182,18 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 typedef struct	//modbus rtu slave
 {
 	uint32_t			baud;
-	uint32_t			unittime;
+	uint8_t				address;
+	uint8_t				parity;
+	uint32_t			timeToSend;
 	uint16_t			timeout;
 	uint8_t				bufread[MBS_BUFMAX];
 	uint8_t 			bufwrite[MBS_BUFMAX];
-	
-	uint16_t			statusMbrtu[10];
-	uint8_t				address;
+	uint16_t			statusMbrtu[STATUS_TABMAX];
+
 	eMBError			error;
-	uint32_t			tick;
 	eMBFun 				fun;
-	uint16_t			numregs;
-	uint16_t			coils;
-	uint16_t			hregs[MBS_REGMAX];
+	uint16_t			hregs[MBS_HREGMAX];
+	uint16_t			iregs[MBS_HREGMAX];
 }sMBS;
 typedef struct	//system information: registers 0d - 99d
 {
@@ -418,7 +419,6 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 typedef struct
 {
 	uint32_t				comBaud;
-	double					comOneByteTime;
 	uint8_t					comAddress;
 	uint32_t				comPossibleSettings[NIC_COMPOSSETBAUDMAX];
 	eNicFun 				nicFun;

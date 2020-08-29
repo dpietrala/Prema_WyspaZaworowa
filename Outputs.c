@@ -176,10 +176,12 @@ static void Outputs_ChangeState(void)
 }
 void Outputs_RunModbusRTU(void)
 {
+	pC->Outs.coilsReq = pC->Mbs.hregs[0];
+	Outputs_ChangeState();
 }
 void Outputs_RunModbusTCP(void)
 {
-	if(pC->Status.flagBusMbtcpCommunicating && pC->Status.flagBusMbtcpRunning)
+	if(pC->Status.flagBusMbtcpCommunicating && pC->Status.flagBusMbtcpRunning && pC->Status.flagBusMbtcpBusOn)
 	{
 		pC->Outs.coilsReq = pC->Nic.cid.coils;
 	}
@@ -187,7 +189,7 @@ void Outputs_RunModbusTCP(void)
 }
 void Outputs_RunProfiBUS(void)
 {
-	if(pC->Status.flagBusPfbusCommunicating && pC->Status.flagBusPfbusRunning)
+	if(pC->Status.flagBusPfbusCommunicating && pC->Status.flagBusPfbusRunning && pC->Status.flagBusPfbusBusOn)
 	{
 		pC->Outs.coilsReq = pC->Nic.cid.coils;
 	}
@@ -195,7 +197,7 @@ void Outputs_RunProfiBUS(void)
 }
 void Outputs_RunProfiNET(void)
 {
-	if(pC->Status.flagBusPfnetCommunicating && pC->Status.flagBusPfnetRunning)
+	if(pC->Status.flagBusPfnetCommunicating && pC->Status.flagBusPfnetRunning && pC->Status.flagBusPfnetBusOn)
 	{
 		pC->Outs.coilsReq = pC->Nic.cid.coils;
 	}

@@ -29,24 +29,21 @@ static uint16_t NIC_Crc16(uint8_t* buf, uint32_t len)
 eResult NIC_ComConf(void)
 {
 	eResult result = RES_OK;
-	
 	DMA1_Stream5->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream5->M0AR 	= (uint32_t)pC->Nic.bufread;
 	DMA1_Stream5->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream5->CR 		= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
+	DMA1_Stream5->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CIRC | DMA_SxCR_CHSEL_2 | DMA_SxCR_EN;
 	DMA1_Stream6->PAR 	= (uint32_t)&USART2->DR;
 	DMA1_Stream6->M0AR 	= (uint32_t)pC->Nic.bufwrite;
 	DMA1_Stream6->NDTR 	= (uint16_t)NIC_BUFMAX;
-	DMA1_Stream6->CR 		= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
+	DMA1_Stream6->CR 		|= DMA_SxCR_MINC | DMA_SxCR_CHSEL_2 | DMA_SxCR_DIR_0 | DMA_SxCR_TCIE;
 	NVIC_EnableIRQ(DMA1_Stream6_IRQn);
-	
 	GPIOA->MODER |= GPIO_MODER_MODER2_1 | GPIO_MODER_MODER3_1;
 	GPIOA->PUPDR |= GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0;
 	GPIOA->AFR[0] |= 0x00007700;
-	
-	USART2->BRR = 25000000/pC->Nic.mode.comBaud;
-	USART2->CR3 = USART_CR3_DMAR | USART_CR3_DMAT;
-	USART2->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE | USART_CR1_IDLEIE;
+	USART2->BRR = 25000000/115200;
+	USART2->CR3 |= USART_CR3_DMAR | USART_CR3_DMAT;
+	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_IDLEIE;
 	NVIC_EnableIRQ(USART2_IRQn);
 	return result;
 }
@@ -1880,9 +1877,9 @@ static void NIC_SendNextFunction(void)
 {
 	pC->Nic.mode.tabFunToSend[pC->Nic.mode.numFunToSend]();
 }
-void NIC_StartComunication(uint8_t num, uint32_t numOfBytes)
+void NIC_StartComunication(uint8_t num, uint32_t timeout)
 {
-	pC->Nic.mode.comTimeout = pC->Nic.mode.comOneByteTime * (double)numOfBytes;
+	pC->Nic.mode.comTimeout = timeout;
 	pC->Nic.mode.comTime = 0;
 	pC->Nic.mode.maxFunToSend = num;
 	pC->Nic.mode.numFunToSend = 0;
