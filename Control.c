@@ -49,7 +49,9 @@ static eResult Control_StructConf(void)
 	for(uint32_t i=0;i<EE_VARMAX;i++)
 		pC->Ee.VirtAddVarTab[i] = i;
 	
+	pC->Mbs.address = 2;
 	pC->Mbs.baud = 9600;
+	pC->Mbs.parity = 0;
 	
 	pC->Nic.mode.nicFun = NF_I;
 	pC->Nic.mode.confStatus = NCS_confIsntDone;
@@ -134,7 +136,7 @@ eResult Control_WriteConfigToFlash(void)
 	pC->Ee.wData[EeAdd_mbrtuDataSwap] 							= 0;
 	pC->Ee.wData[EeAdd_mbrtuAddress] 								= 5;
 	pC->Ee.wData[EeAdd_mbrtuBaudrate] 							= 3;
-	pC->Ee.wData[EeAdd_mbrtuParity] 								= 2;
+	pC->Ee.wData[EeAdd_mbrtuParity] 								= 0;
 	
 	pC->Ee.wData[EeAdd_mbtcpTimeout] 								= 1001;
 	pC->Ee.wData[EeAdd_mbtcpDataSwap] 							= 1;

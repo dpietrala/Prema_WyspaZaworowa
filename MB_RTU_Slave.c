@@ -366,6 +366,7 @@ static void Config_SendConfStmToPc(void)
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuDataSwap] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuAddress] >> 0;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuBaudrate] >> 0;
+	buf[idx++] = pC->Ee.rData[EeAdd_mbrtuParity] >> 0;
 	
 	buf[idx++] = pC->Ee.rData[EeAdd_mbtcpTimeout] >> 8;
 	buf[idx++] = pC->Ee.rData[EeAdd_mbtcpTimeout] >> 0;
