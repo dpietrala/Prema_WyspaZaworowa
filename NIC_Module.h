@@ -13,7 +13,7 @@ void NIC_Uint8ToTableUint16(uint8_t highbyte, uint8_t lowbyte, uint32_t* idx, ui
 void NIC_Uint16ToTableUint16(uint16_t val, uint32_t* idx, uint16_t* tab);
 void NIC_Uint32ToTableUint16(uint32_t val, uint32_t* idx, uint16_t* tab);
 
-eResult NIC_ComConf(uint32_t baud, uint32_t parity);
+eResult NIC_ComConf(void);
 void NIC_ReadCoils(void);
 void NIC_ReadSystemInformation(void);
 void NIC_ReadSystemConfiguration(void);

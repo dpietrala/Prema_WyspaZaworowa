@@ -140,6 +140,12 @@ typedef enum
 	EeAdd_pfnetSoftwareRevision2 = 584,
 	EeAdd_pfnetSoftwareRevision3 = 585,
 	EeAdd_pfnetSoftwareRevisionPrefix = 586,
+	
+	EeAdd_stmNicComBaudLow = 587,
+	EeAdd_stmNicComBaudHigh = 588,
+	EeAdd_stmNicComAddress = 589,
+	EeAdd_stmNicComParity = 590,
+	
 }eEeAdd;
 typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
 
@@ -162,11 +168,13 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 #define MBS_REGMAX							100
 #define NIC_FRAMEMAX						20
 #define MBS_COILMAX							16
-#define EE_VARMAX								587
+#define EE_VARMAX								591
 #define EE_CONFIGWASUPLOADED		0xACAD
 #define STATUS_TABMAX						10
 #define NIC_COMPOSSETBAUDMAX		8
 #define NIC_COMPOSSETPARRMAX		3
+#define NIC_COMADDRESSMIN				1
+#define NIC_COMADDRESSMAX				247
 
 #define SI_REGMAX								100
 #define SC_REGMAX								100
@@ -414,8 +422,11 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 }sNIC_NC_PFN;
 typedef struct
 {
+	uint32_t				comBaud;
+	double					comOneByteTime;
+	uint32_t 				comParity;
+	uint8_t					comAddress;
 	uint32_t				comPossibleSettings[NIC_COMPOSSETBAUDMAX];
-	uint8_t					address;
 	eNicFun 				nicFun;
 	uint32_t				comTime;
 	uint32_t				comTimeout;
