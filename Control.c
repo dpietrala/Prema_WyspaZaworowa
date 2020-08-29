@@ -52,7 +52,6 @@ static eResult Control_StructConf(void)
 	pC->Nic.mode.confStatus = NCS_confIsntDone;
 	pC->Nic.mode.comStatus = NCS_comIsIdle;
 	pC->Nic.mode.comBaud = 115200;
-	pC->Nic.mode.comParity = 0;
 	pC->Nic.mode.comAddress = 2;
 	pC->Nic.mode.comOneByteTime = 11.0 * 1000.0 / (double)pC->Nic.mode.comBaud;
 	pC->Nic.mode.comTime = 0;
@@ -134,7 +133,7 @@ eResult Control_WriteConfigToFlash(void)
 	pC->Ee.wData[EeAdd_mbrtuAddress] 								= 5;
 	pC->Ee.wData[EeAdd_mbrtuBaudrate] 							= 3;
 	
-	pC->Ee.wData[EeAdd_mbtcpTimeout] 								= 1000;
+	pC->Ee.wData[EeAdd_mbtcpTimeout] 								= 1001;
 	pC->Ee.wData[EeAdd_mbtcpDataSwap] 							= 1;
 	pC->Ee.wData[EeAdd_mbtcpIP0] 										= 19;
 	pC->Ee.wData[EeAdd_mbtcpIP1] 										= 0;
@@ -257,51 +256,13 @@ eResult Control_WriteConfigToFlash(void)
 	
 	FLASH_Unlock();
 	EE_Init();
-	for(uint16_t i=0;i<=EeAdd_pfnetSoftwareRevisionPrefix;i++)
+	for(uint16_t i=0;i<EE_VARMAX;i++)
 		EE_WriteVariable(pC->Ee.VirtAddVarTab[i], pC->Ee.wData[i]);
 	FLASH_Lock();
 	
 	return result;
 }
 
-static eResult Control_ReadNicComSettingsFromFlash(void)
-{
-	eResult result = RES_OK;
-	
-	FLASH_Unlock();
-	EE_Init();
-	EE_ReadVariable(pC->Ee.VirtAddVarTab[EeAdd_stmNicComAddress], &pC->Ee.rData[EeAdd_stmNicComAddress]);
-	EE_ReadVariable(pC->Ee.VirtAddVarTab[EeAdd_stmNicComBaudHigh], &pC->Ee.rData[EeAdd_stmNicComBaudHigh]);
-	EE_ReadVariable(pC->Ee.VirtAddVarTab[EeAdd_stmNicComBaudLow], &pC->Ee.rData[EeAdd_stmNicComBaudLow]);
-	EE_ReadVariable(pC->Ee.VirtAddVarTab[EeAdd_stmNicComParity], &pC->Ee.rData[EeAdd_stmNicComParity]);
-	pC->Nic.mode.comAddress = (uint8_t)pC->Ee.rData[EeAdd_stmNicComAddress];
-	pC->Nic.mode.comBaud = ((uint32_t)pC->Ee.rData[EeAdd_stmNicComBaudHigh] << 16) + ((uint32_t)pC->Ee.rData[EeAdd_stmNicComBaudLow] << 0);
-	pC->Nic.mode.comParity = pC->Ee.rData[EeAdd_stmNicComParity];
-	FLASH_Lock();
-	
-	return result;
-}
-eResult Control_WriteNicComSettingsToFlash(void)
-{
-	eResult result = RES_OK;
-	
-	pC->Ee.wData[EeAdd_stmNicComAddress] 						= pC->Nic.mode.comAddress;
-	pC->Ee.wData[EeAdd_stmNicComBaudHigh] 					= pC->Nic.mode.comBaud >> 16;
-	pC->Ee.wData[EeAdd_stmNicComBaudLow] 						= pC->Nic.mode.comBaud >> 0;
-	pC->Ee.wData[EeAdd_stmNicComParity] 						= pC->Nic.mode.comParity;
-	
-	FLASH_Unlock();
-	EE_Init();
-	
-	EE_WriteVariable(EeAdd_stmNicComAddress, pC->Ee.wData[EeAdd_stmNicComAddress]);
-	EE_WriteVariable(EeAdd_stmNicComBaudHigh, pC->Ee.wData[EeAdd_stmNicComBaudHigh]);
-	EE_WriteVariable(EeAdd_stmNicComBaudLow, pC->Ee.wData[EeAdd_stmNicComBaudLow]);
-	EE_WriteVariable(EeAdd_stmNicComParity, pC->Ee.wData[EeAdd_stmNicComParity]);
-	
-	FLASH_Lock();
-	
-	return result;
-}
 static eResult Control_TimsConf(void)
 {
 	eResult result = RES_OK;
@@ -532,7 +493,7 @@ static eResult Control_WaitForNicFlagIsChanged(eBool* flag, eBool newstate, uint
 	while(*flag != newstate)
 	{
 		pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemStatusComErrorFlags;
-		NIC_StartComunication(1, 5000);
+		NIC_StartComunication(1, 50);
 		result = Control_WaitForNicComunicationIsDone();
 		if(result != RES_OK)
 		{
@@ -549,86 +510,11 @@ static eResult Control_WaitForNicFlagIsChanged(eBool* flag, eBool newstate, uint
 	pC->Nic.mode.flagWaitingForFlag = false;
 	return result;
 }
-static eResult Control_FindSystemConfigurationBaudrate(void)
-{
-	eResult result = RES_OK;
-	
-	Control_ReadNicComSettingsFromFlash();
-	NIC_ComConf();
-	pC->Status.flagNicComTimeoutError = false;
-	pC->Nic.mode.comOneByteTime = 11.0 * 1000.0 / (double)pC->Nic.mode.comBaud;
-	
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-	NIC_StartComunication(1, 50.0 * pC->Nic.mode.comOneByteTime);
-	result = Control_WaitForNicComunicationIsDone();
-	if(result == RES_OK)
-	{
-		return result;
-	}
-	
-	pC->Nic.mode.comAddress = 2;
-	pC->Nic.mode.comBaud = 115200;
-	pC->Nic.mode.comParity = 0;
-	NIC_ComConf();
-	pC->Status.flagNicComTimeoutError = false;
-	pC->Nic.mode.comOneByteTime = 11.0 * 1000.0 / (double)pC->Nic.mode.comBaud;
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-	NIC_StartComunication(1, 50.0 * pC->Nic.mode.comOneByteTime);
-	result = Control_WaitForNicComunicationIsDone();
-	if(result == RES_OK)
-	{
-		Control_WriteNicComSettingsToFlash();
-		return result;
-	}
-	pC->Nic.mode.comAddress = 2;
-	pC->Nic.mode.comBaud = 9600;
-	pC->Nic.mode.comParity = 1;
-	NIC_ComConf();
-	pC->Status.flagNicComTimeoutError = false;
-	pC->Nic.mode.comOneByteTime = 11.0 * 1000.0 / (double)pC->Nic.mode.comBaud;
-	pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-	NIC_StartComunication(1, 50.0 * pC->Nic.mode.comOneByteTime);
-	result = Control_WaitForNicComunicationIsDone();
-	if(result == RES_OK)
-	{
-		Control_WriteNicComSettingsToFlash();
-		return result;
-	}
-	
-	for(uint8_t i=NIC_COMADDRESSMIN;i<NIC_COMADDRESSMAX;i++)
-	{
-		for(uint8_t j=0;j<NIC_COMPOSSETBAUDMAX;j++)
-		{
-			for(uint8_t k=0;k<3;k++)
-			{
-				pC->Nic.mode.comAddress = i;
-				pC->Nic.mode.comBaud = pC->Nic.mode.comPossibleSettings[j];
-				pC->Nic.mode.comParity = k;
-				NIC_ComConf();
-				pC->Status.flagNicComTimeoutError = false;
-				pC->Nic.mode.comOneByteTime = 11.0 * 1000.0 / (double)pC->Nic.mode.comBaud;
-				pC->Nic.mode.tabFunToSend[0] = NIC_ReadCoils;
-				NIC_StartComunication(1, 50.0 * pC->Nic.mode.comOneByteTime);
-				result = Control_WaitForNicComunicationIsDone();
-				if(pC->Status.flagNicCrcError == true || pC->Status.flagNicComTimeoutError == true)
-				{
-					continue;
-				}
-				if(result == RES_OK)
-				{
-					Control_WriteNicComSettingsToFlash();
-					return result;
-				}
-			}
-		}
-	}
-	return result;
-}
 static eResult Control_ReadSystemInformationFromModule(void)
 {
 	eResult result = RES_OK;
 	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemInformation;
-	NIC_StartComunication(1, 10000);
+	NIC_StartComunication(1, 400);
 	result = Control_WaitForNicComunicationIsDone();
 	return result;
 }
@@ -749,7 +635,7 @@ static eResult Control_ReadConfigurationFromModuleModbusTCP(void)
 	eResult result = RES_OK;
 	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemConfiguration;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationMb300_333;
-	NIC_StartComunication(2, 10000);
+	NIC_StartComunication(2, 1000);
 	result = Control_WaitForNicComunicationIsDone();
 	return result;
 }
@@ -823,7 +709,7 @@ static eResult Control_WriteConfigurationModbusTCP(void)
 	pC->Nic.mode.tabFunToSend[1] = NIC_WriteNetworkConfigurationMb300_333;
 	pC->Nic.mode.tabFunToSend[2] = NIC_WriteClrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[3] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(4, 10000);
+	NIC_StartComunication(4, 2000);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -838,7 +724,7 @@ static eResult Control_WriteConfigurationModbusTCP(void)
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(2, 10000);
+	NIC_StartComunication(2, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -852,7 +738,7 @@ static eResult Control_WriteConfigurationModbusTCP(void)
 	}
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
-	NIC_StartComunication(1, 10000);
+	NIC_StartComunication(1, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -999,7 +885,7 @@ static eResult Control_ReadConfigurationFromModuleProfiBUS(void)
 	pC->Nic.mode.tabFunToSend[0] = NIC_ReadSystemConfiguration;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadNetworkConfigurationPfbus300_399;
 	pC->Nic.mode.tabFunToSend[2] = NIC_ReadNetworkConfigurationPfbus400_430;
-	NIC_StartComunication(3, 10000);
+	NIC_StartComunication(3, 5000);
 	result = Control_WaitForNicComunicationIsDone();
 	return result;
 }
@@ -1060,7 +946,7 @@ static eResult Control_WriteConfigurationProfiBUS(void)
 	pC->Nic.mode.tabFunToSend[2] = NIC_WriteSystemConfiguration;
 	pC->Nic.mode.tabFunToSend[3] = NIC_WriteClrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[4] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(5, 10000);
+	NIC_StartComunication(5, 5000);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1075,7 +961,7 @@ static eResult Control_WriteConfigurationProfiBUS(void)
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(2, 10000);
+	NIC_StartComunication(2, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1089,7 +975,7 @@ static eResult Control_WriteConfigurationProfiBUS(void)
 	}
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
-	NIC_StartComunication(1, 10000);
+	NIC_StartComunication(1, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1356,7 +1242,7 @@ static eResult Control_WriteConfigurationProfiNET(void)
 	pC->Nic.mode.tabFunToSend[7] = NIC_WriteNetworkConfigurationPfnet900_987;
 	pC->Nic.mode.tabFunToSend[8] = NIC_WriteClrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[9] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(10, 15000);
+	NIC_StartComunication(10, 10000);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1371,7 +1257,7 @@ static eResult Control_WriteConfigurationProfiNET(void)
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteStrcfgFlagInCommandFlags;
 	pC->Nic.mode.tabFunToSend[1] = NIC_ReadSystemStatusComErrorFlags;
-	NIC_StartComunication(2, 10000);
+	NIC_StartComunication(2, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1385,7 +1271,7 @@ static eResult Control_WriteConfigurationProfiNET(void)
 	}
 	
 	pC->Nic.mode.tabFunToSend[0] = NIC_WriteInitFlagInCommandFlags;
-	NIC_StartComunication(1, 10000);
+	NIC_StartComunication(1, 200);
 	result = Control_WaitForNicComunicationIsDone();
 	if(result != RES_OK)
 	{
@@ -1511,17 +1397,6 @@ void Control_WorkTypeConf(void)
 	
 	pC->Mode.workType = workTypeConf;
 	delay_ms(3000);
-	
-	if(pC->Mode.protocol == Prot_Mbtcp || pC->Mode.protocol == Prot_Pfbus || pC->Mode.protocol == Prot_Pfnet)
-	{
-		result = Control_FindSystemConfigurationBaudrate();
-		if(result != RES_OK)
-		{
-			pC->Mode.workType = workTypeError;
-			Control_TimsConf();
-			return;
-		}
-	}
 	
 	for(uint8_t i=0;i<3;i++)
 	{

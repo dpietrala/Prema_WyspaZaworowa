@@ -141,11 +141,6 @@ typedef enum
 	EeAdd_pfnetSoftwareRevision3 = 585,
 	EeAdd_pfnetSoftwareRevisionPrefix = 586,
 	
-	EeAdd_stmNicComBaudLow = 587,
-	EeAdd_stmNicComBaudHigh = 588,
-	EeAdd_stmNicComAddress = 589,
-	EeAdd_stmNicComParity = 590,
-	
 }eEeAdd;
 typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
 
@@ -168,7 +163,7 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 #define MBS_REGMAX							100
 #define NIC_FRAMEMAX						20
 #define MBS_COILMAX							16
-#define EE_VARMAX								591
+#define EE_VARMAX								587
 #define EE_CONFIGWASUPLOADED		0xACAD
 #define STATUS_TABMAX						10
 #define NIC_COMPOSSETBAUDMAX		8
@@ -424,7 +419,6 @@ typedef struct
 {
 	uint32_t				comBaud;
 	double					comOneByteTime;
-	uint32_t 				comParity;
 	uint8_t					comAddress;
 	uint32_t				comPossibleSettings[NIC_COMPOSSETBAUDMAX];
 	eNicFun 				nicFun;
