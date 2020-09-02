@@ -176,7 +176,10 @@ static void Outputs_ChangeState(void)
 }
 void Outputs_RunModbusRTU(void)
 {
-	pC->Outs.coilsReq = pC->Mbs.hregs[0];
+	if(pC->Status.flagBusMbrtuRunning == true && pC->Status.flagBusMbrtuError == false)
+	{
+		pC->Outs.coilsReq = pC->Mbs.hregs[0];
+	}
 	Outputs_ChangeState();
 }
 void Outputs_RunModbusTCP(void)

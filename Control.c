@@ -52,6 +52,8 @@ static eResult Control_StructConf(void)
 	pC->Mbs.address = 2;
 	pC->Mbs.baud = 9600;
 	pC->Mbs.parity = 0;
+	pC->Mbs.timeout = 1000;
+	pC->Mbs.time = pC->Mbs.timeout;
 	
 	pC->Nic.mode.nicFun = NF_I;
 	pC->Nic.mode.confStatus = NCS_confIsntDone;
@@ -130,7 +132,7 @@ eResult Control_WriteConfigToFlash(void)
 {
 	eResult result = RES_OK;
 	pC->Ee.wData[EeAdd_configWasUploaded] 					= (uint16_t)EE_CONFIGWASUPLOADED;
-	pC->Ee.wData[EeAdd_stmProt] 										= (uint16_t)Prot_Mbrtu;
+	pC->Ee.wData[EeAdd_stmProt] 										= (uint16_t)Prot_Pfbus;
 	
 	pC->Ee.wData[EeAdd_mbrtuTimeout] 								= 1000;
 	pC->Ee.wData[EeAdd_mbrtuDataSwap] 							= 0;
@@ -326,20 +328,27 @@ static void Control_CheckStatus(void)
 	else
 		pC->Status.flagNicComTimeoutError = false;
 	
-	
-	if(pC->Mode.protocol == Prot_Mbrtu)
+	if(pC->Status.flagBusMbrtuRunning == true)
+		pC->Mbs.time++;
+	if(pC->Mbs.time >= pC->Mbs.timeout)
 	{
-//		pC->Status.statBusMbrtuSystemError = pC->Nic.sscef.systemError;
-//		pC->Status.statBusMbrtuCounterError = pC->Nic.sscef.errorCounter;
-//		pC->Status.statBusMbrtuComError = pC->Nic.sscef.comError;
-//		pC->Status.statBusMbrtuComStatus = pC->Nic.sscef.comStatus;
-//		pC->Status.flagBusMbrtuReady = pC->Nic.sscef.flagReady;
-//		pC->Status.flagBusMbrtuError = pC->Nic.sscef.flagError;
-//		pC->Status.flagBusMbrtuCommunicating = pC->Nic.sscef.flagCommunicating;
-//		pC->Status.flagBusMbrtuNcfError = pC->Nic.sscef.flagNcfError;
-//		pC->Status.flagBusMbrtuBusOn = pC->Nic.sscef.flagBusOn;
-//		pC->Status.flagBusMbrtuRunning = pC->Nic.sscef.flagRunning;
+		if(pC->Status.flagBusMbrtuErrorTimeout == false)
+		{
+			pC->Status.statBusMbrtuCounterError++;
+		}
+		pC->Mbs.time = pC->Mbs.timeout;
+		pC->Status.flagBusMbrtuErrorTimeout = true;
 	}
+	else
+	{
+		pC->Status.flagBusMbrtuErrorTimeout = false;
+	}
+	
+	if(pC->Status.flagBusMbrtuErrorTimeout || pC->Status.flagBusMbrtuErrorIllegalFunction || pC->Status.flagBusMbrtuErrorIllegalDataRange)
+		pC->Status.flagBusMbrtuError = true;
+	else
+		pC->Status.flagBusMbrtuError = false;
+	
 	if(pC->Status.flagBusMbtcpCorrectModule == true)
 	{
 		pC->Status.statBusMbtcpSystemError = pC->Nic.sscef.systemError;
@@ -380,65 +389,62 @@ static void Control_CheckStatus(void)
 		pC->Status.flagBusPfnetRunning = pC->Nic.sscef.flagRunning;
 	}
 	
-	pC->Status.flagsMbrtu = 0x00000000;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCorrectModule << 0;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCorrectDevNumber << 1;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCorrectDevClass << 2;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCorrectProtClass << 3;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCorrectFirmName << 4;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuConfigUploadError << 5;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuConfigUploaded << 6;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuReady << 7;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuError << 8;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuCommunicating << 9;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuNcfError << 10;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuBusOn << 11;
-	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuRunning << 12;
+	pC->Status.flagsStm32 = 0x0000;
+	pC->Status.flagsStm32 += pC->Status.ConfigReadingFromFlashError << 0;
+	pC->Status.flagsStm32 += pC->Status.flagNicComTimeoutError << 1;
+	pC->Status.flagsStm32 += pC->Status.flagNicFlagTimeoutError << 2;
+	pC->Status.flagsStm32 += pC->Status.flagNicCrcError << 3;
 	
-	pC->Status.flagsMbtcp = 0x00000000;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectModule << 0;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectDevNumber << 1;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectDevClass << 2;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectProtClass << 3;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectFirmName << 4;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpConfigUploadError << 5;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpConfigUploaded << 6;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpReady << 7;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpError << 8;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCommunicating << 9;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpNcfError << 10;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpBusOn << 11;
-	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpRunning << 12;
+	pC->Status.flagsMbrtu = 0x0000;
+	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuRunning << 0;
+	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuErrorTimeout << 1;
+	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuErrorIllegalFunction << 2;
+	pC->Status.flagsMbrtu += pC->Status.flagBusMbrtuErrorIllegalDataRange << 3;
 	
-	pC->Status.flagsPfbus = 0x00000000;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectModule << 0;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectDevNumber << 1;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectDevClass << 2;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectProtClass << 3;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectFirmName << 4;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusConfigUploadError << 5;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusConfigUploaded << 6;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusReady << 7;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusError << 8;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCommunicating << 9;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusNcfError << 10;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusBusOn << 11;
-	pC->Status.flagsPfbus += pC->Status.flagBusPfbusRunning << 12;
+	pC->Status.flagsMbtcp = 0x0000;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpReady << 0;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpRunning << 1;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpBusOn << 2;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCommunicating << 3;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpError << 4;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpNcfError << 5;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectModule << 6;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectDevNumber << 7;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectDevClass << 8;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectProtClass << 9;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpCorrectFirmName << 10;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpConfigUploadError << 11;
+	pC->Status.flagsMbtcp += pC->Status.flagBusMbtcpConfigUploaded << 12;
+
+	pC->Status.flagsPfbus = 0x0000;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusReady << 0;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusRunning << 1;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusBusOn << 2;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCommunicating << 3;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusError << 4;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusNcfError << 5;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectModule << 6;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectDevNumber << 7;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectDevClass << 8;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectProtClass << 9;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusCorrectFirmName << 10;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusConfigUploadError << 11;
+	pC->Status.flagsPfbus += pC->Status.flagBusPfbusConfigUploaded << 12;
 	
-	pC->Status.flagsPfnet = 0x00000000;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectModule << 0;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectDevNumber << 1;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectDevClass << 2;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectProtClass << 3;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectFirmName << 4;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetConfigUploadError << 5;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetConfigUploaded << 6;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetReady << 7;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetError << 8;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCommunicating << 9;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetNcfError << 10;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetBusOn << 11;
-	pC->Status.flagsPfnet += pC->Status.flagBusPfnetRunning << 12;
+	pC->Status.flagsPfnet = 0x0000;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetReady << 0;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetRunning << 1;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetBusOn << 2;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCommunicating << 3;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetError << 4;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetNcfError << 5;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectModule << 6;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectDevNumber << 7;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectDevClass << 8;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectProtClass << 9;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetCorrectFirmName << 10;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetConfigUploadError << 11;
+	pC->Status.flagsPfnet += pC->Status.flagBusPfnetConfigUploaded << 12;
 }
 void SysTick_Handler(void)
 {
@@ -584,6 +590,8 @@ static eResult Control_ConfModbusRTU(void)
 		pC->Mbs.iregs[i] = 0x0000;
 	}
 	MBS_ComConf();
+	pC->Mbs.time = pC->Mbs.timeout;
+	pC->Status.flagBusMbrtuRunning = true;
 	
 	return result;
 }
@@ -1393,12 +1401,11 @@ void Control_WorkTypeConf(void)
 	MBS_ComConf();
 	NIC_ComConf();
 	Outputs_Conf();
-	Control_WriteConfigToFlash();
 	result = Control_ReadConfigFromFlash();
 	if(result != RES_OK)
 	{
 		pC->Mode.workType = workTypeError;
-		pC->Status.flagIncorrectConfigReadingFromFlash = true;
+		pC->Status.ConfigReadingFromFlashError = true;
 		Control_TimsConf();
 		return;
 	}

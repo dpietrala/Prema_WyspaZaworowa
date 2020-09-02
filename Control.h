@@ -97,12 +97,12 @@ typedef enum
 	EeAdd_mbtcpGateway2 		= 19,
 	EeAdd_mbtcpGateway3 		= 20,
 	EeAdd_mbtcpSerwerCons 	= 21,
-	EeAdd_mbtcpSendAckTimeoutLow 			= 22,
-	EeAdd_mbtcpSendAckTimeoutHigh 		= 23,
-	EeAdd_mbtcpConnectAckTimeoutLow 	= 24,
-	EeAdd_mbtcpConnectAckTimeoutHigh 	= 25,
-	EeAdd_mbtcpCloseAckTimeoutLow 		= 26,
-	EeAdd_mbtcpCloseAckTimeoutHigh 		= 27,
+	EeAdd_mbtcpSendAckTimeoutHigh 		= 22,
+	EeAdd_mbtcpSendAckTimeoutLow 			= 23,
+	EeAdd_mbtcpConnectAckTimeoutHigh 	= 24,
+	EeAdd_mbtcpConnectAckTimeoutLow 	= 25,
+	EeAdd_mbtcpCloseAckTimeoutHigh 		= 26,
+	EeAdd_mbtcpCloseAckTimeoutLow 		= 27,
 	
 	EeAdd_pfbusTimeout 						= 28,
 	EeAdd_pfbusDataSwap 					= 29,
@@ -143,7 +143,16 @@ typedef enum
 	EeAdd_pfnetSoftwareRevisionPrefix = 587,
 	
 }eEeAdd;
-typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmToPc = 2, frameConfig_ConfPcToStm = 3, frameConfig_TelemReq = 4, frameConfig_TelemStmToPc = 5}eFrameConfig;
+typedef enum
+{
+	frameConfig_Null = 0,
+	frameConfig_ConfReq = 1,
+	frameConfig_ConfStmToPc = 2,
+	frameConfig_ConfPcToStm = 3,
+	frameConfig_TelemReq = 4,
+	frameConfig_TelemStmToPc = 5,
+	frameConfig_Echo = 6,
+}eFrameConfig;
 
 #include "NIC_Module.h"
 #include "MB_RTU_Slave.h"
@@ -179,12 +188,12 @@ typedef enum{frameConfig_Null = 0, frameConfig_ConfReq = 1, frameConfig_ConfStmT
 #define PFBUS_REGMAX						131
 #define PFNET_REGMAX						688
 
-typedef struct	//modbus rtu slave
+typedef struct	//MBS
 {
 	uint32_t			baud;
 	uint8_t				address;
 	uint8_t				parity;
-	uint32_t			timeToSend;
+	uint32_t			time;
 	uint16_t			timeout;
 	uint8_t				bufread[MBS_BUFMAX];
 	uint8_t 			bufwrite[MBS_BUFMAX];
@@ -416,7 +425,7 @@ typedef struct	//network confguration for ProfiNet: registers 300d - 987d
 	uint16_t		reserved2[4];									//registers: 619d - 622d, must be set to 0
 	uint16_t		structureSubmoduleOrApi[365];	//registers: 623d - 987d
 }sNIC_NC_PFN;
-typedef struct
+typedef struct	//NIC Mode
 {
 	uint32_t				comBaud;
 	uint8_t					comAddress;
@@ -433,9 +442,8 @@ typedef struct
 	uint8_t					maxFunToSend;
 	void						(*tabFunToSend[NIC_FRAMEMAX])(void);
 }sNIC_Mode;
-typedef struct
+typedef struct	//NIC
 {
-	
 	uint8_t				bufread[NIC_BUFMAX];
 	uint8_t 			bufwrite[NIC_BUFMAX];
 	
@@ -488,10 +496,10 @@ typedef struct	//Eeprom emulation
 	uint16_t			rData[EE_VARMAX];
 	uint16_t			wData[EE_VARMAX];
 }sEe;
-typedef struct
+typedef struct	//Status
 {
 	uint16_t	flagsStm32;
-	eBool			flagIncorrectConfigReadingFromFlash;
+	eBool			ConfigReadingFromFlashError;
 	eBool			flagNicComTimeoutError;
 	eBool			flagNicFlagTimeoutError;
 	eBool			flagNicCrcError;
@@ -499,23 +507,12 @@ typedef struct
 	double		statTemp;
 	
 	uint16_t	flagsMbrtu;
-	uint32_t	statBusMbrtuSystemError;
 	uint16_t	statBusMbrtuCounterError;
-	uint32_t	statBusMbrtuComError;
-	uint32_t	statBusMbrtuComStatus;
-	eBool			flagBusMbrtuCorrectModule;
-	eBool			flagBusMbrtuCorrectDevNumber;
-	eBool			flagBusMbrtuCorrectDevClass;
-	eBool			flagBusMbrtuCorrectProtClass;
-	eBool			flagBusMbrtuCorrectFirmName;
-	eBool			flagBusMbrtuConfigUploadError;
-	eBool			flagBusMbrtuConfigUploaded;
-	eBool			flagBusMbrtuReady;
-	eBool			flagBusMbrtuError;
-	eBool			flagBusMbrtuCommunicating;
-	eBool			flagBusMbrtuNcfError;
-	eBool			flagBusMbrtuBusOn;
 	eBool			flagBusMbrtuRunning;
+	eBool			flagBusMbrtuError;
+	eBool			flagBusMbrtuErrorTimeout;
+	eBool			flagBusMbrtuErrorIllegalFunction;
+	eBool			flagBusMbrtuErrorIllegalDataRange;
 	
 	uint16_t	flagsMbtcp;
 	uint32_t	statBusMbtcpSystemError;

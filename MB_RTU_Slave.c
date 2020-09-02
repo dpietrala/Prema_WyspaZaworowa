@@ -97,9 +97,9 @@ uint16_t MBS_Crc16(uint8_t* buf, uint32_t len)
 // ----- ModbusRTU responses -----------------------------------------
 static void MBS_ResponseError_IF(void)
 {
-	pC->Mbs.statusMbrtu[9]++;
+	pC->Status.flagBusMbrtuErrorIllegalFunction = true;
+	pC->Status.statBusMbrtuCounterError++;
 	pC->Mbs.error = MFE_IF;
-	pC->Mbs.statusMbrtu[7] = pC->Mbs.fun;
 	uint8_t* bufw = pC->Mbs.bufwrite;
 	MBS_ClrStr(bufw, MBS_BUFMAX);
 	uint16_t idx = 0;
@@ -109,12 +109,12 @@ static void MBS_ResponseError_IF(void)
 	uint16_t crc = MBS_Crc16(bufw, idx);
 	bufw[idx++] = crc;
 	bufw[idx++] = crc >> 8;
-
 	MBS_StartSending(idx);
 }
 static void MBS_ResponseError_IDR(void)
 {
-	pC->Mbs.statusMbrtu[8]++;
+	pC->Status.flagBusMbrtuErrorIllegalDataRange = true;
+	pC->Status.statBusMbrtuCounterError++;
 	pC->Mbs.error = MFE_IDR;
 	uint8_t* bufw = pC->Mbs.bufwrite;
 	MBS_ClrStr(bufw, MBS_BUFMAX);
@@ -125,7 +125,6 @@ static void MBS_ResponseError_IDR(void)
 	uint16_t crc = MBS_Crc16(bufw, idx);
 	bufw[idx++] = crc;
 	bufw[idx++] = crc >> 8;
-
 	MBS_StartSending(idx);
 }
 static void MBS_Response_RnIR(void)
@@ -224,17 +223,19 @@ static void MBS_ReadRequest_RnIR(void)
 	uint16_t crc2 = ((uint16_t)bufr[6]<<0) + ((uint16_t)bufr[7]<<8);
 	if(crc1 == crc2)
 	{
+		pC->Mbs.time = 0;
+		pC->Status.flagBusMbrtuErrorIllegalFunction = false;
 		pC->Mbs.fun = MF_RnIR;
 		uint16_t regstart = ((uint16_t)bufr[2]<<8) + ((uint16_t)bufr[3]<<0);
 		uint16_t regnum = ((uint16_t)bufr[4]<<8) + ((uint16_t)bufr[5]<<0);
 		uint16_t regend = regstart + regnum - 1;
 		if(regend >= MBS_IREGMAX)
 		{
-			
 			MBS_ResponseError_IDR();
 		}
 		else
 		{
+			pC->Status.flagBusMbrtuErrorIllegalDataRange = false;
 			MBS_Response_RnIR();
 		}
 	}
@@ -252,6 +253,8 @@ static void MBS_ReadRequest_W1HR(void)
 	uint16_t crc2 = ((uint16_t)bufr[6]<<0) + ((uint16_t)bufr[7]<<8);
 	if(crc1 == crc2)
 	{
+		pC->Mbs.time = 0;
+		pC->Status.flagBusMbrtuErrorIllegalFunction = false;
 		pC->Mbs.fun = MF_W1HR;
 		uint16_t regstart = ((uint16_t)bufr[2]<<8) + ((uint16_t)bufr[3]<<0);
 		if(regstart >= MBS_HREGMAX)
@@ -260,6 +263,7 @@ static void MBS_ReadRequest_W1HR(void)
 		}
 		else
 		{
+			pC->Status.flagBusMbrtuErrorIllegalDataRange = false;
 			MBS_Response_W1HR();
 		}
 	}
@@ -290,6 +294,8 @@ static void MBS_ReadRequest_WnHR(void)
 	uint16_t crc2 = ((uint16_t)bufr[numbytes]<<0) + ((uint16_t)bufr[numbytes+1]<<8);
 	if(crc1 == crc2)
 	{
+		pC->Mbs.time = 0;
+		pC->Status.flagBusMbrtuErrorIllegalFunction = false;
 		pC->Mbs.fun = MF_WnHR;
 		uint16_t regstart = ((uint16_t)bufr[2]<<8) + ((uint16_t)bufr[3]<<0);
 		uint16_t regnum = ((uint16_t)bufr[4]<<8) + ((uint16_t)bufr[5]<<0);
@@ -300,6 +306,7 @@ static void MBS_ReadRequest_WnHR(void)
 		}
 		else
 		{
+			pC->Status.flagBusMbrtuErrorIllegalDataRange = false;
 			MBS_Response_WnHR();
 		}
 	}
@@ -314,22 +321,19 @@ static void MBS_ReadRequest_IF(void)
 static void MBS_ReadRequest(void)
 {
 	uint8_t* buf = pC->Mbs.bufread;
-	if(buf[0] == pC->Mbs.address)
+	switch(buf[1])
 	{
-		switch(buf[1])
-		{
-			case MF_RnDQ:		MBS_ReadRequest_RnDQ();	break;
-			case MF_RnDI:		MBS_ReadRequest_RnDI();	break;
-			case MF_RnHR:		MBS_ReadRequest_RnHR();	break;
-			case MF_RnIR:		MBS_ReadRequest_RnIR();	break;
-			case MF_W1DQ:		MBS_ReadRequest_W1DQ();	break;
-			case MF_W1HR:		MBS_ReadRequest_W1HR();	break;
-			case MF_RS:			MBS_ReadRequest_RS();		break;
-			case MF_DT:			MBS_ReadRequest_DT();		break;
-			case MF_WnDQ:		MBS_ReadRequest_WnDQ();	break;
-			case MF_WnHR:		MBS_ReadRequest_WnHR();	break;
-			default:				MBS_ReadRequest_IF();		break;
-		}
+		case MF_RnDQ:		MBS_ReadRequest_RnDQ();	break;
+		case MF_RnDI:		MBS_ReadRequest_RnDI();	break;
+		case MF_RnHR:		MBS_ReadRequest_RnHR();	break;
+		case MF_RnIR:		MBS_ReadRequest_RnIR();	break;
+		case MF_W1DQ:		MBS_ReadRequest_W1DQ();	break;
+		case MF_W1HR:		MBS_ReadRequest_W1HR();	break;
+		case MF_RS:			MBS_ReadRequest_RS();		break;
+		case MF_DT:			MBS_ReadRequest_DT();		break;
+		case MF_WnDQ:		MBS_ReadRequest_WnDQ();	break;
+		case MF_WnHR:		MBS_ReadRequest_WnHR();	break;
+		default:				MBS_ReadRequest_IF();		break;
 	}
 }
 // Funkcje zwiazane z konfiguracja z poziomu PC **************************************
@@ -352,11 +356,11 @@ static void Config_SendConfStmToPc(void)
 	uint8_t* buf = pC->Mbs.bufwrite;
 	MBS_ClrStr(buf, MBS_BUFMAX);
 	uint32_t idx = 0;
-	buf[idx++] = 247;
-	buf[idx++] = 248;
 	buf[idx++] = 249;
 	buf[idx++] = 250;
 	buf[idx++] = 251;
+	buf[idx++] = 252;
+	buf[idx++] = 253;
 	buf[idx++] = (uint8_t)frameConfig_ConfStmToPc;
 	
 	buf[idx++] = pC->Ee.rData[EeAdd_stmProt] >> 0;
@@ -459,11 +463,11 @@ static void Config_SendTelemStmToPc(void)
 	uint8_t* buf = pC->Mbs.bufwrite;
 	MBS_ClrStr(buf, MBS_BUFMAX);
 	uint32_t idx = 0;
-	buf[idx++] = 247;
-	buf[idx++] = 248;
 	buf[idx++] = 249;
 	buf[idx++] = 250;
 	buf[idx++] = 251;
+	buf[idx++] = 252;
+	buf[idx++] = 253;
 	buf[idx++] = (uint8_t)frameConfig_TelemStmToPc;
 	
 	buf[idx++] = pC->Outs.coils >> 8;
@@ -472,10 +476,8 @@ static void Config_SendTelemStmToPc(void)
 	buf[idx++] = pC->Mode.protocol >> 0;
 	buf[idx++] = (uint16_t)((int16_t)(pC->Status.statTemp * 10)) >> 8;
 	buf[idx++] = (uint16_t)((int16_t)(pC->Status.statTemp * 10)) >> 0;
-//	buf[idx++] = pC->Status.status >> 24;
-//	buf[idx++] = pC->Status.status >> 16;
-//	buf[idx++] = pC->Status.status >> 8;
-//	buf[idx++] = pC->Status.status >> 0;
+	buf[idx++] = pC->Status.flagsStm32 >> 8;
+	buf[idx++] = pC->Status.flagsStm32 >> 0;
 	
 	buf[idx++] = pC->Nic.si.devNumber >> 24;
 	buf[idx++] = pC->Nic.si.devNumber >> 16;
@@ -519,22 +521,62 @@ static void Config_SendTelemStmToPc(void)
 	buf[idx++] = pC->Nic.si.protClass >> 0;
 	buf[idx++] = pC->Nic.si.protConfClass >> 8;
 	buf[idx++] = pC->Nic.si.protConfClass >> 0;
-	buf[idx++] = pC->Nic.sscef.systemError >> 24;
-	buf[idx++] = pC->Nic.sscef.systemError >> 16;
-	buf[idx++] = pC->Nic.sscef.systemError >> 8;
-	buf[idx++] = pC->Nic.sscef.systemError >> 0;
-	buf[idx++] = pC->Nic.sscef.errorCounter >> 8;
-	buf[idx++] = pC->Nic.sscef.errorCounter >> 0;
-	buf[idx++] = pC->Nic.sscef.comError >> 24;
-	buf[idx++] = pC->Nic.sscef.comError >> 16;
-	buf[idx++] = pC->Nic.sscef.comError >> 8;
-	buf[idx++] = pC->Nic.sscef.comError >> 0;
-	buf[idx++] = pC->Nic.sscef.comStatus >> 24;
-	buf[idx++] = pC->Nic.sscef.comStatus >> 16;
-	buf[idx++] = pC->Nic.sscef.comStatus >> 8;
-	buf[idx++] = pC->Nic.sscef.comStatus >> 0;
-	buf[idx++] = pC->Nic.sscef.flagsSystem >> 8;
-	buf[idx++] = pC->Nic.sscef.flagsSystem >> 0;
+	
+	buf[idx++] = pC->Status.flagsMbrtu >> 8;
+	buf[idx++] = pC->Status.flagsMbrtu >> 0;
+	buf[idx++] = pC->Status.statBusMbrtuCounterError >> 8;
+	buf[idx++] = pC->Status.statBusMbrtuCounterError >> 0;
+	
+	buf[idx++] = pC->Status.flagsMbtcp >> 8;
+	buf[idx++] = pC->Status.flagsMbtcp >> 0;
+	buf[idx++] = pC->Status.statBusMbtcpCounterError >> 8;
+	buf[idx++] = pC->Status.statBusMbtcpCounterError >> 0;
+	buf[idx++] = pC->Status.statBusMbtcpSystemError >> 24;
+	buf[idx++] = pC->Status.statBusMbtcpSystemError >> 16;
+	buf[idx++] = pC->Status.statBusMbtcpSystemError >> 8;
+	buf[idx++] = pC->Status.statBusMbtcpSystemError >> 0;
+	buf[idx++] = pC->Status.statBusMbtcpComError >> 24;
+	buf[idx++] = pC->Status.statBusMbtcpComError >> 16;
+	buf[idx++] = pC->Status.statBusMbtcpComError >> 8;
+	buf[idx++] = pC->Status.statBusMbtcpComError >> 0;
+	buf[idx++] = pC->Status.statBusMbtcpComStatus >> 24;
+	buf[idx++] = pC->Status.statBusMbtcpComStatus >> 16;
+	buf[idx++] = pC->Status.statBusMbtcpComStatus >> 8;
+	buf[idx++] = pC->Status.statBusMbtcpComStatus >> 0;
+	
+	buf[idx++] = pC->Status.flagsPfbus >> 8;
+	buf[idx++] = pC->Status.flagsPfbus >> 0;
+	buf[idx++] = pC->Status.statBusPfbusCounterError >> 8;
+	buf[idx++] = pC->Status.statBusPfbusCounterError >> 0;
+	buf[idx++] = pC->Status.statBusPfbusSystemError >> 24;
+	buf[idx++] = pC->Status.statBusPfbusSystemError >> 16;
+	buf[idx++] = pC->Status.statBusPfbusSystemError >> 8;
+	buf[idx++] = pC->Status.statBusPfbusSystemError >> 0;
+	buf[idx++] = pC->Status.statBusPfbusComError >> 24;
+	buf[idx++] = pC->Status.statBusPfbusComError >> 16;
+	buf[idx++] = pC->Status.statBusPfbusComError >> 8;
+	buf[idx++] = pC->Status.statBusPfbusComError >> 0;
+	buf[idx++] = pC->Status.statBusPfbusComStatus >> 24;
+	buf[idx++] = pC->Status.statBusPfbusComStatus >> 16;
+	buf[idx++] = pC->Status.statBusPfbusComStatus >> 8;
+	buf[idx++] = pC->Status.statBusPfbusComStatus >> 0;
+	
+	buf[idx++] = pC->Status.flagsPfnet >> 8;
+	buf[idx++] = pC->Status.flagsPfnet >> 0;
+	buf[idx++] = pC->Status.statBusPfnetCounterError >> 8;
+	buf[idx++] = pC->Status.statBusPfnetCounterError >> 0;
+	buf[idx++] = pC->Status.statBusPfnetSystemError >> 24;
+	buf[idx++] = pC->Status.statBusPfnetSystemError >> 16;
+	buf[idx++] = pC->Status.statBusPfnetSystemError >> 8;
+	buf[idx++] = pC->Status.statBusPfnetSystemError >> 0;
+	buf[idx++] = pC->Status.statBusPfnetComError >> 24;
+	buf[idx++] = pC->Status.statBusPfnetComError >> 16;
+	buf[idx++] = pC->Status.statBusPfnetComError >> 8;
+	buf[idx++] = pC->Status.statBusPfnetComError >> 0;
+	buf[idx++] = pC->Status.statBusPfnetComStatus >> 24;
+	buf[idx++] = pC->Status.statBusPfnetComStatus >> 16;
+	buf[idx++] = pC->Status.statBusPfnetComStatus >> 8;
+	buf[idx++] = pC->Status.statBusPfnetComStatus >> 0;
 	
 	uint16_t crc = Config_Crc16(buf, idx);
 	buf[idx++] = crc >> 8;
@@ -552,14 +594,35 @@ static void Config_ReadConfReq(void)
 		Config_SendConfStmToPc();
 	}
 }
+static void Config_SendEcho(void)
+{
+	uint8_t* buf = pC->Mbs.bufwrite;
+	MBS_ClrStr(buf, MBS_BUFMAX);
+	uint32_t idx = 0;
+	buf[idx++] = 249;
+	buf[idx++] = 250;
+	buf[idx++] = 251;
+	buf[idx++] = 252;
+	buf[idx++] = 253;
+	buf[idx++] = (uint8_t)frameConfig_Echo;
+	
+	uint16_t crc = Config_Crc16(buf, idx);
+	buf[idx++] = crc >> 8;
+	buf[idx++] = crc >> 0;
+	
+	MBS_StartSending(idx);
+}
 static void Config_ReadConfPcToStm(void)
 {
 	uint8_t* buf = pC->Mbs.bufread;
-	uint16_t crc1 = Config_Crc16(buf, 606);
-	uint16_t crc2 = ((uint16_t)buf[606]<<8) + ((uint16_t)buf[607]<<0);
+	uint16_t crc1 = Config_Crc16(buf, 610);
+	uint16_t crc2 = ((uint16_t)buf[610]<<8) + ((uint16_t)buf[611]<<0);
 	if(crc1 == crc2)
 	{
 		uint32_t idx = 6;
+		
+		pC->Ee.wData[EeAdd_configWasUploaded] 					= (uint16_t)EE_CONFIGWASUPLOADED;
+		
 		pC->Ee.wData[EeAdd_stmProt] 										= buf[idx++];
 
 		pC->Ee.wData[EeAdd_mbrtuTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
@@ -567,6 +630,7 @@ static void Config_ReadConfPcToStm(void)
 		pC->Ee.wData[EeAdd_mbrtuDataSwap] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_mbrtuAddress] 								= buf[idx++];
 		pC->Ee.wData[EeAdd_mbrtuBaudrate] 							= buf[idx++];
+		pC->Ee.wData[EeAdd_mbrtuParity] 								= buf[idx++];
 		
 		pC->Ee.wData[EeAdd_mbtcpTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
@@ -584,17 +648,18 @@ static void Config_ReadConfPcToStm(void)
 		pC->Ee.wData[EeAdd_mbtcpGateway2] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_mbtcpGateway3] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_mbtcpSerwerCons] 						= buf[idx++];
-		pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutLow] 			= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
-		idx += 2;
+
 		pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutHigh] 		= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
-		pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutLow] 	= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
+		pC->Ee.wData[EeAdd_mbtcpSendAckTimeoutLow] 			= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutHigh] 	= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
-		pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutLow] 		= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
+		pC->Ee.wData[EeAdd_mbtcpConnectAckTimeoutLow] 	= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutHigh] 		= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
+		idx += 2;
+		pC->Ee.wData[EeAdd_mbtcpCloseAckTimeoutLow] 		= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		
 		pC->Ee.wData[EeAdd_pfbusTimeout] 								= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
@@ -638,7 +703,6 @@ static void Config_ReadConfPcToStm(void)
 		pC->Ee.wData[EeAdd_pfnetGateway1] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_pfnetGateway2] 							= buf[idx++];
 		pC->Ee.wData[EeAdd_pfnetGateway3] 							= buf[idx++];
-		
 		pC->Ee.wData[EeAdd_pfnetHardwareRevision] 			= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
 		idx += 2;
 		pC->Ee.wData[EeAdd_pfnetSoftwareRevision1] 			= ((uint16_t)buf[idx + 0] << 8) + ((uint16_t)buf[idx + 1] << 0);
@@ -649,7 +713,13 @@ static void Config_ReadConfPcToStm(void)
 		idx += 2;
 		pC->Ee.wData[EeAdd_pfnetSoftwareRevisionPrefix] = buf[idx++];
 		
-		Control_WriteConfigToFlash();
+		FLASH_Unlock();
+		EE_Init();
+		for(uint16_t i=0;i<EE_VARMAX;i++)
+			EE_WriteVariable(pC->Ee.VirtAddVarTab[i], pC->Ee.wData[i]);
+		FLASH_Lock();
+		
+		Config_SendEcho();
 	}
 }
 static void Config_ReadTelemReq(void)
@@ -660,6 +730,16 @@ static void Config_ReadTelemReq(void)
 	if(crc1 == crc2)
 	{
 		Config_SendTelemStmToPc();
+	}
+}
+static void Config_ReadEcho(void)
+{
+	uint8_t* buf = pC->Mbs.bufread;
+	uint16_t crc1 = Config_Crc16(buf, 6);
+	uint16_t crc2 = ((uint16_t)buf[6]<<8) + ((uint16_t)buf[7]<<0);
+	if(crc1 == crc2)
+	{
+		Config_SendEcho();
 	}
 }
 static void Config_ReadFrame(void)
@@ -676,6 +756,9 @@ static void Config_ReadFrame(void)
 		case frameConfig_TelemReq:
 			Config_ReadTelemReq();
 			break;
+		case frameConfig_Echo:
+			Config_ReadEcho();
+			break;
 		default:
 			break;
 	}
@@ -684,7 +767,7 @@ static void Config_ReadFrame(void)
 static void ReadFromUsart(void)
 {
 	uint8_t* buf = pC->Mbs.bufread;
-	if(buf[0] == 247 && buf[1] == 248 && buf[2] == 249 && buf[3] == 250 && buf[4] == 251)
+	if(buf[0] == 249 && buf[1] == 250 && buf[2] == 251 && buf[3] == 252 && buf[4] == 253)
 	{
 		Config_ReadFrame();
 	}
