@@ -25,7 +25,7 @@
 //MFE_NC 	= modbus function error - negative confirmation
 //MFE_PE 	= modbus function error - parity error
 typedef enum {false = 0, true = 1}eBool;
-typedef enum {workTypeStop = 0, workTypeConf = 1, workTypeRun = 2, workTypeError = 3}eWorkType;
+typedef enum {workTypeStop = 0, workTypeInit = 1, workTypeRun = 2, workTypeError = 3}eWorkType;
 typedef enum {Prot_Mbrtu = 0, Prot_Mbtcp, Prot_Pfbus, Prot_Pfnet}eProtocol;
 typedef enum 
 {
@@ -582,7 +582,7 @@ typedef struct
 }sControl;
 
 void delay_ms(uint32_t ms);
-void Control_WorkTypeConf(void);
+void Control_workTypeInit(void);
 eResult Control_WriteConfigToFlash(void);
 uint16_t Control_DataSwap(uint16_t in, eBool flag);
 

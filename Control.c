@@ -287,7 +287,7 @@ static void Control_LedAct(void)
 		LED1_OFF;
 		pC->Mode.ledTime = 0;
 	}
-	else if(pC->Mode.workType == workTypeConf)
+	else if(pC->Mode.workType == workTypeInit)
 	{
 		LED1_OFF;
 		pC->Mode.ledTime = 0;
@@ -329,25 +329,26 @@ static void Control_CheckStatus(void)
 		pC->Status.flagNicComTimeoutError = false;
 	
 	if(pC->Status.flagBusMbrtuRunning == true)
+	{
 		pC->Mbs.time++;
-	if(pC->Mbs.time >= pC->Mbs.timeout)
-	{
-		if(pC->Status.flagBusMbrtuErrorTimeout == false)
+		if(pC->Mbs.time >= pC->Mbs.timeout)
 		{
-			pC->Status.statBusMbrtuCounterError++;
+			if(pC->Status.flagBusMbrtuErrorTimeout == false)
+			{
+				pC->Status.statBusMbrtuCounterError++;
+			}
+			pC->Mbs.time = pC->Mbs.timeout;
+			pC->Status.flagBusMbrtuErrorTimeout = true;
 		}
-		pC->Mbs.time = pC->Mbs.timeout;
-		pC->Status.flagBusMbrtuErrorTimeout = true;
+		else
+		{
+			pC->Status.flagBusMbrtuErrorTimeout = false;
+		}
+		if(pC->Status.flagBusMbrtuErrorTimeout || pC->Status.flagBusMbrtuErrorIllegalFunction || pC->Status.flagBusMbrtuErrorIllegalDataRange)
+			pC->Status.flagBusMbrtuError = true;
+		else
+			pC->Status.flagBusMbrtuError = false;
 	}
-	else
-	{
-		pC->Status.flagBusMbrtuErrorTimeout = false;
-	}
-	
-	if(pC->Status.flagBusMbrtuErrorTimeout || pC->Status.flagBusMbrtuErrorIllegalFunction || pC->Status.flagBusMbrtuErrorIllegalDataRange)
-		pC->Status.flagBusMbrtuError = true;
-	else
-		pC->Status.flagBusMbrtuError = false;
 	
 	if(pC->Status.flagBusMbtcpCorrectModule == true)
 	{
@@ -1388,7 +1389,7 @@ static void Control_ErrorProfiNET(void)
 	}
 }
 //*******************************************************************************
-void Control_WorkTypeConf(void)
+void Control_workTypeInit(void)
 {
 	eResult result = RES_OK;
 	pC->Mode.workType = workTypeStop;
@@ -1410,7 +1411,7 @@ void Control_WorkTypeConf(void)
 		return;
 	}
 	
-	pC->Mode.workType = workTypeConf;
+	pC->Mode.workType = workTypeInit;
 	delay_ms(300);
 	
 	for(uint8_t i=0;i<3;i++)
